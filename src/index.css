@@ -23,8 +23,8 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 51 100% 50%;
-    --accent-foreground: 51 100% 10%;
+    --accent: 263 81% 65%;
+    --accent-foreground: 263 81% 95%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -53,8 +53,7 @@
     
     /* Custom colors for BradHub */
     --brad-purple: 251 81% 75%;
-    --brad-yellow: 51 100% 50%;
-    --brad-dark: 230 24% 15%;
+    --brad-accent: 263 81% 65%;
   }
 
   .dark {
@@ -128,8 +127,14 @@
     animation: pulse-glow 2s infinite;
   }
   
+  @keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    50% { transform: translateX(100%) rotate(45deg); }
+    100% { transform: translateX(-100%) rotate(45deg); }
+  }
+  
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#FFD700];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#a990ff];
   }
 }
 

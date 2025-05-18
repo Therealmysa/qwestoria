@@ -76,7 +76,7 @@ const Index = () => {
                 }}
               />
               <motion.div
-                className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-[#FFD700]/10 blur-3xl"
+                className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-[#7654d3]/10 blur-3xl"
                 animate={{
                   scale: [1.2, 1, 1.2],
                   opacity: [0.3, 0.5, 0.3]
@@ -102,7 +102,7 @@ const Index = () => {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mb-4 text-center text-4xl font-bold bg-gradient-to-br from-white via-[#FFD700] to-[#9b87f5] bg-clip-text text-transparent md:text-5xl lg:text-6xl"
+              className="mb-4 text-center text-4xl font-bold bg-gradient-to-br from-white via-[#c8bcff] to-[#9b87f5] bg-clip-text text-transparent md:text-5xl lg:text-6xl"
             >
               La communauté Fortnite
             </motion.h1>
@@ -124,7 +124,7 @@ const Index = () => {
               className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
             >
               <Link to="/missions">
-                <Button className="min-w-[160px] bg-gradient-to-r from-[#9b87f5] to-[#FFD700] text-white hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#9b87f5]/30 rounded-full px-6">
+                <Button className="min-w-[160px] bg-gradient-to-r from-[#9b87f5] to-[#7654d3] text-white hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#9b87f5]/30 rounded-full px-6">
                   Voir les missions
                 </Button>
               </Link>
@@ -164,7 +164,7 @@ const Index = () => {
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                   className="rounded-xl bg-gradient-to-br from-[#221F26]/80 to-[#221F26]/40 backdrop-blur-sm p-6 shadow-lg border border-[#9b87f5]/10 hover:border-[#9b87f5]/30 transition-all duration-300"
                 >
-                  <div className="mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#FFD700] p-3 text-center text-white shadow-inner">
+                  <div className="mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#7654d3] p-3 text-center text-white shadow-inner">
                     {item.icon}
                   </div>
                   <h3 className="mb-2 text-xl font-semibold text-white">{item.title}</h3>
@@ -179,7 +179,7 @@ const Index = () => {
 
         {/* CTA Section */}
         <section className="px-4 py-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/80 to-[#FFD700]/80 skew-y-3 transform -translate-y-12"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/80 to-[#7654d3]/80 skew-y-3 transform -translate-y-12"></div>
           <div className="container mx-auto flex flex-col items-center text-center relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -209,7 +209,7 @@ const Index = () => {
               viewport={{ once: true }}
             >
               <Link to="/auth">
-                <Button className="bg-white font-semibold text-[#9b87f5] hover:bg-gray-100 rounded-full px-6 shadow-lg">
+                <Button className="bg-white font-semibold text-[#7654d3] hover:bg-gray-100 rounded-full px-6 shadow-lg">
                   Créer un compte
                 </Button>
               </Link>
