@@ -1,7 +1,8 @@
 
 import { ReactNode } from "react";
-import Navbar from "./Navbar";
+import MainNavigation from "./MainNavigation";
 import Footer from "./Footer";
+import { motion } from "framer-motion";
 
 interface LayoutProps {
   children: ReactNode;
@@ -9,9 +10,16 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex min-h-screen flex-col bg-[#1A1F2C]">
-      <Navbar />
-      <main className="flex-1">{children}</main>
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#1A1F2C] to-[#2A243C]">
+      <MainNavigation />
+      <motion.main 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex-1"
+      >
+        {children}
+      </motion.main>
       <Footer />
     </div>
   );
