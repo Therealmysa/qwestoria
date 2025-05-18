@@ -1,25 +1,32 @@
-import { useLocation } from "react-router-dom";
+
 import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
-  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
+    const timer = setTimeout(() => {
+      navigate("/");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#1A1F2C] to-[#221F26] p-4 text-center text-white">
+      <h1 className="mb-4 text-6xl font-bold text-[#9b87f5]">404</h1>
+      <h2 className="mb-6 text-2xl font-semibold">Page non trouvée</h2>
+      <p className="mb-8 max-w-md text-gray-300">
+        Oups ! La page que vous recherchez n'existe pas ou a été déplacée.
+        Vous serez redirigé vers la page d'accueil dans quelques secondes...
+      </p>
+      <Link to="/">
+        <Button className="bg-[#9b87f5] text-white hover:bg-[#7E69AB]">
+          Retour à l'accueil
+        </Button>
+      </Link>
     </div>
   );
 };

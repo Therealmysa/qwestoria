@@ -9,7 +9,199 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      brad_coins: {
+        Row: {
+          balance: number
+          id: string
+          last_updated: string | null
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          id?: string
+          last_updated?: string | null
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          id?: string
+          last_updated?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brad_coins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mission_submissions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string | null
+          fortnite_username: string
+          id: string
+          mission_id: string
+          screenshot_url: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string | null
+          fortnite_username: string
+          id?: string
+          mission_id: string
+          screenshot_url?: string | null
+          status: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string | null
+          fortnite_username?: string
+          id?: string
+          mission_id?: string
+          screenshot_url?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_submissions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      missions: {
+        Row: {
+          created_at: string | null
+          description: string
+          ends_at: string | null
+          external_link: string | null
+          id: string
+          is_vip_only: boolean | null
+          reward_coins: number
+          starts_at: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          ends_at?: string | null
+          external_link?: string | null
+          id?: string
+          is_vip_only?: boolean | null
+          reward_coins: number
+          starts_at?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          ends_at?: string | null
+          external_link?: string | null
+          id?: string
+          is_vip_only?: boolean | null
+          reward_coins?: number
+          starts_at?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          fortnite_rank: string | null
+          fortnite_username: string | null
+          id: string
+          is_admin: boolean | null
+          is_vip: boolean | null
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          fortnite_rank?: string | null
+          fortnite_username?: string | null
+          id: string
+          is_admin?: boolean | null
+          is_vip?: boolean | null
+          updated_at?: string | null
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          fortnite_rank?: string | null
+          fortnite_username?: string | null
+          id?: string
+          is_admin?: boolean | null
+          is_vip?: boolean | null
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description: string
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
