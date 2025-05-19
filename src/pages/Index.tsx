@@ -76,13 +76,25 @@ const Index = () => {
                 }}
               />
               <motion.div
-                className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-[#7654d3]/10 blur-3xl"
+                className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-[#f1c40f]/10 blur-3xl"
                 animate={{
                   scale: [1.2, 1, 1.2],
                   opacity: [0.3, 0.5, 0.3]
                 }}
                 transition={{
                   duration: 10,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div
+                className="absolute top-40 left-20 w-64 h-64 rounded-full bg-[#4ecdc4]/10 blur-3xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.2, 0.4, 0.2]
+                }}
+                transition={{
+                  duration: 12,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
@@ -102,7 +114,7 @@ const Index = () => {
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mb-4 text-center text-4xl font-bold bg-gradient-to-br from-white via-[#c8bcff] to-[#9b87f5] bg-clip-text text-transparent md:text-5xl lg:text-6xl"
+              className="mb-4 text-center text-4xl font-bold bg-gradient-to-br from-white via-[#f1c40f] to-[#9b87f5] bg-clip-text text-transparent md:text-5xl lg:text-6xl"
             >
               La communauté Fortnite
             </motion.h1>
@@ -121,7 +133,7 @@ const Index = () => {
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.6 }}
-              className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
+              className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 justify-center"
             >
               <Link to="/missions">
                 <Button className="min-w-[160px] bg-gradient-to-r from-[#9b87f5] to-[#7654d3] text-white hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#9b87f5]/30 rounded-full px-6">
@@ -129,7 +141,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Link to="/auth">
-                <Button className="min-w-[160px] border border-[#9b87f5] bg-transparent text-[#9b87f5] hover:bg-[#9b87f5]/20 rounded-full px-6">
+                <Button className="min-w-[160px] border border-[#f1c40f] bg-transparent text-[#f1c40f] hover:bg-[#f1c40f]/10 rounded-full px-6">
                   Rejoindre maintenant
                 </Button>
               </Link>
@@ -145,7 +157,7 @@ const Index = () => {
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              className="mb-8 text-center text-3xl font-bold text-[#9b87f5]"
+              className="mb-8 text-center text-3xl font-bold text-gradient"
             >
               Fonctionnalités principales
             </motion.h2>
@@ -164,7 +176,7 @@ const Index = () => {
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
                   className="rounded-xl bg-gradient-to-br from-[#221F26]/80 to-[#221F26]/40 backdrop-blur-sm p-6 shadow-lg border border-[#9b87f5]/10 hover:border-[#9b87f5]/30 transition-all duration-300"
                 >
-                  <div className="mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-[#9b87f5] to-[#7654d3] p-3 text-center text-white shadow-inner">
+                  <div className="mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-[#4ecdc4] to-[#2ecc71] p-3 text-center text-white shadow-inner">
                     {item.icon}
                   </div>
                   <h3 className="mb-2 text-xl font-semibold text-white">{item.title}</h3>
@@ -179,7 +191,7 @@ const Index = () => {
 
         {/* CTA Section */}
         <section className="px-4 py-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/80 to-[#7654d3]/80 skew-y-3 transform -translate-y-12"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/60 via-[#f1c40f]/60 to-[#4ecdc4]/60 skew-y-3 transform -translate-y-12"></div>
           <div className="container mx-auto flex flex-col items-center text-center relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}

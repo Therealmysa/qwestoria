@@ -78,14 +78,15 @@ const MainNavigation = () => {
         </Button>
       </DrawerTrigger>
       <DrawerContent className="bg-gradient-to-r from-[#1A1F2C] to-[#2A243C] border-t border-[#9b87f5]/20">
-        <div className="flex justify-end px-4 pt-4">
+        <div className="flex justify-between items-center px-4 pt-4 border-b border-[#9b87f5]/20 pb-3">
+          <BradHubLogo size="sm" />
           <DrawerClose asChild>
             <Button size="icon" variant="ghost" className="text-gray-200">
               <X className="h-5 w-5" />
             </Button>
           </DrawerClose>
         </div>
-        <div className="px-4 pb-6">
+        <div className="px-4 pb-6 pt-2">
           <nav className="flex flex-col space-y-1">
             {menuItems.map((item) => (
               <DrawerClose key={item.name} asChild>
@@ -196,9 +197,6 @@ const MainNavigation = () => {
             </NavigationMenu>
           </div>
 
-          {/* Mobile Menu Trigger - using Drawer component */}
-          <MobileMenu />
-
           {/* Auth Controls - always on the far right */}
           {!loading && (
             user ? (
@@ -252,6 +250,11 @@ const MainNavigation = () => {
               </Link>
             )
           )}
+          
+          {/* Mobile Menu Trigger - moved to be the last element */}
+          <div className="md:hidden">
+            <MobileMenu />
+          </div>
         </div>
       </div>
     </nav>
