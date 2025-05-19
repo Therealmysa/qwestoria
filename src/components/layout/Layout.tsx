@@ -10,7 +10,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-[#1A1F2C] to-[#2A243C]">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C]">
       <MainNavigation />
       <motion.main 
         initial={{ opacity: 0, y: 20 }}

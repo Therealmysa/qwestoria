@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,25 +36,18 @@
     --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
     
     /* Custom colors for BradHub */
     --brad-purple: 251 81% 75%;
     --brad-accent: 263 81% 65%;
-    --brad-yellow: 48 100% 51%;
+    --brad-yellow: 45 93% 60%;
     --brad-orange: 27 96% 61%;
     --brad-teal: 174 72% 56%;
   }
@@ -77,8 +71,8 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 51 100% 50%;
-    --accent-foreground: 51 100% 10%;
+    --accent: 45 93% 60%;
+    --accent-foreground: 45 93% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
@@ -135,8 +129,26 @@
     100% { transform: translateX(-100%) rotate(45deg); }
   }
   
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce 3s ease-in-out infinite;
+  }
+  
+  @keyframes glow {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(255, 170, 0, 0.7)); }
+    50% { filter: drop-shadow(0 0 15px rgba(255, 170, 0, 0.9)); }
+  }
+  
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite;
+  }
+  
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-[#f1c40f];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] to-amber-500;
   }
   
   .text-gradient-purple {
@@ -145,6 +157,10 @@
   
   .text-gradient-teal {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#4ecdc4] to-[#26c6da];
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-purple-400/20 hover:-translate-y-1;
   }
 }
 
@@ -155,7 +171,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-[#1A1F2C];
+  @apply bg-gray-100 dark:bg-[#1A1F2C];
 }
 
 ::-webkit-scrollbar-thumb {
