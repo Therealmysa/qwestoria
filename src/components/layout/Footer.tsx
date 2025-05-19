@@ -1,7 +1,31 @@
 
 import { Link } from "react-router-dom";
+import { Facebook, Instagram, Tiktok, Twitch } from "lucide-react";
 
 const Footer = () => {
+  const socialLinks = [
+    { 
+      name: "TikTok", 
+      url: "https://www.tiktok.com/@bradcon_tv",
+      icon: <Tiktok className="mr-2 h-4 w-4" />
+    },
+    { 
+      name: "Twitch", 
+      url: "https://www.twitch.tv/bradcon91",
+      icon: <Twitch className="mr-2 h-4 w-4" />
+    },
+    { 
+      name: "Snapchat", 
+      url: "https://www.snapchat.com/add/bradcontv",
+      icon: <img src="/snapchat-icon.svg" alt="Snapchat" className="mr-2 h-4 w-4" />
+    },
+    { 
+      name: "Instagram", 
+      url: "https://www.instagram.com/eymeric.alt/",
+      icon: <Instagram className="mr-2 h-4 w-4" />
+    },
+  ];
+
   return (
     <footer className="bg-[#221F26] py-8 text-gray-300">
       <div className="container mx-auto px-4">
@@ -41,38 +65,21 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="mb-4 font-semibold text-white">Community</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a 
-                  href="https://tiktok.com/@bradcon91" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-[#9b87f5]"
-                >
-                  TikTok
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-[#9b87f5]"
-                >
-                  Discord
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-[#9b87f5]"
-                >
-                  Instagram
-                </a>
-              </li>
+            <h4 className="mb-4 font-semibold text-white">Réseaux sociaux</h4>
+            <ul className="space-y-3 text-sm">
+              {socialLinks.map((link) => (
+                <li key={link.name}>
+                  <a 
+                    href={link.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center hover:text-[#9b87f5] transition-colors"
+                  >
+                    {link.icon}
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           
