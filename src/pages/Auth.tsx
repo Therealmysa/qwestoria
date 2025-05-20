@@ -43,15 +43,6 @@ const Auth = () => {
     },
   });
 
-  // Réinitialiser le formulaire quand on change entre login et inscription
-  useEffect(() => {
-    form.reset({
-      email: "",
-      password: "",
-      username: "",
-    });
-  }, [isLogin, form]);
-
   const socialLinks = [
     { 
       name: "TikTok", 
@@ -76,20 +67,18 @@ const Auth = () => {
   ];
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Tentative de connexion avec:", values);
     setLoading(true);
 
     try {
       if (isLogin) {
         // Sign in
-        const { error, data } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: values.email,
           password: values.password,
         });
 
         if (error) throw error;
-        
-        console.log("Connexion réussie:", data);
+
         toast.success("Connexion réussie !");
         navigate("/dashboard");
       } else {
@@ -112,7 +101,6 @@ const Auth = () => {
         setIsLogin(true);
       }
     } catch (error: any) {
-      console.error("Erreur d'authentification:", error);
       toast.error(error.message || "Une erreur est survenue");
     } finally {
       setLoading(false);
@@ -133,14 +121,6 @@ const Auth = () => {
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1 }
-  };
-
-  // Helper function pour débogage - sera appelée lorsqu'on clique sur le bouton
-  const debugFormSubmission = () => {
-    console.log("Bouton cliqué");
-    console.log("Valeurs du formulaire:", form.getValues());
-    console.log("État de validation:", form.formState.isValid);
-    console.log("Erreurs:", form.formState.errors);
   };
 
   return (
@@ -174,97 +154,103 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
 
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            console.log("Formulaire soumis directement");
-            debugFormSubmission();
-            form.handleSubmit(handleSubmit)(e);
-          }}>
-            <CardContent className="space-y-4">
-              {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-sm font-medium text-gray-300">
-                    Nom d'utilisateur
-                  </Label>
-                  <Input
-                    id="username"
-                    placeholder="Votre pseudo"
-                    className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                    {...form.register("username")}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <CardContent className="space-y-4">
+                {!isLogin && (
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-300">
+                          Nom d'utilisateur
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Votre pseudo"
+                            className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {form.formState.errors.username && (
-                    <p className="text-sm font-medium text-destructive">
-                      {form.formState.errors.username.message}
-                    </p>
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-300">
+                        Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="votre@email.com"
+                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-300">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                  {...form.register("email")}
                 />
-                {form.formState.errors.email && (
-                  <p className="text-sm font-medium text-destructive">
-                    {form.formState.errors.email.message}
-                  </p>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-300">
-                  Mot de passe
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                  {...form.register("password")}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-gray-300">
+                        Mot de passe
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder="••••••••"
+                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {form.formState.errors.password && (
-                  <p className="text-sm font-medium text-destructive">
-                    {form.formState.errors.password.message}
-                  </p>
-                )}
-              </div>
-            </CardContent>
+              </CardContent>
 
-            <CardFooter className="flex flex-col space-y-4">
-              <Button
-                type="submit"
-                className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-amber-500 text-white transition-all hover:from-[#8A76E5] hover:to-amber-600"
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <>
-                    {isLogin ? "Se connecter" : "S'inscrire"}
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </Button>
+              <CardFooter className="flex flex-col space-y-4">
+                <Button
+                  type="submit"
+                  className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-amber-500 text-white transition-all hover:from-[#8A76E5] hover:to-amber-600"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      {isLogin ? "Se connecter" : "S'inscrire"}
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
 
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-[#9b87f5] hover:bg-[#1A1F2C] hover:text-white"
-                onClick={() => setIsLogin(!isLogin)}
-              >
-                {isLogin
-                  ? "Pas encore de compte ? S'inscrire"
-                  : "Déjà un compte ? Se connecter"}
-              </Button>
-            </CardFooter>
-          </form>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full text-[#9b87f5] hover:bg-[#1A1F2C] hover:text-white"
+                  onClick={() => setIsLogin(!isLogin)}
+                >
+                  {isLogin
+                    ? "Pas encore de compte ? S'inscrire"
+                    : "Déjà un compte ? Se connecter"}
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
         </Card>
 
         <motion.div variants={itemVariants} className="mt-8">
