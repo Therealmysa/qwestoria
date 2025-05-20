@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import Layout from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Transactions from "@/components/Transactions";
+import { Coins, CheckCircle2, XCircle, Clock3 } from "lucide-react";
 
 interface BradCoin {
   balance: number;
@@ -74,6 +76,19 @@ const Dashboard = () => {
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Clock3 className="h-4 w-4 text-yellow-300" />;
+      case "verified":
+        return <CheckCircle2 className="h-4 w-4 text-green-300" />;
+      case "rejected":
+        return <XCircle className="h-4 w-4 text-red-300" />;
+      default:
+        return null;
+    }
+  };
+
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "pending":
@@ -106,7 +121,6 @@ const Dashboard = () => {
   };
 
   return (
-    // <Layout>
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold text-[#9b87f5]">
         Tableau de bord
@@ -123,20 +137,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="flex items-center">
               <span className="mr-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#9b87f5]/20">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="#9b87f5"
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
+                <Coins className="h-5 w-5 text-[#9b87f5]" />
               </span>
               <span className="text-2xl font-bold">
                 {isLoading ? "..." : coins}
@@ -145,7 +146,10 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Add more dashboard cards here as needed */}
+        {/* Transactions Card - using the new Transactions component */}
+        <div className="lg:col-span-2">
+          <Transactions />
+        </div>
       </div>
 
       {/* Recent Submissions */}
