@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const formSchema = z.object({
   email: z.string().email("Entrez un email valide"),
@@ -24,6 +25,14 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Rediriger si l'utilisateur est déjà connecté
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,18 +139,18 @@ const Auth = () => {
             <div className="absolute h-10 w-10 rounded-full bg-gradient-to-r from-[#9b87f5] to-amber-400 shadow-inner"></div>
             <span className="relative text-lg font-bold text-white">BC</span>
           </div>
-          <h1 className="ml-3 text-3xl font-bold text-gradient">BradHub</h1>
+          <h1 className="ml-3 text-3xl font-bold text-gradient">BradFlow</h1>
         </motion.div>
 
         <Card className="border-[#9b87f5] bg-[#221F26] text-white shadow-xl shadow-[#9b87f5]/10">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-[#9b87f5]">
-              {isLogin ? "Connexion" : "Inscription"} à BradHub
+              {isLogin ? "Connexion" : "Inscription"} à BradFlow
             </CardTitle>
             <CardDescription className="text-gray-300">
               {isLogin
                 ? "Accédez à votre compte"
-                : "Rejoignez la communauté BradHub"}
+                : "Rejoignez la communauté BradFlow"}
             </CardDescription>
           </CardHeader>
 
