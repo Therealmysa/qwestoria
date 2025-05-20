@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Coins } from "lucide-react";
 
