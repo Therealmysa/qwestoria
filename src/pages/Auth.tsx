@@ -135,6 +135,14 @@ const Auth = () => {
     visible: { y: 0, opacity: 1 }
   };
 
+  // Helper function pour débogage - sera appelée lorsqu'on clique sur le bouton
+  const debugFormSubmission = () => {
+    console.log("Bouton cliqué");
+    console.log("Valeurs du formulaire:", form.getValues());
+    console.log("État de validation:", form.formState.isValid);
+    console.log("Erreurs:", form.formState.errors);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#1A1F2C] to-[#221F26] p-4">
       <motion.div 
@@ -166,103 +174,97 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <CardContent className="space-y-4">
-                {!isLogin && (
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-300">
-                          Nom d'utilisateur
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Votre pseudo"
-                            className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            console.log("Formulaire soumis directement");
+            debugFormSubmission();
+            form.handleSubmit(handleSubmit)(e);
+          }}>
+            <CardContent className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-sm font-medium text-gray-300">
+                    Nom d'utilisateur
+                  </Label>
+                  <Input
+                    id="username"
+                    placeholder="Votre pseudo"
+                    className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                    {...form.register("username")}
                   />
+                  {form.formState.errors.username && (
+                    <p className="text-sm font-medium text-destructive">
+                      {form.formState.errors.username.message}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-300">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                  {...form.register("email")}
+                />
+                {form.formState.errors.email && (
+                  <p className="text-sm font-medium text-destructive">
+                    {form.formState.errors.email.message}
+                  </p>
                 )}
+              </div>
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-300">
-                        Email
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="email"
-                          placeholder="votre@email.com"
-                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-300">
+                  Mot de passe
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                  {...form.register("password")}
                 />
+                {form.formState.errors.password && (
+                  <p className="text-sm font-medium text-destructive">
+                    {form.formState.errors.password.message}
+                  </p>
+                )}
+              </div>
+            </CardContent>
 
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-300">
-                        Mot de passe
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="••••••••"
-                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-amber-500 text-white transition-all hover:from-[#8A76E5] hover:to-amber-600"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    {isLogin ? "Se connecter" : "S'inscrire"}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
 
-              <CardFooter className="flex flex-col space-y-4">
-                <Button
-                  type="submit"
-                  className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-amber-500 text-white transition-all hover:from-[#8A76E5] hover:to-amber-600"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      {isLogin ? "Se connecter" : "S'inscrire"}
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full text-[#9b87f5] hover:bg-[#1A1F2C] hover:text-white"
-                  onClick={() => setIsLogin(!isLogin)}
-                >
-                  {isLogin
-                    ? "Pas encore de compte ? S'inscrire"
-                    : "Déjà un compte ? Se connecter"}
-                </Button>
-              </CardFooter>
-            </form>
-          </Form>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-[#9b87f5] hover:bg-[#1A1F2C] hover:text-white"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin
+                  ? "Pas encore de compte ? S'inscrire"
+                  : "Déjà un compte ? Se connecter"}
+              </Button>
+            </CardFooter>
+          </form>
         </Card>
 
         <motion.div variants={itemVariants} className="mt-8">

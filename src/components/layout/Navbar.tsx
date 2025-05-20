@@ -12,15 +12,22 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
+      console.log("Tentative de déconnexion");
       await supabase.auth.signOut();
       toast.success("Déconnexion réussie");
       navigate("/");
     } catch (error: any) {
+      console.error("Erreur lors de la déconnexion:", error);
       toast.error(
         error.message || "Une erreur est survenue lors de la déconnexion"
       );
     }
   };
+
+  // Débogage de l'état d'authentification
+  useEffect(() => {
+    console.log("État d'authentification dans Navbar:", { user, loading });
+  }, [user, loading]);
 
   return (
     <nav className="sticky top-0 z-50 bg-[#1A1F2C] px-4 py-3 shadow-md">

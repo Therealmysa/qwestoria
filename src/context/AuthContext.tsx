@@ -27,8 +27,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Initialisation de AuthProvider");
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Auth state change event:", event);
+        console.log("Session update:", session ? "Session active" : "Pas de session");
+        
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -42,6 +47,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Initial session fetch
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session fetch:", session ? "Session trouvée" : "Pas de session");
+      
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -57,6 +64,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log("Récupération du profil utilisateur:", userId);
+      
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -67,6 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
+      console.log("Profil récupéré:", data);
       setProfile(data);
     } catch (error) {
       console.error("Error fetching profile:", error);
