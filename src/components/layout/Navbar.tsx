@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,9 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -30,7 +31,9 @@ const Navbar = () => {
       toast.success("Déconnexion réussie");
       navigate("/");
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue lors de la déconnexion");
+      toast.error(
+        error.message || "Une erreur est survenue lors de la déconnexion"
+      );
     }
   };
 
@@ -38,27 +41,41 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-[#1A1F2C] px-4 py-3 shadow-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-[#9b87f5]">BradHub</span>
+          <span className="text-2xl font-bold text-[#9b87f5]">BradFlow</span>
         </Link>
 
         <div className="hidden space-x-4 md:flex">
-          <Link to="/" className="text-gray-200 hover:text-[#9b87f5]">Accueil</Link>
-          <Link to="/missions" className="text-gray-200 hover:text-[#9b87f5]">Missions</Link>
-          <Link to="/shop" className="text-gray-200 hover:text-[#9b87f5]">Boutique</Link>
-          <Link to="/leaderboard" className="text-gray-200 hover:text-[#9b87f5]">Classement</Link>
+          <Link to="/" className="text-gray-200 hover:text-[#9b87f5]">
+            Accueil
+          </Link>
+          <Link to="/missions" className="text-gray-200 hover:text-[#9b87f5]">
+            Missions
+          </Link>
+          <Link to="/shop" className="text-gray-200 hover:text-[#9b87f5]">
+            Boutique
+          </Link>
+          <Link
+            to="/leaderboard"
+            className="text-gray-200 hover:text-[#9b87f5]"
+          >
+            Classement
+          </Link>
         </div>
 
         <div className="flex items-center space-x-2">
-          {!loading && (
-            user ? (
+          {!loading &&
+            (user ? (
               <div className="flex items-center space-x-2">
                 <Link to="/dashboard">
-                  <Button variant="ghost" className="text-[#9b87f5] hover:bg-[#9b87f5]/20">
+                  <Button
+                    variant="ghost"
+                    className="text-[#9b87f5] hover:bg-[#9b87f5]/20"
+                  >
                     Dashboard
                   </Button>
                 </Link>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="text-white hover:bg-red-500/20 hover:text-red-300"
                   onClick={handleLogout}
                 >
@@ -71,8 +88,7 @@ const Navbar = () => {
                   Connexion
                 </Button>
               </Link>
-            )
-          )}
+            ))}
         </div>
       </div>
     </nav>

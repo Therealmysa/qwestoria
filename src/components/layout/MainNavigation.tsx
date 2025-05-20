@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,7 +25,12 @@ import BradHubLogo from "../BradHubLogo";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { cn } from "@/lib/utils";
 import { Menu, X, ChevronDown, User as UserIcon, LogOut } from "lucide-react";
-import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  DrawerClose,
+} from "@/components/ui/drawer";
 
 const MainNavigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -35,7 +39,9 @@ const MainNavigation = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -53,7 +59,9 @@ const MainNavigation = () => {
       toast.success("Déconnexion réussie");
       navigate("/");
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue lors de la déconnexion");
+      toast.error(
+        error.message || "Une erreur est survenue lors de la déconnexion"
+      );
     }
   };
 
@@ -62,7 +70,7 @@ const MainNavigation = () => {
     { name: "Missions", path: "/missions" },
     { name: "Boutique", path: "/shop" },
     { name: "Classement", path: "/leaderboard" },
-    { name: "Coéquipiers", path: "/teammates" }
+    { name: "Coéquipiers", path: "/teammates" },
   ];
 
   // Mobile drawer menu component
@@ -70,7 +78,7 @@ const MainNavigation = () => {
     <Drawer>
       <DrawerTrigger asChild>
         <Button
-          variant="ghost" 
+          variant="ghost"
           size="icon"
           className="md:hidden text-gray-200 hover:bg-[#9b87f5]/20 hover:text-[#9b87f5]"
         >
@@ -81,9 +89,15 @@ const MainNavigation = () => {
       <DrawerContent className="bg-white dark:bg-gradient-to-r dark:from-[#1A1F2C] dark:to-[#2A243C] border-t border-purple-400/20">
         <div className="flex justify-between items-center px-4 pt-4 border-b border-purple-400/20 pb-3">
           <BradHubLogo size="sm" />
-          <div className="text-lg font-semibold ml-2 text-gradient">BradHub</div>
+          <div className="text-lg font-semibold ml-2 text-gradient">
+            BradFlow
+          </div>
           <DrawerClose asChild>
-            <Button size="icon" variant="ghost" className="text-gray-700 dark:text-gray-200">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-gray-700 dark:text-gray-200"
+            >
               <X className="h-5 w-5" />
             </Button>
           </DrawerClose>
@@ -152,8 +166,8 @@ const MainNavigation = () => {
                       <NavigationMenuLink
                         className={cn(
                           "px-3 py-2 text-sm rounded-full transition-colors hover:bg-purple-500/10 hover:text-purple-600 dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5]",
-                          location.pathname === item.path 
-                            ? "bg-purple-500/10 text-purple-600 font-medium dark:bg-[#9b87f5]/20 dark:text-[#9b87f5]" 
+                          location.pathname === item.path
+                            ? "bg-purple-500/10 text-purple-600 font-medium dark:bg-[#9b87f5]/20 dark:text-[#9b87f5]"
                             : "text-gray-700 dark:text-gray-200"
                         )}
                       >
@@ -163,7 +177,7 @@ const MainNavigation = () => {
                   </NavigationMenuItem>
                 ))}
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger 
+                  <NavigationMenuTrigger
                     className="px-3 py-2 text-sm rounded-full text-gray-700 hover:bg-purple-500/10 hover:text-purple-600 
                              data-[state=open]:bg-purple-500/10 data-[state=open]:text-purple-600 
                              dark:text-gray-200 dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5] 
@@ -210,12 +224,12 @@ const MainNavigation = () => {
           <ThemeToggle />
 
           {/* Auth Controls - always on the far right */}
-          {!loading && (
-            user ? (
+          {!loading &&
+            (user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="rounded-full flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-purple-500/30 text-gray-700 dark:text-white hover:from-purple-500/20 hover:to-purple-500/40 dark:hover:from-[#9b87f5]/20 dark:hover:to-[#9b87f5]/40 transition-all duration-300"
                   >
                     <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 dark:from-[#9b87f5] dark:to-[#7654d3] flex items-center justify-center text-white">
@@ -225,28 +239,33 @@ const MainNavigation = () => {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#221F26] text-gray-700 dark:text-white border-purple-400/20">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 bg-white dark:bg-[#221F26] text-gray-700 dark:text-white border-purple-400/20"
+                >
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium">Mon compte</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{user.email}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-purple-400/20" />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="hover:bg-purple-500/10 hover:text-purple-600 dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5] cursor-pointer"
                     onClick={() => navigate("/dashboard")}
                   >
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="hover:bg-purple-500/10 hover:text-purple-600 dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5] cursor-pointer"
                     onClick={() => navigate("/profile")}
                   >
                     Mon profil
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-purple-400/20" />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="text-red-500 hover:bg-red-500/10 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-500/20 dark:hover:text-red-300 cursor-pointer"
                     onClick={handleLogout}
                   >
@@ -260,9 +279,8 @@ const MainNavigation = () => {
                   Connexion
                 </Button>
               </Link>
-            )
-          )}
-          
+            ))}
+
           {/* Mobile Menu Trigger - moved to be the last element */}
           <div className="md:hidden">
             <MobileMenu />
