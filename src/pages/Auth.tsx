@@ -43,6 +43,15 @@ const Auth = () => {
     },
   });
 
+  // Réinitialiser le formulaire quand on change entre login et inscription
+  useEffect(() => {
+    form.reset({
+      email: "",
+      password: "",
+      username: "",
+    });
+  }, [isLogin, form]);
+
   const socialLinks = [
     { 
       name: "TikTok", 
@@ -67,18 +76,20 @@ const Auth = () => {
   ];
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("Tentative de connexion avec:", values);
     setLoading(true);
 
     try {
       if (isLogin) {
         // Sign in
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email: values.email,
           password: values.password,
         });
 
         if (error) throw error;
-
+        
+        console.log("Connexion réussie:", data);
         toast.success("Connexion réussie !");
         navigate("/dashboard");
       } else {
@@ -101,6 +112,7 @@ const Auth = () => {
         setIsLogin(true);
       }
     } catch (error: any) {
+      console.error("Erreur d'authentification:", error);
       toast.error(error.message || "Une erreur est survenue");
     } finally {
       setLoading(false);
