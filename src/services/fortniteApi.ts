@@ -1,37 +1,55 @@
-
+// src/services/fortniteApi.ts
 import { supabase } from "@/integrations/supabase/client";
 
-export interface FortniteShopItem {
+export interface RawFortniteItem {
   id: string;
   name: string;
   description: string;
-  price: number;
-  priceIconLink: string;
+  type: { value: string; displayValue: string; backendValue: string };
+  rarity: { value: string; displayValue: string; backendValue: string };
+  set?: { value: string; text: string; backendValue: string };
+  introduction?: {
+    chapter: string;
+    season: string;
+    text: string;
+    backendValue: number;
+  };
+  banner?: { value: string; intensity: string; backendValue: string };
   images: {
     icon: string;
-    featured: string;
-    background: string;
+    featured?: string;
+    background?: string;
+    smallIcon?: string;
   };
-  type: string;
-  rarity: string;
+  offerId: string;
+  finalPrice?: number;
+  regularPrice?: number;
+  giftable: boolean;
+  refundable: boolean;
+  inDate: string;
+  outDate: string;
+  layout: Record<string, any>;
+  colors: Record<string, string>;
+  tileSize: string;
+  brItems?: any[];
 }
 
-/**
- * Get Fortnite shop items for the day
- * This calls a Supabase Edge Function that securely handles the API key
- */
-export const getFortniteShop = async (): Promise<FortniteShopItem[]> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('fortnite-shop');
-    
-    if (error) {
-      console.error('Error fetching Fortnite shop data:', error);
-      throw new Error('Failed to fetch Fortnite shop');
-    }
-    
-    return data as FortniteShopItem[];
-  } catch (error) {
-    console.error('Error in getFortniteShop:', error);
-    throw error;
-  }
+export interface FortniteShopPayload {
+  status: number;
+  data: {
+    hash: string;
+    date: string;
+    vbuckIcon: string;
+    entries: RawFortniteItem[];
+  };
+}
+
+export const getFortniteShop = async (): Promise<FortniteShopPayload> => {
+  const { data, error } = await supabase.functions.invoke<FortniteShopPayload>(
+    "fortnite-shop"
+  );
+  if (error) throw error;
+  if (!data) throw new Error("No data returned from edge function");
+  // `data` est déjà un objet conforme à FortniteShopPayload
+  return data;
 };

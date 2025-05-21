@@ -1,138 +1,235 @@
-
 import { useEffect, useState } from "react";
-import { getFortniteShop, FortniteShopItem } from "@/services/fortniteApi";
-import { toast } from "sonner";
+import {
+  getFortniteShop,
+  FortniteShopPayload,
+  RawFortniteItem,
+} from "@/services/fortniteApi";
+import { Loader2, Calendar, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Calendar } from "lucide-react";
+
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  return (
+    `${String(d.getDate()).padStart(2, "0")}/${String(
+      d.getMonth() + 1
+    ).padStart(2, "0")}/${d.getFullYear()} ` +
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(
+      2,
+      "0"
+    )}:${String(d.getSeconds()).padStart(2, "0")}`
+  );
+};
 
 const FortniteShop = () => {
-  const [shopItems, setShopItems] = useState<FortniteShopItem[]>([]);
+  const [payload, setPayload] = useState<FortniteShopPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [modalData, setModalData] = useState<{
+    entry: RawFortniteItem;
+    item: any;
+  } | null>(null);
+  const [search, setSearch] = useState("");
+  const [rarity, setRarity] = useState("all");
+  const [showPacks, setShowPacks] = useState(false);
 
   useEffect(() => {
-    fetchFortniteShop();
+    getFortniteShop()
+      .then((res) => setPayload(res))
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const fetchFortniteShop = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getFortniteShop();
-      setShopItems(data);
-      setLastUpdated(new Date());
-    } catch (error) {
-      console.error("Error fetching Fortnite shop:", error);
-      toast.error("Failed to load Fortnite shop items");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#121217]">
+        <Loader2 className="animate-spin text-5xl text-[#9b87f5]" />
+      </div>
+    );
+  if (!payload)
+    return (
+      <div className="text-center p-8 text-red-500">
+        Erreur de chargement...
+      </div>
+    );
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity.toLowerCase()) {
-      case "legendary": return "bg-amber-500/80 text-black";
-      case "epic": return "bg-purple-500/80 text-white";
-      case "rare": return "bg-blue-500/80 text-white";
-      case "uncommon": return "bg-green-500/80 text-white";
-      case "common": return "bg-gray-500/80 text-white";
-      default: return "bg-gray-500/80 text-white";
-    }
-  };
+  const { data } = payload;
+  // Identify packs (entries with brItems length >1)
+  const packs = data.entries.filter((e) => (e.brItems?.length || 0) > 1);
+  const singles = data.entries.filter((e) => (e.brItems?.length || 0) === 1);
+  const target = showPacks ? packs : singles;
+
+  const filtered = target
+    .filter((e) =>
+      e.brItems!.some((i) =>
+        i.name.toLowerCase().includes(search.toLowerCase())
+      )
+    )
+    .filter(
+      (e) =>
+        rarity === "all" || e.brItems!.some((i) => i.rarity.value === rarity)
+    );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[#9b87f5]">Boutique Fortnite du Jour</h1>
-        
-        {lastUpdated && (
-          <div className="flex items-center text-sm text-gray-400">
-            <Calendar className="h-4 w-4 mr-1" />
-            <span>
-              Mis à jour le {lastUpdated.toLocaleDateString()} à {lastUpdated.toLocaleTimeString()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {isLoading ? (
-        <div className="flex justify-center items-center h-[60vh]">
-          <div className="text-center">
-            <Loader2 className="h-10 w-10 animate-spin text-[#9b87f5] mx-auto mb-4" />
-            <p className="text-gray-400">Chargement de la boutique Fortnite...</p>
+    <div className="min-h-screen bg-[#121217] text-white">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col md:flex-row items-center justify-between shadow-md">
+        <div className="flex items-center gap-2">
+          <Calendar className="text-white" />
+          <div>
+            <h1 className="text-3xl font-extrabold">Boutique Fortnite</h1>
+            <p className="text-sm text-gray-200">
+              Mis à jour : {new Date(data.date).toLocaleString()}
+            </p>
           </div>
         </div>
-      ) : shopItems.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-xl text-gray-400 mb-4">
-            La boutique Fortnite n'est pas disponible pour le moment.
-          </p>
-          <button
-            onClick={fetchFortniteShop}
-            className="px-4 py-2 bg-[#9b87f5] text-white rounded-md hover:bg-[#8976e4]"
+        <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
+          <input
+            type="text"
+            placeholder="Rechercher un item..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-[#1f1f27] placeholder-gray-500 focus:outline-none w-64"
+          />
+          <select
+            value={rarity}
+            onChange={(e) => setRarity(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-[#1f1f27]"
           >
-            Réessayer
+            <option value="all">Toutes raretés</option>
+            {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
+              <option key={r} value={r}>
+                {r.charAt(0).toUpperCase() + r.slice(1)}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setShowPacks((prev) => !prev)}
+            className="px-4 py-2 rounded-lg bg-[#1f1f27] hover:bg-[#2a2b31] transition"
+          >
+            {showPacks ? "Voir articles seuls" : "Voir packs"}
           </button>
         </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {shopItems.map((item) => (
-            <Card 
-              key={item.id} 
-              className="border-[#9b87f5]/50 bg-[#221F26] text-white overflow-hidden"
+      </header>
+
+      {/* Grid */}
+      <main className="max-w-7xl mx-auto p-6 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {filtered.map((entry) =>
+          entry.brItems!.map((item) => (
+            <Card
+              key={item.id}
+              onClick={() => setModalData({ entry, item })}
+              className="cursor-pointer bg-[#1f1f27] hover:shadow-2xl transition-shadow rounded-lg overflow-hidden"
             >
-              <div className="w-full h-56 relative overflow-hidden">
-                <img 
-                  src={item.images.featured || item.images.icon} 
+              <div className="relative">
+                <img
+                  src={item.images.featured || item.images.icon}
                   alt={item.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-56 object-cover"
                 />
-                <Badge className={`absolute top-2 right-2 ${getRarityColor(item.rarity)}`}>
-                  {item.rarity}
+                <Badge className="absolute top-3 left-3 bg-white text-black text-sm">
+                  {item.rarity.displayValue}
                 </Badge>
+                {entry.brItems!.length > 1 && (
+                  <Badge className="absolute top-3 right-3 bg-[#9b87f5] text-white text-xs">
+                    PACK
+                  </Badge>
+                )}
               </div>
-              
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl font-semibold text-[#9b87f5]">
+              <CardContent className="p-4">
+                <CardTitle className="text-lg font-bold truncate mb-1">
                   {item.name}
                 </CardTitle>
-                <CardDescription className="text-gray-400">
-                  {item.type}
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent>
-                <p className="text-sm text-gray-300">{item.description}</p>
+                <p className="text-sm text-gray-400 truncate mb-2">
+                  {item.type.displayValue}
+                </p>
+                <p className="text-xs text-gray-300 line-clamp-3">
+                  {item.description}
+                </p>
               </CardContent>
-              
-              <CardFooter className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <img 
-                    src={item.priceIconLink} 
-                    alt="V-Bucks" 
-                    className="h-5 w-5 mr-1"
-                  />
-                  <span className="font-bold text-white">{item.price}</span>
+              <CardFooter className="flex justify-between items-center p-4 pt-0">
+                <div className="flex items-center gap-2">
+                  <img src={data.vbuckIcon} alt="V-Bucks" className="h-5 w-5" />
+                  <span className="text-lg font-semibold">
+                    {entry.finalPrice ?? entry.regularPrice}
+                  </span>
                 </div>
-                
-                <a 
-                  href="https://www.epicgames.com/fortnite/en-US/home" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-[#9b87f5] hover:bg-[#8976e4] text-white px-3 py-1 rounded text-sm"
-                >
-                  Voir dans Fortnite
-                </a>
+                <span className="text-xs text-gray-500 uppercase tracking-wide">
+                  Voir détails
+                </span>
               </CardFooter>
             </Card>
-          ))}
+          ))
+        )}
+      </main>
+
+      {/* Modal */}
+      {modalData && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-[#1f1f27] rounded-lg max-w-4xl w-full overflow-hidden shadow-2xl relative">
+            <button
+              onClick={() => setModalData(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+            >
+              <X size={28} />
+            </button>
+            <div className="md:flex">
+              <img
+                src={
+                  modalData.item.images.featured || modalData.item.images.icon
+                }
+                alt={modalData.item.name}
+                className="w-full md:w-1/2 h-80 object-cover"
+              />
+              <div className="p-8 flex-1 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2">
+                    {modalData.item.name}
+                  </h2>
+                  <Badge className="bg-white text-black mb-4 text-base">
+                    {modalData.item.rarity.displayValue}
+                  </Badge>
+                  <p className="text-sm text-gray-300 mb-4">
+                    {modalData.item.description}
+                  </p>
+                  <div className="flex items-center gap-4 mb-4">
+                    <img
+                      src={data.vbuckIcon}
+                      alt="V-Bucks"
+                      className="h-6 w-6"
+                    />
+                    <span className="text-2xl font-bold">
+                      {modalData.entry.finalPrice ??
+                        modalData.entry.regularPrice}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>OfferId: {modalData.entry.offerId}</div>
+                  <div>Date in: {formatDate(modalData.entry.inDate)}</div>
+                  <div>Date out: {formatDate(modalData.entry.outDate)}</div>
+                  <div>
+                    Giftable: {modalData.entry.giftable ? "Oui" : "Non"}
+                  </div>
+                  <div>
+                    Refundable: {modalData.entry.refundable ? "Oui" : "Non"}
+                  </div>
+                </div>
+                <a
+                  href={`https://www.epicgames.com/fortnite/marketplace/item/${modalData.item.id}`}
+                  target="_blank"
+                  className="mt-6 self-start bg-gradient-to-r from-purple-500 to-indigo-500 px-8 py-3 rounded-lg text-white font-semibold uppercase tracking-wide hover:opacity-90 transition-opacity"
+                >
+                  Voir sur le site
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
