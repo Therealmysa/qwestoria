@@ -10,6 +10,10 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Missions from "./pages/Missions";
+import Shop from "./pages/Shop";
+import Profile from "./pages/Profile";
+import Leaderboard from "./pages/Leaderboard";
+import FortniteShop from "./pages/FortniteShop";
 import Layout from "./components/layout/Layout";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -28,6 +32,10 @@ const App = () => (
               <Route path="/auth" element={<Layout><Auth /></Layout>} />
               <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
               <Route path="/missions" element={<Layout><Missions /></Layout>} />
+              <Route path="/shop" element={<Layout><Shop /></Layout>} />
+              <Route path="/profile" element={<Layout><Profile /></Layout>} />
+              <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+              <Route path="/fortnite-shop" element={<Layout><FortniteShop /></Layout>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<Layout><NotFound /></Layout>} />
             </Routes>

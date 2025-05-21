@@ -11,13 +11,23 @@ cloudinary.v2.config({
   secure: true
 });
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
     // Vérifier la méthode de la requête
     if (req.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
@@ -27,7 +37,7 @@ serve(async (req) => {
     if (!fileUrl) {
       return new Response(JSON.stringify({ error: 'File URL is required' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
@@ -36,7 +46,7 @@ serve(async (req) => {
     if (!fileResponse.ok) {
       return new Response(JSON.stringify({ error: 'Failed to fetch file from URL' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
     
@@ -66,14 +76,14 @@ serve(async (req) => {
     
     return new Response(JSON.stringify(uploadResponse), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
     
   } catch (error) {
     console.error("Error in cloudinary-upload function:", error);
     return new Response(JSON.stringify({ error: error.message || "Unknown error" }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
 });
