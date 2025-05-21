@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Trophy, User, Coins } from "lucide-react";
+import { Loader2, Trophy, User, Coins, CheckCircle as BadgeCheck } from "lucide-react";
 
 interface LeaderboardUser {
   id: string;
@@ -46,7 +46,7 @@ const Leaderboard = () => {
   const fetchLeaderboardData = async () => {
     setIsLoading(true);
     try {
-      // Fetch leaderboard data based on filter
+      // Fixed to correctly call the get_leaderboard RPC function
       const { data, error } = await supabase.rpc("get_leaderboard", {
         sort_by: filter
       });
@@ -54,10 +54,10 @@ const Leaderboard = () => {
       if (error) throw error;
       
       // Add rank to each user
-      const rankedData = data.map((item: any, index: number) => ({
+      const rankedData = data ? data.map((item: any, index: number) => ({
         ...item,
         rank: index + 1
-      }));
+      })) : [];
       
       setLeaderboardData(rankedData);
       

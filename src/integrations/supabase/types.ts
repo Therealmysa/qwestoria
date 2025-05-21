@@ -167,6 +167,42 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_items: {
+        Row: {
+          available_until: string | null
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string | null
+          is_vip_only: boolean | null
+          name: string
+          price: number
+        }
+        Insert: {
+          available_until?: string | null
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          is_vip_only?: boolean | null
+          name: string
+          price: number
+        }
+        Update: {
+          available_until?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_vip_only?: boolean | null
+          name?: string
+          price?: number
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -202,12 +238,54 @@ export type Database = {
           },
         ]
       }
+      user_purchases: {
+        Row: {
+          id: string
+          item_id: string
+          price_paid: number
+          purchased_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          price_paid: number
+          purchased_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          price_paid?: number
+          purchased_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_purchases_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_leaderboard: {
+        Args: { sort_by: string }
+        Returns: {
+          id: string
+          username: string
+          avatar_url: string
+          is_vip: boolean
+          total_coins: number
+          completed_missions: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

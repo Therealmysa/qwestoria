@@ -55,6 +55,7 @@ const Shop = () => {
 
   const fetchShopItems = async () => {
     try {
+      // Updated to use the new shop_items table
       const { data, error } = await supabase
         .from("shop_items")
         .select("*")
@@ -98,7 +99,7 @@ const Shop = () => {
     try {
       setIsPurchasing(true);
 
-      // Create purchase record
+      // Create purchase record using the new user_purchases table
       const { error: purchaseError } = await supabase
         .from("user_purchases")
         .insert({
