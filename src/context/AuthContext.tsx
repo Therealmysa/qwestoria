@@ -27,27 +27,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("AuthContext: Initializing auth state");
+
+    // Setup the auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        console.log("AuthContext: Auth state changed", { event, session: currentSession });
         
-        if (session?.user) {
-          setTimeout(() => fetchProfile(session.user.id), 0);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (currentSession?.user) {
+          console.log("AuthContext: User found, fetching profile");
+          setTimeout(() => fetchProfile(currentSession.user.id), 0);
         } else {
+          console.log("AuthContext: No user, setting profile to null");
           setProfile(null);
         }
       }
     );
 
     // Initial session fetch
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("AuthContext: Initial session fetch", { session: currentSession });
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       
-      if (session?.user) {
-        fetchProfile(session.user.id);
+      if (currentSession?.user) {
+        console.log("AuthContext: Initial user found, fetching profile");
+        fetchProfile(currentSession.user.id);
       } else {
+        console.log("AuthContext: No initial user, setting loading to false");
         setLoading(false);
       }
     });
@@ -57,6 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log("AuthContext: Fetching profile for user", userId);
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -64,13 +75,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (error) {
+        console.error("AuthContext: Error fetching profile", error);
         throw error;
       }
 
+      console.log("AuthContext: Profile fetched", data);
       setProfile(data);
     } catch (error) {
-      console.error("Error fetching profile:", error);
+      console.error("AuthContext: Error in fetchProfile", error);
     } finally {
+      console.log("AuthContext: Setting loading to false");
       setLoading(false);
     }
   };

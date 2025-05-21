@@ -1,5 +1,4 @@
 
-import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,16 +10,20 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    console.log("Navbar: Logout button clicked");
     try {
       await supabase.auth.signOut();
       toast.success("Déconnexion réussie");
       navigate("/");
     } catch (error: any) {
+      console.error("Navbar: Logout error", error);
       toast.error(
         error.message || "Une erreur est survenue lors de la déconnexion"
       );
     }
   };
+
+  console.log("Navbar: Rendering with user state", { user, loading });
 
   return (
     <nav className="sticky top-0 z-50 bg-[#1A1F2C] px-4 py-3 shadow-md">

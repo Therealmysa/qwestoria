@@ -43,6 +43,15 @@ const Auth = () => {
     },
   });
 
+  // Réinitialiser le formulaire lors du changement de mode
+  useEffect(() => {
+    form.reset({
+      email: "",
+      password: "",
+      username: isLogin ? undefined : "",
+    });
+  }, [isLogin, form]);
+
   const socialLinks = [
     { 
       name: "TikTok", 
@@ -67,15 +76,19 @@ const Auth = () => {
   ];
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("Fonction handleSubmit appelée avec:", values);
     setLoading(true);
 
     try {
       if (isLogin) {
         // Sign in
-        const { error } = await supabase.auth.signInWithPassword({
+        console.log("Tentative de connexion avec email:", values.email);
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: values.email,
           password: values.password,
         });
+
+        console.log("Résultat connexion:", { data, error });
 
         if (error) throw error;
 
@@ -83,7 +96,8 @@ const Auth = () => {
         navigate("/dashboard");
       } else {
         // Sign up
-        const { error } = await supabase.auth.signUp({
+        console.log("Tentative d'inscription avec email:", values.email);
+        const { data, error } = await supabase.auth.signUp({
           email: values.email,
           password: values.password,
           options: {
@@ -93,6 +107,8 @@ const Auth = () => {
           },
         });
 
+        console.log("Résultat inscription:", { data, error });
+
         if (error) throw error;
 
         toast.success(
@@ -101,6 +117,7 @@ const Auth = () => {
         setIsLogin(true);
       }
     } catch (error: any) {
+      console.error("Erreur d'authentification:", error);
       toast.error(error.message || "Une erreur est survenue");
     } finally {
       setLoading(false);
