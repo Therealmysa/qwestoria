@@ -21,7 +21,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="dark" storageKey="bradhub-theme">
+    <ThemeProvider defaultTheme="light" storageKey="bradhub-theme">
       <TooltipProvider>
         <AuthProvider>
           <Toaster />
@@ -36,6 +36,8 @@ const App = () => (
               <Route path="/profile" element={<Layout><Profile /></Layout>} />
               <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
               <Route path="/fortnite-shop" element={<Layout><FortniteShop /></Layout>} />
+              <Route path="/blog" element={<Layout><NotFound /></Layout>} />
+              <Route path="/messages" element={<Layout><NotFound /></Layout>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<Layout><NotFound /></Layout>} />
             </Routes>

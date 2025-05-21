@@ -11,9 +11,10 @@ import {
   LogOut,
   LayoutDashboard,
   BadgeCheck,
-  ShoppingBag,
+  MessageSquare,
+  BookOpen,
   Trophy,
-  Gamepad2
+  ShoppingBag
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -48,28 +49,28 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#1A1F2C] px-4 py-3 shadow-md">
+    <nav className="sticky top-0 z-50 bg-white dark:bg-[#1A1F2C] px-4 py-3 shadow-md border-b border-gray-100 dark:border-gray-800">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-[#9b87f5]">BradFlow</span>
+          <span className="text-2xl font-bold text-primary dark:text-[#9b87f5]">BradFlow</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden space-x-1 md:flex">
-          <Link to="/" className={`px-3 py-2 rounded-md ${isActive("/") ? "text-[#9b87f5]" : "text-gray-200 hover:text-[#9b87f5]"}`}>
+          <Link to="/" className={`px-3 py-2 rounded-md transition-colors ${isActive("/") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
             Accueil
           </Link>
-          <Link to="/missions" className={`px-3 py-2 rounded-md ${isActive("/missions") ? "text-[#9b87f5]" : "text-gray-200 hover:text-[#9b87f5]"}`}>
+          <Link to="/missions" className={`px-3 py-2 rounded-md transition-colors ${isActive("/missions") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
             Missions
           </Link>
-          <Link to="/shop" className={`px-3 py-2 rounded-md ${isActive("/shop") ? "text-[#9b87f5]" : "text-gray-200 hover:text-[#9b87f5]"}`}>
-            Boutique
+          <Link to="/blog" className={`px-3 py-2 rounded-md transition-colors ${isActive("/blog") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
+            Blog
           </Link>
-          <Link to="/fortnite-shop" className={`px-3 py-2 rounded-md ${isActive("/fortnite-shop") ? "text-[#9b87f5]" : "text-gray-200 hover:text-[#9b87f5]"}`}>
+          <Link to="/messages" className={`px-3 py-2 rounded-md transition-colors ${isActive("/messages") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
+            Messagerie
+          </Link>
+          <Link to="/fortnite-shop" className={`px-3 py-2 rounded-md transition-colors ${isActive("/fortnite-shop") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
             Boutique Fortnite
-          </Link>
-          <Link to="/leaderboard" className={`px-3 py-2 rounded-md ${isActive("/leaderboard") ? "text-[#9b87f5]" : "text-gray-200 hover:text-[#9b87f5]"}`}>
-            Classement
           </Link>
         </div>
 
@@ -77,25 +78,36 @@ const Navbar = () => {
         <div className="md:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="border-gray-700 text-gray-300">
+              <Button variant="outline" size="icon" className="rounded-full border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-300">
                 <Menu className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#1A1F2C] border-gray-700 text-white">
-              <DropdownMenuItem onClick={() => navigate("/")} className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer">
+            <DropdownMenuContent className="bg-white dark:bg-[#1A1F2C] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-white w-56">
+              <DropdownMenuLabel className="flex items-center">
+                <span className="font-bold text-primary dark:text-[#9b87f5]">Navigation</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              <DropdownMenuItem onClick={() => navigate("/")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 Accueil
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/missions")} className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer">
+              <DropdownMenuItem onClick={() => navigate("/missions")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 Missions
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/shop")} className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer">
-                Boutique
+              <DropdownMenuItem onClick={() => navigate("/blog")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                Blog
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/fortnite-shop")} className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer">
+              <DropdownMenuItem onClick={() => navigate("/messages")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                Messagerie
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/fortnite-shop")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 Boutique Fortnite
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/leaderboard")} className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer">
-                Classement
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              <DropdownMenuItem onClick={() => navigate("/shop")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/leaderboard")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                <Trophy className="h-4 w-4 mr-2" /> Classement
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -106,39 +118,39 @@ const Navbar = () => {
             (user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-[#9b87f5] hover:bg-[#9b87f5]/20 flex items-center">
+                  <Button variant="ghost" className="text-primary dark:text-[#9b87f5] hover:bg-primary/10 dark:hover:bg-[#9b87f5]/20 flex items-center rounded-full">
                     {profile?.username || user.email?.split("@")[0] || "User"}
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#1A1F2C] border-gray-700 text-white">
+                <DropdownMenuContent className="bg-white dark:bg-[#1A1F2C] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-white">
                   <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                   <DropdownMenuItem 
                     onClick={() => navigate("/profile")}
-                    className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer flex items-center"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => navigate("/dashboard")}
-                    className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer flex items-center"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => navigate("/missions")}
-                    className="focus:bg-[#9b87f5]/20 focus:text-white cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer flex items-center"
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                   <DropdownMenuItem 
                     onClick={handleLogout}
-                    className="text-red-400 focus:bg-red-500/20 focus:text-red-300 cursor-pointer flex items-center"
+                    className="text-red-500 focus:bg-red-500/10 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-500/10 dark:focus:text-red-300 cursor-pointer flex items-center"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Déconnexion
@@ -147,7 +159,7 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-[#9b87f5] text-white hover:bg-[#7E69AB]">
+                <Button className="bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4] text-white rounded-full">
                   Connexion
                 </Button>
               </Link>
