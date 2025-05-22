@@ -10,7 +10,7 @@ type ProfileCompletionFields = {
   bio: boolean;
 }
 
-export default function useProfileCompletion() {
+export const useProfileCompletion = () => {  // Changed from export default to export named function
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const [isChecking, setIsChecking] = useState(true);
@@ -52,6 +52,8 @@ export default function useProfileCompletion() {
   return {
     isChecking,
     isProfileComplete: isProfileComplete(),
-    incompleteFields: getIncompleteFields(),
+    missingFields: getIncompleteFields(),
   };
-}
+};
+
+export default useProfileCompletion;  // Keep the default export for backward compatibility

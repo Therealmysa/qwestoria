@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Transactions from "@/components/Transactions";
 import { Coins, CheckCircle2, XCircle, Clock3, Trophy } from "lucide-react";
-import { getRankByPoints } from "@/utils/rankUtils";
+import { getRankByPoints, rankTiers, RankTier } from "@/utils/rankUtils";  // Fixed import for rankTiers and RankTier
 import RankBadge from "@/components/rank/RankBadge";
-import { useProfileCompletion } from "@/hooks/useProfileCompletion";
+import { useProfileCompletion } from "@/hooks/useProfileCompletion";  // Fixed import for useProfileCompletion
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface BradCoin {

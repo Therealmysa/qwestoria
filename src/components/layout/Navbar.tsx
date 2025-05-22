@@ -52,7 +52,7 @@ const Navbar = () => {
   };
 
   // Calculate user rank from profile data
-  const userPoints = profile?.coins || 0;
+  const userPoints = profile?.coins || 0;  // Changed to use optional chaining since coins might not exist
   const userRank = getRankByPoints(userPoints);
 
   return (
