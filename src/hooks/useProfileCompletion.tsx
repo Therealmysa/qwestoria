@@ -36,7 +36,7 @@ export default function useProfileCompletion() {
     if (!loading) {
       if (user && profile) {
         const complete = isProfileComplete();
-        // If we're not already on the profile page and profile is incomplete
+        // If profile is incomplete and we're not already on the profile page
         if (!complete && !window.location.pathname.includes('/profile')) {
           toast.info("Merci de compléter votre profil pour continuer", {
             description: "Certaines informations sont requises pour utiliser pleinement la plateforme.",
