@@ -5,10 +5,10 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Transactions from "@/components/Transactions";
-import { Coins, CheckCircle2, XCircle, Clock3, Trophy } from "lucide-react";
-import { getRankByPoints, rankTiers, RankTier } from "@/utils/rankUtils";  // Fixed import for rankTiers and RankTier
+import { Coins, CheckCircle2, XCircle, Clock3, Trophy, BadgeCheck, ShoppingBag } from "lucide-react";
+import { getRankByPoints } from "@/utils/rankUtils";
 import RankBadge from "@/components/rank/RankBadge";
-import { useProfileCompletion } from "@/hooks/useProfileCompletion";  // Fixed import for useProfileCompletion
+import useProfileCompletion from "@/hooks/useProfileCompletion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface BradCoin {
@@ -131,11 +131,23 @@ const Dashboard = () => {
   };
 
   const currentRank = getRankByPoints(coins);
+  
+  // Calculate next rank progress percentage
+  const calculateNextRankProgress = () => {
+    // This is a simplified calculation - you should replace with actual tier logic
+    return Math.min(100, (coins / (coins + 200)) * 100);
+  };
+
+  // Get the next rank tier name
+  const getNextRankName = () => {
+    // Simplified - replace with actual next rank logic
+    return currentRank;
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[#9b87f5] dark:text-[#9b87f5] light:text-primary">
+        <h1 className="text-3xl font-bold text-primary dark:text-[#9b87f5]">
           Tableau de bord
         </h1>
         
@@ -145,14 +157,14 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* User Profile Summary Card */}
-        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-md">
-          <CardHeader className="pb-2">
+        {/* User Profile Summary Card - Improved with better light mode styling */}
+        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-gray-700">
             <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5]">
               Profil Joueur
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-4">
             <div className="flex items-center gap-4 mb-4">
               <Avatar className="h-16 w-16 border-2 border-primary/20 dark:border-[#9b87f5]/50">
                 {profile?.avatar_url ? (
@@ -173,55 +185,84 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center">
-                <Trophy className="h-5 w-5 text-primary/70 dark:text-[#9b87f5]/70 mr-2" />
-                <span className="text-gray-700 dark:text-gray-200">Rang actuel:</span>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Trophy className="h-5 w-5 text-primary dark:text-[#9b87f5] mr-2" />
+                  <span className="text-gray-700 dark:text-gray-200 font-medium">Rang actuel:</span>
+                </div>
+                <RankBadge rankTier={currentRank} />
               </div>
-              <RankBadge rankTier={currentRank} />
+              
+              {/* Add clickable mission button */}
+              <button 
+                onClick={() => navigate("/missions")} 
+                className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
+                          dark:bg-[#9b87f5]/10 dark:hover:bg-[#9b87f5]/20 
+                          text-primary dark:text-[#9b87f5] 
+                          transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <BadgeCheck className="h-4 w-4" />
+                Voir les missions disponibles
+              </button>
             </div>
           </CardContent>
         </Card>
 
-        {/* BradCoins Card */}
-        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-md">
-          <CardHeader className="pb-2">
+        {/* BradCoins Card - Improved with better light mode styling */}
+        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-gray-700">
             <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5]">
               Solde BradCoins
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center">
-              <span className="mr-2 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 dark:bg-[#9b87f5]/20">
-                <Coins className="h-6 w-6 text-primary dark:text-[#9b87f5]" />
+          <CardContent className="pt-4">
+            <div className="flex items-center mb-4">
+              <span className="mr-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 dark:bg-[#9b87f5]/20">
+                <Coins className="h-7 w-7 text-primary dark:text-[#9b87f5]" />
               </span>
-              <span className="text-3xl font-bold text-gray-800 dark:text-white">
-                {isLoading ? "..." : coins}
-              </span>
+              <div>
+                <span className="text-3xl font-bold text-gray-800 dark:text-white">
+                  {isLoading ? "..." : coins}
+                </span>
+                <p className="text-sm text-gray-500 dark:text-gray-400">BradCoins</p>
+              </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm text-gray-700 dark:text-gray-300 mb-2">Progression vers le prochain rang</h4>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Progression vers le prochain rang
+              </h4>
               <div className="flex items-center gap-2 mb-1">
                 <RankBadge rankTier={currentRank} showText={false} size="sm" />
                 <div className="flex-1">
-                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-primary dark:bg-[#9b87f5] rounded-full" 
-                      style={{ width: `${Math.min(100, (coins / (coins + 200)) * 100)}%` }}
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 dark:from-[#9b87f5] dark:to-[#7654d3] rounded-full" 
+                      style={{ width: `${calculateNextRankProgress()}%` }}
                     ></div>
                   </div>
                 </div>
                 {currentRank !== 'unreal' && (
                   <RankBadge 
-                    rankTier={Object.keys(rankTiers).indexOf(currentRank) < Object.keys(rankTiers).length - 1 
-                      ? Object.keys(rankTiers)[Object.keys(rankTiers).indexOf(currentRank) + 1] as RankTier
-                      : currentRank} 
+                    rankTier={getNextRankName()}
                     showText={false}
                     size="sm"
                   />
                 )}
               </div>
+              
+              {/* Add shop button */}
+              <button 
+                onClick={() => navigate("/shop")} 
+                className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
+                          dark:bg-[#9b87f5]/10 dark:hover:bg-[#9b87f5]/20 
+                          text-primary dark:text-[#9b87f5] 
+                          transition-colors font-medium flex items-center justify-center gap-2"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Visiter la boutique
+              </button>
             </div>
           </CardContent>
         </Card>
@@ -232,29 +273,33 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Submissions */}
-      <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-white">
+      {/* Recent Submissions - Improved with better light mode styling */}
+      <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+        <BadgeCheck className="h-5 w-5 text-primary dark:text-[#9b87f5]" />
         Missions récentes
       </h2>
-      <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-md overflow-hidden">
+      <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
         {isLoading ? (
-          <div className="p-6 text-center text-gray-500 dark:text-gray-400">Chargement...</div>
+          <div className="p-6 text-center text-gray-500 dark:text-gray-400 animate-pulse">
+            <div className="mx-auto h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
+            Chargement...
+          </div>
         ) : submissions.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="border-b border-gray-200 dark:border-gray-700 text-left text-sm text-gray-500 dark:text-gray-400">
-                  <th className="px-6 py-3">Mission</th>
-                  <th className="px-6 py-3">Récompense</th>
-                  <th className="px-6 py-3">Date</th>
-                  <th className="px-6 py-3">Statut</th>
+                <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-sm text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 font-medium">Mission</th>
+                  <th className="px-6 py-3 font-medium">Récompense</th>
+                  <th className="px-6 py-3 font-medium">Date</th>
+                  <th className="px-6 py-3 font-medium">Statut</th>
                 </tr>
               </thead>
               <tbody>
                 {submissions.map((submission) => (
                   <tr
                     key={submission.id}
-                    className="border-b border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1A1F2C]"
+                    className="border-b border-gray-100 dark:border-gray-700 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1A1F2C]"
                   >
                     <td className="px-6 py-4">{submission.mission.title}</td>
                     <td className="px-6 py-4 flex items-center gap-1">
@@ -280,8 +325,24 @@ const Dashboard = () => {
             </table>
           </div>
         ) : (
-          <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-            Vous n'avez pas encore soumis de missions.
+          <div className="p-8 text-center">
+            <div className="mb-4 flex justify-center">
+              <div className="rounded-full bg-primary/10 dark:bg-[#9b87f5]/20 p-3">
+                <BadgeCheck className="h-6 w-6 text-primary dark:text-[#9b87f5]" />
+              </div>
+            </div>
+            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Pas encore de missions
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Vous n'avez pas encore soumis de missions.
+            </p>
+            <button 
+              onClick={() => navigate("/missions")} 
+              className="px-4 py-2 bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4] text-white rounded-md transition-colors"
+            >
+              Découvrir les missions
+            </button>
           </div>
         )}
       </Card>

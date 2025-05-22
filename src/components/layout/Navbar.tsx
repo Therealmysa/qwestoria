@@ -1,3 +1,4 @@
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,8 +110,9 @@ const Navbar = () => {
                 Boutique
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
-              <DropdownMenuItem onClick={() => navigate("/fortnite-shop")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
-                <ShoppingBag className="h-4 w-4 mr-2" /> Boutique Fortnite
+              {/* Changed this from fortnite-shop to shop */}
+              <DropdownMenuItem onClick={() => navigate("/shop")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/leaderboard")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 <Trophy className="h-4 w-4 mr-2" /> Classement
