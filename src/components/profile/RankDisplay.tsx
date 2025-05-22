@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getRankByPoints, rankTiers, RankTier } from "@/utils/rankUtils";
+import RankBadge from "@/components/rank/RankBadge";
 
 interface RankDisplayProps {
   points: number;

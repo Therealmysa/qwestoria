@@ -92,15 +92,4 @@ export const getRankByPoints = (points: number): RankTier => {
   return 'bronze'; // Default to bronze if something goes wrong
 };
 
-export const RankBadge = ({ rankTier, className = '' }: { rankTier: RankTier, className?: string }) => {
-  const rank = rankTiers[rankTier];
-  
-  return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <img src={rank.logoUrl} alt={`${rank.name} rank`} className="w-6 h-6" />
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${rank.color} text-foreground ${rank.darkColor}`}>
-        {rank.name}
-      </span>
-    </div>
-  );
-};
+// We're moving the RankBadge component to its own file, so remove it from here
