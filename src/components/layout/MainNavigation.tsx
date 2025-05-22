@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -25,7 +24,15 @@ import {
 import BradHubLogo from "../BradHubLogo";
 import { ThemeToggle } from "../theme/theme-toggle";
 import { cn } from "@/lib/utils";
-import { Menu, X, ChevronDown, User as UserIcon, LogOut, MessageSquare, BookOpen } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  User as UserIcon,
+  LogOut,
+  MessageSquare,
+  BookOpen,
+} from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -71,7 +78,8 @@ const MainNavigation = () => {
     { name: "Missions", path: "/missions" },
     { name: "Blog", path: "/blog" },
     { name: "Messagerie", path: "/messages" },
-    { name: "Boutique Fortnite", path: "/fortnite-shop" },
+    { name: "Boutique", path: "/shop" },
+    { name: "Team Mates", path: "/teammates" },
   ];
 
   // Mobile drawer menu component
@@ -91,7 +99,6 @@ const MainNavigation = () => {
         <div className="flex justify-between items-center px-4 pt-4 border-b border-gray-200 dark:border-purple-400/20 pb-3">
           <div className="flex items-center">
             <BradHubLogo size="sm" />
-            <span className="text-lg font-semibold ml-2 text-primary dark:text-gradient">BradFlow</span>
           </div>
           <DrawerClose asChild>
             <Button
@@ -201,15 +208,15 @@ const MainNavigation = () => {
                       <li>
                         <NavigationMenuLink asChild>
                           <Link
-                            to="/shop"
+                            to="/fortnite-shop"
                             className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] dark:text-gray-200"
                           >
                             <div className="text-sm font-medium flex items-center">
                               <BookOpen className="mr-2 h-4 w-4" />
-                              Boutique
+                              Boutique Fortnite
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Dépensez vos BradCoins
+                              Accédez à la boutique Fortnite du jour!
                             </p>
                           </Link>
                         </NavigationMenuLink>

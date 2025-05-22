@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import FortniteShop from "./pages/FortniteShop";
 import Layout from "./components/layout/Layout";
 import { AuthProvider } from "./context/AuthContext";
 import { useEffect } from "react";
+import Teammates from "./pages/Teammates";
 
 const queryClient = new QueryClient();
 
@@ -30,17 +30,95 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Layout><Auth /></Layout>} />
-              <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-              <Route path="/missions" element={<Layout><Missions /></Layout>} />
-              <Route path="/shop" element={<Layout><Shop /></Layout>} />
-              <Route path="/profile" element={<Layout><Profile /></Layout>} />
-              <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
-              <Route path="/fortnite-shop" element={<Layout><FortniteShop /></Layout>} />
-              <Route path="/blog" element={<Layout><NotFound /></Layout>} />
-              <Route path="/messages" element={<Layout><NotFound /></Layout>} />
+              <Route
+                path="/auth"
+                element={
+                  <Layout>
+                    <Auth />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/missions"
+                element={
+                  <Layout>
+                    <Missions />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/shop"
+                element={
+                  <Layout>
+                    <Shop />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/leaderboard"
+                element={
+                  <Layout>
+                    <Leaderboard />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/fortnite-shop"
+                element={
+                  <Layout>
+                    <FortniteShop />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/blog"
+                element={
+                  <Layout>
+                    <NotFound />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/messages"
+                element={
+                  <Layout>
+                    <NotFound />
+                  </Layout>
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<Layout><NotFound /></Layout>} />
+              <Route
+                path="*"
+                element={
+                  <Layout>
+                    <NotFound />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/teammates"
+                element={
+                  <Layout>
+                    <Teammates />
+                  </Layout>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </AuthProvider>
