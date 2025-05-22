@@ -1,10 +1,12 @@
+
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
   FortniteShopPayload,
   RawFortniteItem,
 } from "@/services/fortniteApi";
-import { Loader2, Calendar, X } from "lucide-react";
+import useProfileCompletion from "@/hooks/useProfileCompletion";
+import { Loader2, Calendar, X, Tag, Search, FilterX, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -13,6 +15,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
@@ -28,6 +39,7 @@ const formatDate = (iso: string) => {
 };
 
 const FortniteShop = () => {
+  const { isChecking } = useProfileCompletion();
   const [payload, setPayload] = useState<FortniteShopPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [modalData, setModalData] = useState<{
@@ -39,15 +51,22 @@ const FortniteShop = () => {
   const [showPacks, setShowPacks] = useState(false);
 
   useEffect(() => {
-    getFortniteShop()
-      .then((res) => setPayload(res))
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
-  }, []);
+    if (!isChecking) {
+      getFortniteShop()
+        .then((res) => setPayload(res))
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
+    }
+  }, [isChecking]);
 
-  if (isLoading)
+  const clearFilters = () => {
+    setSearch("");
+    setRarity("all");
+  };
+
+  if (isLoading || isChecking)
     return (
-      <div className="flex items-center justify-center h-screen bg-[#121217]">
+      <div className="flex items-center justify-center h-screen bg-background">
         <Loader2 className="animate-spin text-5xl text-[#9b87f5]" />
       </div>
     );
@@ -75,47 +94,87 @@ const FortniteShop = () => {
         rarity === "all" || e.brItems!.some((i) => i.rarity.value === rarity)
     );
 
+  const getItemCount = () => {
+    return filtered.reduce((count, entry) => count + entry.brItems!.length, 0);
+  };
+
   return (
-    <div className="min-h-screen bg-[#121217] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col md:flex-row items-center justify-between shadow-md">
-        <div className="flex items-center gap-2">
-          <Calendar className="text-white" />
+      <header className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 flex flex-col md:flex-row items-center justify-between shadow-md rounded-lg mb-6">
+        <div className="flex items-center gap-3">
+          <div className="bg-white/20 p-3 rounded-full">
+            <Calendar className="text-white h-6 w-6" />
+          </div>
           <div>
-            <h1 className="text-3xl font-extrabold">Boutique Fortnite</h1>
+            <h1 className="text-3xl font-extrabold text-white">Boutique Fortnite</h1>
             <p className="text-sm text-gray-200">
               Mis à jour : {new Date(data.date).toLocaleString()}
             </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-4 mt-4 md:mt-0">
-          <input
-            type="text"
-            placeholder="Rechercher un item..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-[#1f1f27] placeholder-gray-500 focus:outline-none w-64"
-          />
-          <select
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Rechercher un item..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-4 py-2 rounded-lg bg-white/10 backdrop-blur-sm text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 border-0 w-64"
+            />
+          </div>
+          <Select
             value={rarity}
-            onChange={(e) => setRarity(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-[#1f1f27]"
+            onValueChange={(value) => setRarity(value)}
           >
-            <option value="all">Toutes raretés</option>
-            {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
-              <option key={r} value={r}>
-                {r.charAt(0).toUpperCase() + r.slice(1)}
-              </option>
-            ))}
-          </select>
-          <button
+            <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-sm text-white border-0 focus:ring-2 focus:ring-white/50">
+              <SelectValue placeholder="Toutes raretés" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes raretés</SelectItem>
+              {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
             onClick={() => setShowPacks((prev) => !prev)}
-            className="px-4 py-2 rounded-lg bg-[#1f1f27] hover:bg-[#2a2b31] transition"
+            variant="outline"
+            className="bg-white/10 text-white hover:bg-white/20 border-0"
           >
             {showPacks ? "Voir articles seuls" : "Voir packs"}
-          </button>
+          </Button>
+          {(search || rarity !== "all") && (
+            <Button
+              onClick={clearFilters}
+              variant="ghost" 
+              className="text-white hover:bg-white/10"
+            >
+              <FilterX className="mr-2 h-4 w-4" />
+              Réinitialiser filtres
+            </Button>
+          )}
         </div>
       </header>
+
+      {/* Stats bar */}
+      <div className="max-w-7xl mx-auto px-6 mb-6">
+        <div className="flex flex-wrap gap-6 justify-between items-center bg-white/5 dark:bg-black/20 backdrop-blur-sm p-4 rounded-lg border border-gray-200/10 shadow-sm">
+          <div className="flex items-center gap-2">
+            <Tag className="text-[#9b87f5]" />
+            <span className="text-sm">
+              {getItemCount()} objets affichés sur {showPacks ? packs.length : singles.length} entrées
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Star className="text-amber-400" />
+            <span className="text-sm">Mode: {showPacks ? "Packs" : "Articles individuels"}</span>
+          </div>
+        </div>
+      </div>
 
       {/* Grid */}
       <main className="max-w-7xl mx-auto p-6 grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -124,7 +183,7 @@ const FortniteShop = () => {
             <Card
               key={item.id}
               onClick={() => setModalData({ entry, item })}
-              className="cursor-pointer bg-[#1f1f27] hover:shadow-2xl transition-shadow rounded-lg overflow-hidden"
+              className="cursor-pointer card-enhanced card-hover overflow-hidden"
             >
               <div className="relative">
                 <img
@@ -145,10 +204,10 @@ const FortniteShop = () => {
                 <CardTitle className="text-lg font-bold truncate mb-1">
                   {item.name}
                 </CardTitle>
-                <p className="text-sm text-gray-400 truncate mb-2">
+                <p className="text-sm text-muted-foreground truncate mb-2">
                   {item.type.displayValue}
                 </p>
-                <p className="text-xs text-gray-300 line-clamp-3">
+                <p className="text-xs text-foreground/80 line-clamp-3">
                   {item.description}
                 </p>
               </CardContent>
@@ -159,7 +218,7 @@ const FortniteShop = () => {
                     {entry.finalPrice ?? entry.regularPrice}
                   </span>
                 </div>
-                <span className="text-xs text-gray-500 uppercase tracking-wide">
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">
                   Voir détails
                 </span>
               </CardFooter>
@@ -168,33 +227,53 @@ const FortniteShop = () => {
         )}
       </main>
 
+      {filtered.length === 0 && (
+        <div className="text-center p-12 bg-secondary/50 rounded-lg max-w-3xl mx-auto">
+          <FilterX className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-medium mb-2">Aucun résultat</h3>
+          <p className="text-muted-foreground mb-6">
+            Aucun item ne correspond à votre recherche. Essayez avec d'autres critères.
+          </p>
+          <Button onClick={clearFilters} className="bg-[#9b87f5] hover:bg-[#8976e4]">
+            Réinitialiser les filtres
+          </Button>
+        </div>
+      )}
+
       {/* Modal */}
       {modalData && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-[#1f1f27] rounded-lg max-w-4xl w-full overflow-hidden shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+          <div className="bg-background rounded-lg max-w-4xl w-full overflow-hidden shadow-2xl relative">
             <button
               onClick={() => setModalData(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground z-10 bg-background/80 rounded-full p-1"
             >
-              <X size={28} />
+              <X size={24} />
             </button>
             <div className="md:flex">
-              <img
-                src={
-                  modalData.item.images.featured || modalData.item.images.icon
-                }
-                alt={modalData.item.name}
-                className="w-full md:w-1/2 h-80 object-cover"
-              />
+              <div className="relative w-full md:w-1/2">
+                <img
+                  src={
+                    modalData.item.images.featured || modalData.item.images.icon
+                  }
+                  alt={modalData.item.name}
+                  className="w-full h-80 object-cover"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                  <Badge className="bg-white text-black mb-2">
+                    {modalData.item.rarity.displayValue}
+                  </Badge>
+                  <h3 className="text-xl font-bold text-white">
+                    {modalData.item.type.displayValue}
+                  </h3>
+                </div>
+              </div>
               <div className="p-8 flex-1 flex flex-col justify-between">
                 <div>
                   <h2 className="text-3xl font-bold mb-2">
                     {modalData.item.name}
                   </h2>
-                  <Badge className="bg-white text-black mb-4 text-base">
-                    {modalData.item.rarity.displayValue}
-                  </Badge>
-                  <p className="text-sm text-gray-300 mb-4">
+                  <p className="text-sm text-foreground/80 mb-4">
                     {modalData.item.description}
                   </p>
                   <div className="flex items-center gap-4 mb-4">
@@ -209,15 +288,26 @@ const FortniteShop = () => {
                     </span>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <div>OfferId: {modalData.entry.offerId}</div>
-                  <div>Date in: {formatDate(modalData.entry.inDate)}</div>
-                  <div>Date out: {formatDate(modalData.entry.outDate)}</div>
-                  <div>
-                    Giftable: {modalData.entry.giftable ? "Oui" : "Non"}
+                <div className="text-xs space-y-1 bg-secondary/50 p-3 rounded-lg">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>OfferId:</span>
+                    <span className="font-mono">{modalData.entry.offerId}</span>
                   </div>
-                  <div>
-                    Refundable: {modalData.entry.refundable ? "Oui" : "Non"}
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Date in:</span>
+                    <span>{formatDate(modalData.entry.inDate)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Date out:</span>
+                    <span>{formatDate(modalData.entry.outDate)}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Giftable:</span>
+                    <span>{modalData.entry.giftable ? "Oui" : "Non"}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Refundable:</span>
+                    <span>{modalData.entry.refundable ? "Oui" : "Non"}</span>
                   </div>
                 </div>
                 <a

@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -17,7 +17,7 @@
     --primary: 263 81% 75%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 218 20% 96%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
@@ -35,7 +35,7 @@
 
     --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 210 40% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -161,6 +161,55 @@
   
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:shadow-purple-400/20 hover:-translate-y-1;
+  }
+  
+  /* Light mode enhancements */
+  .light .card-enhanced {
+    @apply bg-white shadow-md border border-gray-100;
+  }
+  
+  .dark .card-enhanced {
+    @apply bg-[#221F26] border-[#9b87f5]/30;
+  }
+  
+  .light .section-bg {
+    @apply bg-gradient-to-b from-purple-50 to-white;
+  }
+  
+  .light .input-enhanced {
+    @apply bg-white border border-gray-200;
+  }
+  
+  .dark .input-enhanced {
+    @apply bg-[#1A191C] border-gray-700;
+  }
+  
+  .badge-rank {
+    @apply px-3 py-1 rounded-full text-xs font-semibold;
+  }
+  
+  .rank-bronze {
+    @apply bg-amber-600/20 text-amber-800 dark:text-amber-300;
+  }
+  
+  .rank-silver {
+    @apply bg-gray-300/30 text-gray-700 dark:text-gray-300;
+  }
+  
+  .rank-gold {
+    @apply bg-amber-400/20 text-amber-800 dark:text-amber-300;
+  }
+  
+  .rank-diamond {
+    @apply bg-blue-300/30 text-blue-800 dark:text-blue-300;
+  }
+  
+  .rank-platinum {
+    @apply bg-cyan-300/30 text-cyan-800 dark:text-cyan-300;
+  }
+  
+  .rank-master {
+    @apply bg-purple-300/30 text-purple-800 dark:text-purple-300;
   }
 }
 
