@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
   Loader2, Upload, User, Trophy, Flame, Coins,
-  AlertCircle, CheckCircle2, CircleHelp
+  AlertCircle, CheckCircle2, CircleHelp, Monitor, Smartphone, Gamepad
 } from "lucide-react";
 
 const fortniteRanks = [
@@ -31,7 +31,17 @@ const fortniteRanks = [
   { value: "gold", label: "Or", color: "rank-gold" },
   { value: "platinum", label: "Platine", color: "rank-platinum" },
   { value: "diamond", label: "Diamant", color: "rank-diamond" },
-  { value: "master", label: "Maître", color: "rank-master" },
+  { value: "elite", label: "Elite", color: "rank-elite" },
+  { value: "champion", label: "Champion", color: "rank-champion" },
+  { value: "unreal", label: "Unreal", color: "rank-unreal" },
+];
+
+const gamingPlatforms = [
+  { value: "pc", label: "PC", icon: Monitor },
+  { value: "playstation", label: "PlayStation", icon: Gamepad },
+  { value: "xbox", label: "Xbox", icon: Gamepad },
+  { value: "switch", label: "Nintendo Switch", icon: Gamepad },
+  { value: "mobile", label: "Mobile", icon: Smartphone },
 ];
 
 const Profile = () => {
@@ -45,6 +55,7 @@ const Profile = () => {
     fortniteUsername: "",
     bio: "",
     fortniteRank: "",
+    platform: "",
   });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -64,6 +75,7 @@ const Profile = () => {
         fortniteUsername: profile.fortnite_username || "",
         bio: profile.bio || "",
         fortniteRank: profile.fortnite_rank || "",
+        platform: profile.platform || "",
       });
       fetchUserStats();
       setIsLoading(false);
@@ -150,6 +162,7 @@ const Profile = () => {
           username: formData.username,
           fortnite_username: formData.fortniteUsername,
           fortnite_rank: formData.fortniteRank,
+          platform: formData.platform,
           bio: formData.bio,
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
@@ -327,6 +340,33 @@ const Profile = () => {
                     className="input-enhanced"
                     required={isInitialSetup}
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="platform" className="flex items-center gap-1">
+                    Plateforme de jeu
+                  </Label>
+                  <Select 
+                    value={formData.platform} 
+                    onValueChange={(value) => handleSelectChange("platform", value)}
+                  >
+                    <SelectTrigger className="input-enhanced">
+                      <SelectValue placeholder="Sélectionnez votre plateforme" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {gamingPlatforms.map((platform) => {
+                        const Icon = platform.icon;
+                        return (
+                          <SelectItem key={platform.value} value={platform.value}>
+                            <div className="flex items-center">
+                              <Icon className="mr-2 h-4 w-4" />
+                              {platform.label}
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">

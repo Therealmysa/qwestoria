@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   Menu, 
   ChevronDown, 
@@ -14,7 +15,9 @@ import {
   MessageSquare,
   BookOpen,
   Trophy,
-  ShoppingBag
+  ShoppingBag,
+  Users,
+  Bell
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -25,13 +28,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import RankBadge from "@/components/rank/RankBadge";
-import { getRankByPoints } from "@/utils/rankUtils";
 
 const Navbar = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const handleLogout = async () => {
     console.log("Navbar: Logout button clicked");
@@ -51,10 +53,6 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Get user points from profile - fixed to not use non-existent coins property
-  const userPoints = 0; // Default to 0 if no coins data available
-  const userRank = getRankByPoints(userPoints);
-
   return (
     <nav className="sticky top-0 z-50 bg-white dark:bg-[#1A1F2C] px-4 py-3 shadow-md border-b border-gray-100 dark:border-gray-800">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
@@ -72,6 +70,9 @@ const Navbar = () => {
           </Link>
           <Link to="/blog" className={`px-3 py-2 rounded-md transition-colors ${isActive("/blog") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
             Blog
+          </Link>
+          <Link to="/teammates" className={`px-3 py-2 rounded-md transition-colors ${isActive("/teammates") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
+            Coéquipiers
           </Link>
           <Link to="/messages" className={`px-3 py-2 rounded-md transition-colors ${isActive("/messages") ? "text-primary font-medium dark:text-[#9b87f5]" : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-[#9b87f5]"}`}>
             Messagerie
@@ -103,6 +104,9 @@ const Navbar = () => {
               <DropdownMenuItem onClick={() => navigate("/blog")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 Blog
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/teammates")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
+                Coéquipiers
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate("/messages")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 Messagerie
               </DropdownMenuItem>
@@ -110,7 +114,6 @@ const Navbar = () => {
                 Boutique
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
-              {/* Changed this from fortnite-shop to shop */}
               <DropdownMenuItem onClick={() => navigate("/shop")} className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer">
                 <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
               </DropdownMenuItem>
@@ -122,11 +125,23 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center space-x-2">
+          {/* Notifications Button */}
+          {!loading && user && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              onClick={() => navigate("/notifications")}
+            >
+              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            </Button>
+          )}
+
           {!loading &&
             (user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-primary dark:text-[#9b87f5] hover:bg-primary/10 dark:hover:bg-[#9b87f5]/20 flex items-center rounded-full gap-2">
+                  <Button variant="ghost" className="text-primary dark:text-[#9b87f5] hover:bg-primary/10 dark:hover:bg-[#9b87f5]/20 flex items-center rounded-full gap-2 p-2 pr-3">
                     <Avatar className="h-8 w-8 border border-primary/20 dark:border-[#9b87f5]/30">
                       {profile?.avatar_url ? (
                         <AvatarImage src={profile.avatar_url} alt={profile?.username || "User"} />
@@ -136,7 +151,9 @@ const Navbar = () => {
                         </AvatarFallback>
                       )}
                     </Avatar>
-                    <span className="hidden sm:inline">{profile?.username || user.email?.split("@")[0] || "User"}</span>
+                    {!isMobile && (
+                      <span className="font-medium">{profile?.username || user.email?.split("@")[0] || "User"}</span>
+                    )}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -144,9 +161,7 @@ const Navbar = () => {
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
                       <span className="font-medium">{profile?.username || user.email?.split("@")[0] || "User"}</span>
-                      <div className="flex items-center mt-1">
-                        <RankBadge rankTier={userRank} showText={true} size="sm" />
-                      </div>
+                      <span className="text-xs text-gray-400">{user.email}</span>
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
@@ -170,6 +185,13 @@ const Navbar = () => {
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate("/friends")}
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer flex items-center"
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Amis
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                   <DropdownMenuItem 
