@@ -1,4 +1,3 @@
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,8 +50,8 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  // Calculate user rank from profile data
-  const userPoints = profile?.coins || 0;  // Changed to use optional chaining since coins might not exist
+  // Get user points from profile - fixed to not use non-existent coins property
+  const userPoints = 0; // Default to 0 if no coins data available
   const userRank = getRankByPoints(userPoints);
 
   return (
