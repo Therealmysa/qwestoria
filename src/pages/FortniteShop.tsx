@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -170,45 +169,109 @@ const FortniteShop = () => {
                     </p>
                   </div>
                 </div>
-                
-                <div className="flex flex-wrap gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 h-5 w-5" />
-                    <Input
-                      type="text"
-                      placeholder="Rechercher un item..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="pl-12 pr-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm text-white placeholder-white/70 border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/30 w-80"
-                    />
-                  </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Enhanced Search and Filter Section */}
+          <div className="px-6 py-6 bg-gradient-to-r from-black/30 via-black/40 to-black/30 backdrop-blur-md border-b border-white/10">
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+                  <Search className="h-6 w-6 text-blue-400" />
+                  Rechercher et Filtrer
+                </h2>
+                <p className="text-blue-200">Trouvez rapidement les objets que vous recherchez</p>
+              </div>
+              
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {/* Enhanced Search Input */}
+                <div className="relative group lg:col-span-2">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 h-5 w-5 group-focus-within:text-blue-400 transition-colors" />
+                  <Input
+                    type="text"
+                    placeholder="Rechercher un objet par nom..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-12 pr-4 py-4 h-14 rounded-2xl bg-white/10 backdrop-blur-sm text-white placeholder-white/70 border-2 border-white/20 focus:border-blue-400/60 focus:ring-4 focus:ring-blue-400/20 text-lg font-medium transition-all duration-300"
+                  />
+                  {search && (
+                    <button
+                      onClick={() => setSearch("")}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Enhanced Rarity Filter */}
+                <div className="relative">
+                  <label className="block text-white/90 text-sm font-semibold mb-2">
+                    Rareté
+                  </label>
                   <Select value={rarity} onValueChange={(value) => setRarity(value)}>
-                    <SelectTrigger className="w-[200px] bg-white/10 backdrop-blur-sm text-white border-white/30 focus:ring-2 focus:ring-white/30 rounded-2xl">
+                    <SelectTrigger className="h-14 bg-white/10 backdrop-blur-sm text-white border-2 border-white/20 focus:border-purple-400/60 focus:ring-4 focus:ring-purple-400/20 rounded-2xl text-lg font-medium">
                       <SelectValue placeholder="Toutes raretés" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-700">
-                      <SelectItem value="all">Toutes raretés</SelectItem>
+                    <SelectContent className="bg-gray-900/95 backdrop-blur-md border-gray-700/50 rounded-xl shadow-2xl">
+                      <SelectItem value="all" className="text-white hover:bg-white/10 rounded-lg">
+                        Toutes raretés
+                      </SelectItem>
                       {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
-                        <SelectItem key={r} value={r}>
-                          {r.charAt(0).toUpperCase() + r.slice(1)}
+                        <SelectItem 
+                          key={r} 
+                          value={r}
+                          className="text-white hover:bg-white/10 rounded-lg capitalize"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getRarityColor(r)}`} />
+                            {r.charAt(0).toUpperCase() + r.slice(1)}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {(search || rarity !== "all") && (
-                    <Button
-                      onClick={clearFilters}
-                      variant="ghost" 
-                      className="text-white hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl"
-                    >
-                      <FilterX className="mr-2 h-4 w-4" />
-                      Réinitialiser
-                    </Button>
-                  )}
                 </div>
               </div>
+
+              {/* Filter Actions and Results */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mt-6 p-4 bg-black/20 backdrop-blur-sm rounded-2xl border border-white/10">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-white">
+                    <Tag className="h-5 w-5 text-blue-400" />
+                    <span className="font-bold">{getItemCount()} objets trouvés</span>
+                  </div>
+                  {(search || rarity !== "all") && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/70">Filtres actifs:</span>
+                      {search && (
+                        <Badge className="bg-blue-500/20 text-blue-300 border-blue-400/30">
+                          Recherche: "{search}"
+                        </Badge>
+                      )}
+                      {rarity !== "all" && (
+                        <Badge className="bg-purple-500/20 text-purple-300 border-purple-400/30">
+                          Rareté: {rarity}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {(search || rarity !== "all") && (
+                  <Button
+                    onClick={clearFilters}
+                    variant="outline" 
+                    className="bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 rounded-xl backdrop-blur-sm transition-all duration-300"
+                  >
+                    <FilterX className="mr-2 h-4 w-4" />
+                    Réinitialiser
+                  </Button>
+                )}
+              </div>
             </div>
-          </header>
+          </div>
 
           {/* Stats bar */}
           <div className="px-6 py-4">
