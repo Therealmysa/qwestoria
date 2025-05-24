@@ -36,17 +36,9 @@ const RankDisplay: React.FC<RankDisplayProps> = ({ points }) => {
         <div className="text-center mb-6">
           <h3 className="text-xl font-bold mb-2">Niveau Actuel</h3>
           <div className="flex justify-center mb-4">
-            <div className="relative">
-              <img 
-                src={currentRankInfo.logoUrl} 
-                alt={`${currentRankInfo.name} rank`} 
-                className="w-20 h-20 mx-auto animate-pulse-slow"
-              />
-              <div className={`absolute -inset-1 rounded-full ${currentRankInfo.color} blur-md opacity-70 -z-10`}></div>
+            <div className={`inline-flex items-center px-4 py-2 rounded-full ${currentRankInfo.color} font-bold text-lg`}>
+              {currentRankInfo.name}
             </div>
-          </div>
-          <div className={`inline-flex items-center px-4 py-2 rounded-full ${currentRankInfo.color} font-bold text-lg`}>
-            {currentRankInfo.name}
           </div>
         </div>
         
@@ -87,8 +79,9 @@ const RankDisplay: React.FC<RankDisplayProps> = ({ points }) => {
                 key={key} 
                 className={`flex flex-col items-center p-2 rounded ${currentRank === key ? 'bg-secondary/70 ring-1 ring-primary/20' : ''}`}
               >
-                <img src={rank.logoUrl} alt={rank.name} className="w-8 h-8" />
-                <span className="text-xs mt-1">{rank.name}</span>
+                <span className={`px-2 py-1 rounded text-xs ${rank.color}`}>
+                  {rank.name}
+                </span>
               </div>
             ))}
           </div>
