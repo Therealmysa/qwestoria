@@ -133,7 +133,12 @@ const FortniteShop = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800">
       {/* Animated Background Pattern */}
       <div className="fixed inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" fill-rule=\"evenodd\"><g fill=\"%23ffffff\" fill-opacity=\"0.1\"><circle cx=\"30\" cy=\"30\" r=\"2\"/></g></g></svg>')] animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 animate-pulse" 
+             style={{
+               backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px)',
+               backgroundSize: '60px 60px'
+             }}
+        />
       </div>
 
       {/* Header */}
