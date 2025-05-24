@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -173,23 +172,23 @@ const FortniteShop = () => {
                 
                 <div className="flex flex-wrap gap-4">
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 h-5 w-5" />
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-700 dark:text-gray-300 h-5 w-5 z-10" />
                     <Input
                       type="text"
                       placeholder="Rechercher un item..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="pl-12 pr-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm text-white placeholder-white/70 border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/30 w-80"
+                      className="pl-12 pr-4 py-3 rounded-2xl bg-white/95 backdrop-blur-sm text-gray-900 placeholder-gray-600 border-2 border-gray-300/80 focus:border-blue-500 focus:ring-2 focus:ring-blue-400/30 w-80 shadow-lg"
                     />
                   </div>
                   <Select value={rarity} onValueChange={(value) => setRarity(value)}>
-                    <SelectTrigger className="w-[200px] bg-white/10 backdrop-blur-sm text-white border-white/30 focus:ring-2 focus:ring-white/30 rounded-2xl">
+                    <SelectTrigger className="w-[200px] bg-white/95 backdrop-blur-sm text-gray-900 border-2 border-gray-300/80 focus:ring-2 focus:ring-blue-400/30 focus:border-blue-500 rounded-2xl shadow-lg font-medium">
                       <SelectValue placeholder="Toutes raretés" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-900 border-gray-700">
-                      <SelectItem value="all">Toutes raretés</SelectItem>
+                    <SelectContent className="bg-white border-gray-300 shadow-xl">
+                      <SelectItem value="all" className="text-gray-900 hover:bg-gray-100">Toutes raretés</SelectItem>
                       {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
-                        <SelectItem key={r} value={r}>
+                        <SelectItem key={r} value={r} className="text-gray-900 hover:bg-gray-100">
                           {r.charAt(0).toUpperCase() + r.slice(1)}
                         </SelectItem>
                       ))}
@@ -198,8 +197,7 @@ const FortniteShop = () => {
                   {(search || rarity !== "all") && (
                     <Button
                       onClick={clearFilters}
-                      variant="ghost" 
-                      className="text-white hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl"
+                      className="bg-white/95 hover:bg-white text-gray-900 hover:text-gray-700 backdrop-blur-sm border-2 border-gray-300/80 rounded-2xl shadow-lg font-medium px-6"
                     >
                       <FilterX className="mr-2 h-4 w-4" />
                       Réinitialiser
