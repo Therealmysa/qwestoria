@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -129,20 +130,22 @@ const FortniteShop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800">
-      {/* Animated Background Pattern */}
-      <div className="fixed inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 animate-pulse" 
-             style={{
-               backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px)',
-               backgroundSize: '60px 60px'
-             }}
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 p-8">
+      {/* Container détaché avec arrière-plan animé inclus */}
+      <div className="max-w-7xl mx-auto bg-black/20 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative">
+        
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 animate-pulse" 
+               style={{
+                 backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 50%, white 1px, transparent 1px)',
+                 backgroundSize: '60px 60px'
+               }}
+          />
+        </div>
 
-      {/* Main Container with rounded corners and spacing */}
-      <div className="relative z-10 min-h-screen py-8 px-4">
-        <div className="max-w-7xl mx-auto bg-black/20 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+        {/* Main Container content */}
+        <div className="relative z-10 min-h-screen">
           
           {/* Header */}
           <header className="bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-orange-500/90 backdrop-blur-md border-b border-white/20">
