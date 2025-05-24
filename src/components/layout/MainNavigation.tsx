@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import {
   NavigationMenu,
@@ -42,6 +43,7 @@ import {
 
 const MainNavigation = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,15 +53,41 @@ const MainNavigation = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        setTimeout(() => fetchProfile(session.user.id), 0);
+      } else {
+        setProfile(null);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      setLoading(false);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (error) throw error;
+      setProfile(data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -256,10 +284,13 @@ const MainNavigation = () => {
                     variant="ghost"
                     className="rounded-full flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/30 text-gray-700 dark:text-white hover:from-primary/20 hover:to-primary/40 dark:hover:from-[#9b87f5]/20 dark:hover:to-[#9b87f5]/40 transition-all duration-300"
                   >
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-primary/80 dark:from-[#9b87f5] dark:to-[#7654d3] flex items-center justify-center text-white">
-                      <UserIcon className="h-4 w-4" />
-                    </div>
-                    <span className="hidden sm:inline">Mon compte</span>
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
+                      <AvatarFallback className="bg-gradient-to-r from-primary to-primary/80 dark:from-[#9b87f5] dark:to-[#7654d3] text-white text-xs">
+                        {profile?.username?.charAt(0)?.toUpperCase() || <UserIcon className="h-4 w-4" />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline">{profile?.username || "Mon compte"}</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -269,7 +300,7 @@ const MainNavigation = () => {
                 >
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">Mon compte</p>
+                      <p className="text-sm font-medium">{profile?.username || "Mon compte"}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {user.email}
                       </p>
