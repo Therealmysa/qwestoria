@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          published: boolean
+          slug: string | null
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published?: boolean
+          slug?: string | null
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published?: boolean
+          slug?: string | null
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brad_coins: {
         Row: {
           balance: number
@@ -37,6 +76,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      friendships: {
+        Row: {
+          created_at: string
+          id: string
+          receiver_id: string
+          sender_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          receiver_id: string
+          sender_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          receiver_id?: string
+          sender_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
       }
       mission_submissions: {
         Row: {
@@ -138,6 +231,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           is_vip: boolean | null
+          platform: string | null
           updated_at: string | null
           username: string
         }
@@ -150,6 +244,7 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           is_vip?: boolean | null
+          platform?: string | null
           updated_at?: string | null
           username: string
         }
@@ -162,8 +257,42 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           is_vip?: boolean | null
+          platform?: string | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_id?: string
+          reporter_id?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -202,6 +331,53 @@ export type Database = {
           price?: number
         }
         Relationships: []
+      }
+      teammate_posts: {
+        Row: {
+          availability: string
+          created_at: string
+          description: string
+          game_mode: string
+          id: string
+          mic_required: boolean
+          platform: string | null
+          skill_level: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          availability?: string
+          created_at?: string
+          description: string
+          game_mode: string
+          id?: string
+          mic_required?: boolean
+          platform?: string | null
+          skill_level: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          availability?: string
+          created_at?: string
+          description?: string
+          game_mode?: string
+          id?: string
+          mic_required?: boolean
+          platform?: string | null
+          skill_level?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teammate_posts_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transactions: {
         Row: {

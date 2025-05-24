@@ -17,6 +17,8 @@ import Layout from "./components/layout/Layout";
 import { AuthProvider } from "./context/AuthContext";
 import { useEffect } from "react";
 import Teammates from "./pages/Teammates";
+import Blog from "./pages/Blog";
+import Messages from "./pages/Messages";
 
 const queryClient = new QueryClient();
 
@@ -87,10 +89,18 @@ const App = () => (
                 }
               />
               <Route
+                path="/teammates"
+                element={
+                  <Layout>
+                    <Teammates />
+                  </Layout>
+                }
+              />
+              <Route
                 path="/blog"
                 element={
                   <Layout>
-                    <NotFound />
+                    <Blog />
                   </Layout>
                 }
               />
@@ -98,7 +108,7 @@ const App = () => (
                 path="/messages"
                 element={
                   <Layout>
-                    <NotFound />
+                    <Messages />
                   </Layout>
                 }
               />
@@ -108,14 +118,6 @@ const App = () => (
                 element={
                   <Layout>
                     <NotFound />
-                  </Layout>
-                }
-              />
-              <Route
-                path="/teammates"
-                element={
-                  <Layout>
-                    <Teammates />
                   </Layout>
                 }
               />

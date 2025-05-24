@@ -68,17 +68,15 @@ export const rankTiers: Record<RankTier, RankInfo> = {
 };
 
 export const getRankByPoints = (points: number): RankTier => {
-  // Sort tiers by minimum points in descending order
   const sortedTiers = Object.entries(rankTiers).sort((a, b) => 
     b[1].minPoints - a[1].minPoints
   );
 
-  // Find the highest tier the user qualifies for
   for (const [tier, info] of sortedTiers) {
     if (points >= info.minPoints) {
       return tier as RankTier;
     }
   }
 
-  return 'bronze'; // Default to bronze if something goes wrong
+  return 'bronze';
 };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,12 +49,12 @@ interface TeammatePost {
   title: string;
   description: string;
   game_mode: string;
-  platform: string;
+  platform: string | null;
   mic_required: boolean;
   skill_level: string;
   created_at: string;
   availability: string;
-  profile: {
+  profiles: {
     username: string;
     avatar_url: string | null;
     fortnite_rank: string | null;
@@ -116,7 +117,7 @@ const Teammates = () => {
         .from("teammate_posts")
         .select(`
           *,
-          profile:user_id (
+          profiles!teammate_posts_user_id_fkey1 (
             username,
             avatar_url,
             fortnite_rank
@@ -155,7 +156,7 @@ const Teammates = () => {
             title: formData.title,
             description: formData.description,
             game_mode: formData.gameMode,
-            platform: formData.platform || profile?.platform || "",
+            platform: formData.platform || null,
             mic_required: formData.micRequired,
             skill_level: formData.skillLevel,
             availability: formData.availability
@@ -168,12 +169,11 @@ const Teammates = () => {
       toast.success("Annonce publiée avec succès !");
       fetchPosts();
       
-      // Reset form
       setFormData({
         title: "",
         description: "",
         gameMode: "battle-royale",
-        platform: profile?.platform || "",
+        platform: "",
         micRequired: true,
         skillLevel: "intermediate",
         availability: "anytime"
@@ -206,25 +206,40 @@ const Teammates = () => {
     }
   };
 
-  const handleContactPlayer = (postId: string, username: string) => {
+  const handleContactPlayer = async (postId: string, username: string, receiverId: string) => {
     if (!user) {
       toast.error("Vous devez être connecté pour contacter un joueur");
       return;
     }
 
-    // This would normally open a messaging interface or send a friend request
-    toast.success(`Demande envoyée à ${username}`);
+    try {
+      // Create a new message
+      const { error } = await supabase
+        .from("messages")
+        .insert([
+          {
+            sender_id: user.id,
+            receiver_id: receiverId,
+            content: `Salut ! Je suis intéressé par votre annonce de coéquipier. Pouvons-nous jouer ensemble ?`
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast.success(`Message envoyé à ${username}`);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Impossible d'envoyer le message");
+    }
   };
 
   const getFilteredPosts = () => {
     return posts.filter(post => {
-      // Search filter
       const matchesSearch = 
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
         post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.profile.username.toLowerCase().includes(searchQuery.toLowerCase());
+        post.profiles.username.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Other filters
       const matchesGameMode = filters.gameMode ? post.game_mode === filters.gameMode : true;
       const matchesPlatform = filters.platform ? post.platform === filters.platform : true;
       const matchesSkill = filters.skillLevel ? post.skill_level === filters.skillLevel : true;
@@ -554,20 +569,20 @@ const Teammates = () => {
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10 border border-primary/20 dark:border-[#9b87f5]/30">
-                          {post.profile.avatar_url ? (
-                            <AvatarImage src={post.profile.avatar_url} alt={post.profile.username} />
+                          {post.profiles.avatar_url ? (
+                            <AvatarImage src={post.profiles.avatar_url} alt={post.profiles.username} />
                           ) : (
                             <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
-                              {post.profile.username.substring(0, 2).toUpperCase()}
+                              {post.profiles.username.substring(0, 2).toUpperCase()}
                             </AvatarFallback>
                           )}
                         </Avatar>
                         <div>
-                          <CardTitle className="text-lg">{post.profile.username}</CardTitle>
+                          <CardTitle className="text-lg">{post.profiles.username}</CardTitle>
                           <div className="flex items-center gap-2 mt-1">
-                            {post.profile.fortnite_rank && (
+                            {post.profiles.fortnite_rank && (
                               <Badge variant="secondary" className="text-xs">
-                                {post.profile.fortnite_rank.charAt(0).toUpperCase() + post.profile.fortnite_rank.slice(1)}
+                                {post.profiles.fortnite_rank.charAt(0).toUpperCase() + post.profiles.fortnite_rank.slice(1)}
                               </Badge>
                             )}
                             <Badge variant="outline" className="text-xs bg-primary/5 dark:bg-[#9b87f5]/5">
@@ -631,7 +646,7 @@ const Teammates = () => {
                   <CardFooter className="border-t border-gray-100 dark:border-gray-800 pt-3">
                     <Button 
                       className="w-full bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]"
-                      onClick={() => handleContactPlayer(post.id, post.profile.username)}
+                      onClick={() => handleContactPlayer(post.id, post.profiles.username, post.user_id)}
                     >
                       Contacter le joueur
                     </Button>
@@ -650,14 +665,6 @@ const Teammates = () => {
               <p className="text-gray-500 dark:text-gray-400 mb-4">
                 Il n'y a aucune annonce correspondant à vos critères pour le moment.
               </p>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]">
-                    Soyez le premier à poster
-                  </Button>
-                </DialogTrigger>
-                {/* Reuse the same dialog content as above */}
-              </Dialog>
             </div>
           )}
         </TabsContent>
@@ -722,14 +729,6 @@ const Teammates = () => {
               <p className="text-gray-500 dark:text-gray-400 mb-4">
                 Créez votre première annonce pour trouver des coéquipiers
               </p>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]">
-                    Créer une annonce
-                  </Button>
-                </DialogTrigger>
-                {/* Reuse the same dialog content as above */}
-              </Dialog>
             </div>
           )}
         </TabsContent>
