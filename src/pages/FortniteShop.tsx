@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -84,7 +83,7 @@ const FortniteShop = () => {
 
   if (isLoading || isChecking)
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin text-6xl text-white mb-4 mx-auto" />
           <p className="text-white text-xl font-semibold">Chargement de la boutique...</p>
@@ -93,7 +92,7 @@ const FortniteShop = () => {
     );
   if (!payload)
     return (
-      <div className="text-center p-8 text-red-500 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
         <div className="bg-red-900/30 p-8 rounded-lg">
           <p className="text-xl font-bold text-white">Erreur de chargement de la boutique</p>
         </div>
@@ -141,272 +140,279 @@ const FortniteShop = () => {
         />
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-orange-500/90 backdrop-blur-md border-b border-white/20 shadow-2xl">
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
-                  <Calendar className="text-white h-8 w-8" />
-                </div>
-                <div className="absolute -top-2 -right-2 bg-orange-500 rounded-full p-1">
-                  <Zap className="h-4 w-4 text-white" />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-4xl font-black text-white tracking-tight">
-                  BOUTIQUE FORTNITE
-                </h1>
-                <p className="text-blue-100 font-medium flex items-center gap-2">
-                  <Timer className="h-4 w-4" />
-                  Mis à jour : {new Date(data.date).toLocaleString('fr-FR')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-4">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 h-5 w-5" />
-                <Input
-                  type="text"
-                  placeholder="Rechercher un item..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-12 pr-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm text-white placeholder-white/70 border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/30 w-80"
-                />
-              </div>
-              <Select value={rarity} onValueChange={(value) => setRarity(value)}>
-                <SelectTrigger className="w-[200px] bg-white/10 backdrop-blur-sm text-white border-white/30 focus:ring-2 focus:ring-white/30 rounded-2xl">
-                  <SelectValue placeholder="Toutes raretés" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-700">
-                  <SelectItem value="all">Toutes raretés</SelectItem>
-                  {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
-                    <SelectItem key={r} value={r}>
-                      {r.charAt(0).toUpperCase() + r.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {(search || rarity !== "all") && (
-                <Button
-                  onClick={clearFilters}
-                  variant="ghost" 
-                  className="text-white hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl"
-                >
-                  <FilterX className="mr-2 h-4 w-4" />
-                  Réinitialiser
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Stats bar */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-4">
-        <div className="flex flex-wrap gap-6 justify-between items-center bg-black/30 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg">
-              <Tag className="text-white h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-white font-bold">
-                {getItemCount()} objets disponibles
-              </p>
-              <p className="text-blue-200 text-sm">
-                {filteredSingles.length} articles • {filteredPacks.length} packs
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg">
-              <Star className="text-white h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-white font-bold">Boutique du jour</p>
-              <p className="text-orange-200 text-sm">
-                {new Date(data.date).toLocaleDateString('fr-FR')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Featured Packs Section */}
-      {filteredPacks.length > 0 && (
-        <section className="relative z-10 max-w-7xl mx-auto px-6 mb-12">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl">
-              <Package className="text-white h-6 w-6" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-black text-white">PACKS PREMIUM</h2>
-              <p className="text-purple-200">Collections exclusives et offres groupées</p>
-            </div>
-          </div>
+      {/* Main Container with rounded corners and spacing */}
+      <div className="relative z-10 min-h-screen py-8 px-4">
+        <div className="max-w-7xl mx-auto bg-black/20 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
           
-          <div className="grid gap-8">
-            {filteredPacks.map((entry) => (
-              <Card
-                key={entry.offerId}
-                onClick={() => setModalData({ entry })}
-                className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden group"
-              >
-                <div className="flex flex-col lg:flex-row">
-                  <div className="relative lg:w-2/5 h-80 lg:h-auto">
-                    <img
-                      src={entry.brItems?.[0]?.images?.featured || entry.brItems?.[0]?.images?.icon}
-                      alt={entry.brItems?.[0]?.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-sm font-bold px-3 py-1">
-                        <Package className="h-4 w-4 mr-1" />
-                        PACK • {entry.brItems?.length} OBJETS
-                      </Badge>
+          {/* Header */}
+          <header className="bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-orange-500/90 backdrop-blur-md border-b border-white/20">
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
+                      <Calendar className="text-white h-8 w-8" />
                     </div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-2xl font-black text-white mb-2">
-                        {entry.brItems?.[0]?.name || "Pack Premium"}
-                      </h3>
-                      <div className="flex items-center gap-2 text-white/80">
-                        <Timer className="h-4 w-4" />
-                        <span className="text-sm">Disponible maintenant</span>
-                      </div>
+                    <div className="absolute -top-2 -right-2 bg-orange-500 rounded-full p-1">
+                      <Zap className="h-4 w-4 text-white" />
                     </div>
                   </div>
-                  
-                  <div className="flex-1 p-8">
-                    <div className="mb-6">
-                      <h4 className="text-xl font-bold text-white mb-3">Contenu du pack</h4>
-                      <p className="text-gray-300 mb-4">
-                        Une collection soigneusement sélectionnée de {entry.brItems?.length} objets exclusifs pour personnaliser votre expérience Fortnite.
-                      </p>
-                    </div>
-                    
-                    {/* Items grid preview */}
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
-                      {entry.brItems?.map((item, idx) => (
-                        <div 
-                          key={idx}
-                          className="relative group/item"
-                        >
-                          <div className={`relative rounded-xl overflow-hidden bg-gradient-to-br ${getRarityColor(item.rarity.value)} p-1`}>
-                            <div className="bg-gray-900 rounded-lg overflow-hidden">
-                              <img 
-                                src={item.images.icon} 
-                                alt={item.name} 
-                                className="w-full h-16 object-cover group-hover/item:scale-110 transition-transform duration-300"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover/item:bg-black/20 transition-colors duration-300" />
-                            </div>
-                          </div>
-                          <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 bg-black/90 px-2 py-1 rounded text-xs text-white whitespace-nowrap z-10">
-                            {item.name}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex justify-between items-center pt-4 border-t border-white/20">
-                      <div className="flex items-center gap-3">
-                        <img src={data.vbuckIcon} alt="V-Bucks" className="h-8 w-8" />
-                        <span className="text-3xl font-black text-white">
-                          {entry.finalPrice ?? entry.regularPrice}
-                        </span>
-                        <span className="text-yellow-400 text-sm font-medium">V-Bucks</span>
-                      </div>
-                      <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold px-6 py-3 rounded-xl">
-                        VOIR LES DÉTAILS
-                      </Button>
-                    </div>
+                  <div>
+                    <h1 className="text-4xl font-black text-white tracking-tight">
+                      BOUTIQUE FORTNITE
+                    </h1>
+                    <p className="text-blue-100 font-medium flex items-center gap-2">
+                      <Timer className="h-4 w-4" />
+                      Mis à jour : {new Date(data.date).toLocaleString('fr-FR')}
+                    </p>
                   </div>
                 </div>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
+                
+                <div className="flex flex-wrap gap-4">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/70 h-5 w-5" />
+                    <Input
+                      type="text"
+                      placeholder="Rechercher un item..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="pl-12 pr-4 py-3 rounded-2xl bg-white/10 backdrop-blur-sm text-white placeholder-white/70 border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/30 w-80"
+                    />
+                  </div>
+                  <Select value={rarity} onValueChange={(value) => setRarity(value)}>
+                    <SelectTrigger className="w-[200px] bg-white/10 backdrop-blur-sm text-white border-white/30 focus:ring-2 focus:ring-white/30 rounded-2xl">
+                      <SelectValue placeholder="Toutes raretés" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-900 border-gray-700">
+                      <SelectItem value="all">Toutes raretés</SelectItem>
+                      {["common", "uncommon", "rare", "epic", "legendary"].map((r) => (
+                        <SelectItem key={r} value={r}>
+                          {r.charAt(0).toUpperCase() + r.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(search || rarity !== "all") && (
+                    <Button
+                      onClick={clearFilters}
+                      variant="ghost" 
+                      className="text-white hover:bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl"
+                    >
+                      <FilterX className="mr-2 h-4 w-4" />
+                      Réinitialiser
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </header>
 
-      {/* Individual Items Grid */}
-      <main className="relative z-10 max-w-7xl mx-auto p-6">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 rounded-xl">
-            <Star className="text-white h-6 w-6" />
-          </div>
-          <div>
-            <h2 className="text-3xl font-black text-white">ARTICLES INDIVIDUELS</h2>
-            <p className="text-blue-200">Objets cosmétiques et accessoires</p>
-          </div>
-        </div>
-
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredSingles.map((entry) => (
-            <Card
-              key={entry.offerId}
-              onClick={() => setModalData({ entry })}
-              className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden group"
-            >
-              <div className="relative">
-                <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(entry.brItems![0].rarity.value)} opacity-20`} />
-                <img
-                  src={entry.brItems![0].images.featured || entry.brItems![0].images.icon}
-                  alt={entry.brItems![0].name}
-                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                <Badge className={`absolute top-4 left-4 bg-gradient-to-r ${getRarityColor(entry.brItems![0].rarity.value)} text-white border-0 font-bold`}>
-                  {entry.brItems![0].rarity.displayValue}
-                </Badge>
-                <div className="absolute bottom-4 left-4 right-4">
-                  <h3 className="text-xl font-bold text-white mb-1 truncate">
-                    {entry.brItems![0].name}
-                  </h3>
-                  <p className="text-gray-300 text-sm mb-2">
-                    {entry.brItems![0].type.displayValue}
+          {/* Stats bar */}
+          <div className="px-6 py-4">
+            <div className="flex flex-wrap gap-6 justify-between items-center bg-black/30 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-lg">
+                  <Tag className="text-white h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-white font-bold">
+                    {getItemCount()} objets disponibles
+                  </p>
+                  <p className="text-blue-200 text-sm">
+                    {filteredSingles.length} articles • {filteredPacks.length} packs
                   </p>
                 </div>
               </div>
-              
-              <CardFooter className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <img src={data.vbuckIcon} alt="V-Bucks" className="h-6 w-6" />
-                  <span className="text-xl font-bold text-white">
-                    {entry.finalPrice ?? entry.regularPrice}
-                  </span>
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-lg">
+                  <Star className="text-white h-5 w-5" />
                 </div>
-                <Button 
-                  size="sm" 
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg"
-                >
-                  DÉTAILS
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </main>
-
-      {filteredSingles.length === 0 && filteredPacks.length === 0 && (
-        <div className="relative z-10 text-center p-12 max-w-3xl mx-auto">
-          <div className="bg-gray-900/80 backdrop-blur-md rounded-3xl p-12 border border-white/20">
-            <FilterX className="h-16 w-16 text-gray-400 mx-auto mb-6" />
-            <h3 className="text-2xl font-bold text-white mb-4">Aucun résultat trouvé</h3>
-            <p className="text-gray-300 mb-8 text-lg">
-              Aucun item ne correspond à votre recherche. Essayez avec d'autres critères.
-            </p>
-            <Button 
-              onClick={clearFilters} 
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold px-8 py-3 rounded-xl"
-            >
-              Réinitialiser les filtres
-            </Button>
+                <div>
+                  <p className="text-white font-bold">Boutique du jour</p>
+                  <p className="text-orange-200 text-sm">
+                    {new Date(data.date).toLocaleDateString('fr-FR')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Featured Packs Section */}
+          {filteredPacks.length > 0 && (
+            <section className="px-6 mb-12">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl">
+                  <Package className="text-white h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-black text-white">PACKS PREMIUM</h2>
+                  <p className="text-purple-200">Collections exclusives et offres groupées</p>
+                </div>
+              </div>
+              
+              <div className="grid gap-8">
+                {filteredPacks.map((entry) => (
+                  <Card
+                    key={entry.offerId}
+                    onClick={() => setModalData({ entry })}
+                    className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl overflow-hidden group"
+                  >
+                    <div className="flex flex-col lg:flex-row">
+                      <div className="relative lg:w-2/5 h-80 lg:h-auto">
+                        <img
+                          src={entry.brItems?.[0]?.images?.featured || entry.brItems?.[0]?.images?.icon}
+                          alt={entry.brItems?.[0]?.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <div className="absolute top-4 left-4">
+                          <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-sm font-bold px-3 py-1">
+                            <Package className="h-4 w-4 mr-1" />
+                            PACK • {entry.brItems?.length} OBJETS
+                          </Badge>
+                        </div>
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="text-2xl font-black text-white mb-2">
+                            {entry.brItems?.[0]?.name || "Pack Premium"}
+                          </h3>
+                          <div className="flex items-center gap-2 text-white/80">
+                            <Timer className="h-4 w-4" />
+                            <span className="text-sm">Disponible maintenant</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex-1 p-8">
+                        <div className="mb-6">
+                          <h4 className="text-xl font-bold text-white mb-3">Contenu du pack</h4>
+                          <p className="text-gray-300 mb-4">
+                            Une collection soigneusement sélectionnée de {entry.brItems?.length} objets exclusifs pour personnaliser votre expérience Fortnite.
+                          </p>
+                        </div>
+                        
+                        {/* Items grid preview */}
+                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+                          {entry.brItems?.map((item, idx) => (
+                            <div 
+                              key={idx}
+                              className="relative group/item"
+                            >
+                              <div className={`relative rounded-xl overflow-hidden bg-gradient-to-br ${getRarityColor(item.rarity.value)} p-1`}>
+                                <div className="bg-gray-900 rounded-lg overflow-hidden">
+                                  <img 
+                                    src={item.images.icon} 
+                                    alt={item.name} 
+                                    className="w-full h-16 object-cover group-hover/item:scale-110 transition-transform duration-300"
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover/item:bg-black/20 transition-colors duration-300" />
+                                </div>
+                              </div>
+                              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 bg-black/90 px-2 py-1 rounded text-xs text-white whitespace-nowrap z-10">
+                                {item.name}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-4 border-t border-white/20">
+                          <div className="flex items-center gap-3">
+                            <img src={data.vbuckIcon} alt="V-Bucks" className="h-8 w-8" />
+                            <span className="text-3xl font-black text-white">
+                              {entry.finalPrice ?? entry.regularPrice}
+                            </span>
+                            <span className="text-yellow-400 text-sm font-medium">V-Bucks</span>
+                          </div>
+                          <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold px-6 py-3 rounded-xl">
+                            VOIR LES DÉTAILS
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Individual Items Grid */}
+          <main className="px-6 pb-8">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-3 rounded-xl">
+                <Star className="text-white h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-black text-white">ARTICLES INDIVIDUELS</h2>
+                <p className="text-blue-200">Objets cosmétiques et accessoires</p>
+              </div>
+            </div>
+
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredSingles.map((entry) => (
+                <Card
+                  key={entry.offerId}
+                  onClick={() => setModalData({ entry })}
+                  className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden group"
+                >
+                  <div className="relative">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(entry.brItems![0].rarity.value)} opacity-20`} />
+                    <img
+                      src={entry.brItems![0].images.featured || entry.brItems![0].images.icon}
+                      alt={entry.brItems![0].name}
+                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <Badge className={`absolute top-4 left-4 bg-gradient-to-r ${getRarityColor(entry.brItems![0].rarity.value)} text-white border-0 font-bold`}>
+                      {entry.brItems![0].rarity.displayValue}
+                    </Badge>
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-xl font-bold text-white mb-1 truncate">
+                        {entry.brItems![0].name}
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-2">
+                        {entry.brItems![0].type.displayValue}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <CardFooter className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-sm">
+                    <div className="flex items-center gap-2">
+                      <img src={data.vbuckIcon} alt="V-Bucks" className="h-6 w-6" />
+                      <span className="text-xl font-bold text-white">
+                        {entry.finalPrice ?? entry.regularPrice}
+                      </span>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg"
+                    >
+                      DÉTAILS
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </main>
+
+          {/* No results message */}
+          {filteredSingles.length === 0 && filteredPacks.length === 0 && (
+            <div className="text-center p-12">
+              <div className="bg-gray-900/50 backdrop-blur-md rounded-3xl p-12 border border-white/10">
+                <FilterX className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-white mb-4">Aucun résultat trouvé</h3>
+                <p className="text-gray-300 mb-8 text-lg">
+                  Aucun item ne correspond à votre recherche. Essayez avec d'autres critères.
+                </p>
+                <Button 
+                  onClick={clearFilters} 
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold px-8 py-3 rounded-xl"
+                >
+                  Réinitialiser les filtres
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Enhanced Modal */}
       {modalData && (
