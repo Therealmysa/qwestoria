@@ -394,7 +394,7 @@ const Messages = () => {
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-3">
                         {messages.map((message) => {
                           const isMyMessage = message.sender_id === user?.id;
                           const senderProfile = userProfiles[message.sender_id];
@@ -402,34 +402,22 @@ const Messages = () => {
                           return (
                             <div
                               key={message.id}
-                              className={`flex items-start gap-2 ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                              className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
                             >
-                              {!isMyMessage && (
-                                <Avatar className="h-8 w-8 mt-1">
-                                  {senderProfile?.avatar_url ? (
-                                    <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
-                                  ) : (
-                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
-                                      {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                              )}
-                              
-                              <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-first' : ''}`}>
-                                {!isMyMessage && (
-                                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 ml-2">
-                                    {senderProfile?.username || 'Utilisateur inconnu'}
-                                  </p>
-                                )}
+                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? '' : 'ml-2'}`}>
                                 <div
-                                  className={`px-4 py-2 rounded-lg ${
+                                  className={`px-4 py-2 rounded-lg relative ${
                                     isMyMessage
-                                      ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-md'
-                                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-md'
+                                      ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-sm'
+                                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                   }`}
                                 >
-                                  <p className="text-sm">{message.content}</p>
+                                  {!isMyMessage && (
+                                    <p className="text-xs font-medium mb-1 text-primary dark:text-[#9b87f5]">
+                                      {senderProfile?.username || 'Utilisateur inconnu'}
+                                    </p>
+                                  )}
+                                  <p className="text-sm break-words">{message.content}</p>
                                   <p className={`text-xs mt-1 ${
                                     isMyMessage
                                       ? 'text-white/70'
@@ -438,19 +426,20 @@ const Messages = () => {
                                     {formatTime(message.created_at)}
                                   </p>
                                 </div>
+                                
+                                {/* Avatar positionné en bas à gauche de la bulle */}
+                                {!isMyMessage && (
+                                  <Avatar className="h-6 w-6 absolute -left-8 bottom-0">
+                                    {senderProfile?.avatar_url ? (
+                                      <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                    ) : (
+                                      <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
+                                        {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                      </AvatarFallback>
+                                    )}
+                                  </Avatar>
+                                )}
                               </div>
-                              
-                              {isMyMessage && (
-                                <Avatar className="h-8 w-8 mt-1">
-                                  {user.user_metadata?.avatar_url ? (
-                                    <AvatarImage src={user.user_metadata.avatar_url} alt="Vous" />
-                                  ) : (
-                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
-                                      {user.user_metadata?.username?.substring(0, 2).toUpperCase() || 'ME'}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                              )}
                             </div>
                           );
                         })}
