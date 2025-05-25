@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -275,17 +274,17 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col">
-      <div className="container mx-auto py-8 px-4 flex flex-col flex-1 overflow-hidden">
-        <div className="flex items-center gap-2 mb-6 flex-shrink-0">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C]">
+      <div className="container mx-auto py-8 px-4 h-[calc(100vh-80px)]">
+        <div className="flex items-center gap-2 mb-6">
           <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
           <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
             Messagerie
           </h1>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-[calc(100%-4rem)]">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="messages" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Messages
@@ -304,10 +303,10 @@ const Messages = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="messages" className="mt-6 flex-1 overflow-hidden">
+          <TabsContent value="messages" className="h-[calc(100%-3rem)]">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
               {/* Conversations List */}
-              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
+              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full flex flex-col">
                 <CardHeader className="pb-4 flex-shrink-0">
                   <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                   <div className="relative">
@@ -326,7 +325,7 @@ const Messages = () => {
                       <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                     </div>
                   ) : filteredConversations.length > 0 ? (
-                    <div className="h-full overflow-y-auto">
+                    <ScrollArea className="h-full">
                       {filteredConversations.map((conversation) => (
                         <div
                           key={conversation.user_id}
@@ -364,7 +363,7 @@ const Messages = () => {
                           )}
                         </div>
                       ))}
-                    </div>
+                    </ScrollArea>
                   ) : (
                     <div className="text-center py-8">
                       <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -377,7 +376,7 @@ const Messages = () => {
               </Card>
 
               {/* Messages */}
-              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
+              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full flex flex-col">
                 {selectedConversation && selectedUser ? (
                   <>
                     <CardHeader className="border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
@@ -403,7 +402,7 @@ const Messages = () => {
                           <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                         </div>
                       ) : (
-                        <div className="h-full overflow-y-auto p-4">
+                        <ScrollArea className="h-full p-4">
                           <div className="space-y-4">
                             {messages.map((message) => {
                               const isMyMessage = message.sender_id === user?.id;
@@ -459,7 +458,7 @@ const Messages = () => {
                               );
                             })}
                           </div>
-                        </div>
+                        </ScrollArea>
                       )}
                     </div>
                     
@@ -509,15 +508,15 @@ const Messages = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="friends" className="mt-6">
-            <Card>
+          <TabsContent value="friends" className="h-[calc(100%-3rem)]">
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
                   Mes amis ({friends.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="h-[calc(100%-5rem)] overflow-y-auto">
                 {friends.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {friends.map((friend) => (
@@ -567,11 +566,11 @@ const Messages = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="requests" className="mt-6">
+          <TabsContent value="requests" className="h-[calc(100%-3rem)]">
             <FriendRequests />
           </TabsContent>
 
-          <TabsContent value="add-friend" className="mt-6">
+          <TabsContent value="add-friend" className="h-[calc(100%-3rem)]">
             <AddFriend />
           </TabsContent>
         </Tabs>
