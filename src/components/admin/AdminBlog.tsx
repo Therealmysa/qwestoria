@@ -106,9 +106,11 @@ const AdminBlog = () => {
         const { error } = await supabase
           .from('blog_posts')
           .update({
-            ...data,
-            image_url: data.image_url || null,
+            title: data.title,
+            content: data.content,
             summary: data.summary || null,
+            image_url: data.image_url || null,
+            published: data.published,
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingPost.id);
@@ -119,9 +121,11 @@ const AdminBlog = () => {
         const { error } = await supabase
           .from('blog_posts')
           .insert({
-            ...data,
-            image_url: data.image_url || null,
+            title: data.title,
+            content: data.content,
             summary: data.summary || null,
+            image_url: data.image_url || null,
+            published: data.published,
             author_id: user!.id,
           });
         
