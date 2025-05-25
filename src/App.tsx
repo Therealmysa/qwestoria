@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +20,8 @@ import { useEffect } from "react";
 import Teammates from "./pages/Teammates";
 import Blog from "./pages/Blog";
 import Messages from "./pages/Messages";
+import Admin from "./pages/Admin";
+import VipUpgrade from "./components/vip/VipUpgrade";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +112,22 @@ const App = () => (
                 element={
                   <Layout>
                     <Messages />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <Layout>
+                    <Admin />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/vip"
+                element={
+                  <Layout>
+                    <VipUpgrade />
                   </Layout>
                 }
               />

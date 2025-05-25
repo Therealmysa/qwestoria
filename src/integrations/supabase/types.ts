@@ -9,6 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      advertisements: {
+        Row: {
+          click_count: number
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          impression_count: number
+          is_active: boolean
+          link_url: string
+          position: string
+          start_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          impression_count?: number
+          is_active?: boolean
+          link_url: string
+          position?: string
+          start_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          impression_count?: number
+          is_active?: boolean
+          link_url?: string
+          position?: string
+          start_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -332,6 +410,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          name: string
+          price_monthly: number
+          price_yearly: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          price_monthly: number
+          price_yearly?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_monthly?: number
+          price_yearly?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       teammate_posts: {
         Row: {
           availability: string
@@ -446,6 +560,53 @@ export type Database = {
           },
         ]
       }
+      user_subscriptions: {
+        Row: {
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_id: string
+          started_at: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -461,6 +622,14 @@ export type Database = {
           total_coins: number
           completed_missions: number
         }[]
+      }
+      increment_ad_clicks: {
+        Args: { ad_id: string }
+        Returns: undefined
+      }
+      increment_ad_impressions: {
+        Args: { ad_id: string }
+        Returns: undefined
       }
     }
     Enums: {
