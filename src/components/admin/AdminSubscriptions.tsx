@@ -14,8 +14,8 @@ const AdminSubscriptions = () => {
         .from('user_subscriptions')
         .select(`
           *,
-          profiles(username, avatar_url),
-          subscription_plans(name, price_monthly)
+          subscription_plans(name, price_monthly),
+          profiles!user_subscriptions_user_id_fkey(username, avatar_url)
         `)
         .order('created_at', { ascending: false });
       
@@ -121,16 +121,16 @@ const AdminSubscriptions = () => {
                           />
                         ) : (
                           <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                            {subscription.profiles?.username?.[0]?.toUpperCase()}
+                            {subscription.profiles?.username?.[0]?.toUpperCase() || 'U'}
                           </div>
                         )}
-                        <span className="font-medium">{subscription.profiles?.username}</span>
+                        <span className="font-medium">{subscription.profiles?.username || 'Utilisateur'}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Crown className="h-3 w-3" />
-                        {subscription.subscription_plans?.name}
+                        {subscription.subscription_plans?.name || 'Plan inconnu'}
                       </Badge>
                     </TableCell>
                     <TableCell>
