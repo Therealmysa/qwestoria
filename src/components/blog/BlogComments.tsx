@@ -48,7 +48,7 @@ const BlogComments = ({ postId, className = "" }: BlogCommentsProps) => {
         .from('blog_post_comments')
         .select(`
           *,
-          profiles!blog_post_comments_user_id_fkey (
+          profiles:user_id (
             username,
             avatar_url
           )
