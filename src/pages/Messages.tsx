@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,7 +54,6 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userProfiles, setUserProfiles] = useState<{ [key: string]: UserProfile }>({});
 
-  // Définir fetchFriends avant les useEffect qui l'utilisent
   const fetchFriends = async () => {
     try {
       // Récupérer les amitiés acceptées
@@ -96,14 +94,12 @@ const Messages = () => {
     }
   };
 
-  // Redirection si non connecté
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  // Utilisation des hooks temps réel
   const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
   const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
 
@@ -119,11 +115,9 @@ const Messages = () => {
     }
   }, [selectedConversation, messages]);
 
-  // Récupérer les profils des utilisateurs pour les messages (y compris l'utilisateur actuel)
   useEffect(() => {
     const fetchUserProfiles = async () => {
       if (messages.length > 0 && user) {
-        // Inclure l'utilisateur actuel dans la liste des IDs à récupérer
         const userIds = [...new Set([...messages.map(msg => msg.sender_id), user.id])];
         const missingUserIds = userIds.filter(id => !userProfiles[id]);
         
@@ -156,7 +150,6 @@ const Messages = () => {
     fetchUserProfiles();
   }, [messages, user]);
 
-  // Ne pas afficher le contenu si l'utilisateur n'est pas connecté
   if (!user || loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -214,7 +207,6 @@ const Messages = () => {
       setNewMessage("");
       toast.success("Message envoyé");
       
-      // Actualiser les conversations après l'envoi
       refetchConversations();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -225,11 +217,9 @@ const Messages = () => {
   };
 
   const startConversationWithFriend = async (friendId: string) => {
-    // Vérifier si une conversation existe déjà
     const existingConv = conversations.find(conv => conv.user_id === friendId);
     
     if (!existingConv) {
-      // Si aucune conversation n'existe, créer un message de bienvenue
       try {
         const { error } = await supabase
           .from("messages")
@@ -243,7 +233,6 @@ const Messages = () => {
 
         if (error) throw error;
         
-        // Actualiser les conversations
         await refetchConversations();
         toast.success("Conversation créée");
       } catch (error) {
@@ -275,8 +264,8 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C] overflow-hidden">
-      <div className="flex-1 flex flex-col min-h-0 p-4">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C]">
+      <div className="flex-1 flex flex-col p-4 min-h-0">
         <div className="flex items-center gap-2 mb-4 flex-shrink-0">
           <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
           <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
@@ -307,7 +296,7 @@ const Messages = () => {
           <TabsContent value="messages" className="flex-1 min-h-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
               {/* Conversations List */}
-              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
+              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
                 <CardHeader className="pb-4 flex-shrink-0">
                   <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                   <div className="relative">
@@ -379,7 +368,7 @@ const Messages = () => {
               </Card>
 
               {/* Messages */}
-              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
+              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
                 {selectedConversation && selectedUser ? (
                   <>
                     <CardHeader className="border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
@@ -399,7 +388,7 @@ const Messages = () => {
                       </div>
                     </CardHeader>
                     
-                    <div className="flex-1 min-h-0 overflow-hidden">
+                    <div className="flex-1 min-h-0">
                       {messagesLoading ? (
                         <div className="flex justify-center items-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
@@ -426,7 +415,6 @@ const Messages = () => {
                                           : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                       }`}
                                     >
-                                      {/* Pseudo avec une couleur qui contraste bien */}
                                       <p className={`text-xs font-semibold mb-1 ${
                                         isMyMessage 
                                           ? 'text-blue-200' 
@@ -444,7 +432,6 @@ const Messages = () => {
                                       </p>
                                     </div>
                                     
-                                    {/* Avatar positionné à droite pour mes messages, à gauche pour les autres */}
                                     <Avatar className={`h-6 w-6 absolute bottom-0 ${
                                       isMyMessage ? '-right-7' : '-left-7'
                                     }`}>
