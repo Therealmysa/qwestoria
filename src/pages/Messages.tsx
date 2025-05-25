@@ -275,9 +275,9 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C]">
-      <div className="container mx-auto py-4 px-4 flex-1 flex flex-col min-h-0">
-        <div className="flex items-center gap-2 mb-4">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C] overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 p-4">
+        <div className="flex items-center gap-2 mb-4 flex-shrink-0">
           <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
           <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
             Messagerie
@@ -285,7 +285,7 @@ const Messages = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="grid w-full grid-cols-4 mb-4 flex-shrink-0">
             <TabsTrigger value="messages" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Messages
@@ -307,7 +307,7 @@ const Messages = () => {
           <TabsContent value="messages" className="flex-1 min-h-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
               {/* Conversations List */}
-              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
+              <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
                 <CardHeader className="pb-4 flex-shrink-0">
                   <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                   <div className="relative">
@@ -327,43 +327,45 @@ const Messages = () => {
                     </div>
                   ) : filteredConversations.length > 0 ? (
                     <ScrollArea className="h-full">
-                      {filteredConversations.map((conversation) => (
-                        <div
-                          key={conversation.user_id}
-                          onClick={() => setSelectedConversation(conversation.user_id)}
-                          className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 transition-colors ${
-                            selectedConversation === conversation.user_id ? 'bg-primary/5 dark:bg-[#9b87f5]/10' : ''
-                          }`}
-                        >
-                          <Avatar className="h-10 w-10">
-                            {conversation.avatar_url ? (
-                              <AvatarImage src={conversation.avatar_url} alt={conversation.username} />
-                            ) : (
-                              <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5]">
-                                {conversation.username.substring(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex-grow min-w-0">
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-medium text-gray-800 dark:text-white truncate">
-                                {conversation.username}
-                              </h3>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {formatTime(conversation.last_message_time)}
-                              </span>
+                      <div>
+                        {filteredConversations.map((conversation) => (
+                          <div
+                            key={conversation.user_id}
+                            onClick={() => setSelectedConversation(conversation.user_id)}
+                            className={`flex items-center gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700 transition-colors ${
+                              selectedConversation === conversation.user_id ? 'bg-primary/5 dark:bg-[#9b87f5]/10' : ''
+                            }`}
+                          >
+                            <Avatar className="h-10 w-10">
+                              {conversation.avatar_url ? (
+                                <AvatarImage src={conversation.avatar_url} alt={conversation.username} />
+                              ) : (
+                                <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5]">
+                                  {conversation.username.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div className="flex-grow min-w-0">
+                              <div className="flex justify-between items-center">
+                                <h3 className="font-medium text-gray-800 dark:text-white truncate">
+                                  {conversation.username}
+                                </h3>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  {formatTime(conversation.last_message_time)}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                                {conversation.last_message}
+                              </p>
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                              {conversation.last_message}
-                            </p>
+                            {conversation.unread_count > 0 && (
+                              <Badge variant="default" className="bg-primary dark:bg-[#9b87f5] text-white text-xs">
+                                {conversation.unread_count}
+                              </Badge>
+                            )}
                           </div>
-                          {conversation.unread_count > 0 && (
-                            <Badge variant="default" className="bg-primary dark:bg-[#9b87f5] text-white text-xs">
-                              {conversation.unread_count}
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </ScrollArea>
                   ) : (
                     <div className="text-center py-8">
@@ -377,7 +379,7 @@ const Messages = () => {
               </Card>
 
               {/* Messages */}
-              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
+              <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
                 {selectedConversation && selectedUser ? (
                   <>
                     <CardHeader className="border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
@@ -397,14 +399,14 @@ const Messages = () => {
                       </div>
                     </CardHeader>
                     
-                    <div className="flex-1 min-h-0">
+                    <div className="flex-1 min-h-0 overflow-hidden">
                       {messagesLoading ? (
                         <div className="flex justify-center items-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                         </div>
                       ) : (
-                        <ScrollArea className="h-full p-4">
-                          <div className="space-y-4">
+                        <ScrollArea className="h-full">
+                          <div className="p-4 space-y-4">
                             {messages.map((message) => {
                               const isMyMessage = message.sender_id === user?.id;
                               const senderProfile = userProfiles[message.sender_id];
