@@ -4,8 +4,6 @@ import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import TextStyle from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import Table from '@tiptap/extension-table';
 import TableRow from '@tiptap/extension-table-row';
@@ -31,10 +29,6 @@ import {
   Redo,
   Link as LinkIcon,
   Image as ImageIcon,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
   Table as TableIcon,
 } from 'lucide-react';
 
@@ -65,10 +59,6 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
           class: 'text-blue-500 underline cursor-pointer',
         },
       }),
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      TextStyle,
       Color.configure({
         types: ['textStyle'],
       }),
@@ -217,45 +207,6 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
           <Quote className="h-4 w-4" />
-        </Button>
-
-        <Separator orientation="vertical" className="h-6" />
-
-        {/* Alignement */}
-        <Button
-          type="button"
-          variant={editor.isActive({ textAlign: 'left' }) ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
-        >
-          <AlignLeft className="h-4 w-4" />
-        </Button>
-        
-        <Button
-          type="button"
-          variant={editor.isActive({ textAlign: 'center' }) ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
-        >
-          <AlignCenter className="h-4 w-4" />
-        </Button>
-        
-        <Button
-          type="button"
-          variant={editor.isActive({ textAlign: 'right' }) ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
-        >
-          <AlignRight className="h-4 w-4" />
-        </Button>
-        
-        <Button
-          type="button"
-          variant={editor.isActive({ textAlign: 'justify' }) ? 'default' : 'ghost'}
-          size="sm"
-          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-        >
-          <AlignJustify className="h-4 w-4" />
         </Button>
 
         <Separator orientation="vertical" className="h-6" />
