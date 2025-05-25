@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -305,7 +306,7 @@ const Messages = () => {
         <TabsContent value="messages" className="mt-6 flex-1 min-h-0">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full min-h-0">
             {/* Conversations List */}
-            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full flex flex-col min-h-0">
+            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col overflow-hidden">
               <CardHeader className="pb-4 flex-shrink-0">
                 <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                 <div className="relative">
@@ -318,7 +319,7 @@ const Messages = () => {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="p-0 flex-1 overflow-hidden min-h-0">
+              <CardContent className="p-0 flex-1 min-h-0">
                 {isLoading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
@@ -375,7 +376,7 @@ const Messages = () => {
             </Card>
 
             {/* Messages */}
-            <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full min-h-0">
+            <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col overflow-hidden">
               {selectedConversation && selectedUser ? (
                 <>
                   <CardHeader className="border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
@@ -395,7 +396,7 @@ const Messages = () => {
                     </div>
                   </CardHeader>
                   
-                  <div className="flex-1 overflow-hidden min-h-0">
+                  <div className="flex-1 min-h-0">
                     {messagesLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
