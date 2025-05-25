@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -44,20 +43,39 @@ const BlogComments = ({ postId, className = "" }: BlogCommentsProps) => {
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Récupérer les commentaires d'abord
+      const { data: commentsData, error: commentsError } = await supabase
         .from('blog_post_comments')
-        .select(`
-          *,
-          profiles:user_id (
-            username,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setComments(data || []);
+      if (commentsError) throw commentsError;
+
+      if (!commentsData || commentsData.length === 0) {
+        setComments([]);
+        return;
+      }
+
+      // Récupérer les profils séparément
+      const userIds = [...new Set(commentsData.map(comment => comment.user_id))];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combiner les données
+      const commentsWithProfiles = commentsData.map(comment => ({
+        ...comment,
+        profiles: profilesData?.find(profile => profile.id === comment.user_id) || {
+          username: 'Utilisateur inconnu',
+          avatar_url: undefined
+        }
+      }));
+
+      setComments(commentsWithProfiles);
     } catch (error) {
       console.error('Erreur lors du chargement des commentaires:', error);
       toast.error("Erreur lors du chargement des commentaires");

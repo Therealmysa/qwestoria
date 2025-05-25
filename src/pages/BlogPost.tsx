@@ -18,21 +18,34 @@ const BlogPost = () => {
   const { data: post, isLoading, error } = useQuery({
     queryKey: ['blog-post', id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Récupérer le post d'abord
+      const { data: postData, error: postError } = await supabase
         .from('blog_posts')
-        .select(`
-          *,
-          profiles:author_id (
-            username,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .eq('published', true)
         .single();
 
-      if (error) throw error;
-      return data;
+      if (postError) throw postError;
+
+      // Récupérer le profil de l'auteur séparément
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', postData.author_id)
+        .single();
+
+      if (profileError) {
+        console.warn('Profil de l\'auteur non trouvé:', profileError);
+      }
+
+      return {
+        ...postData,
+        profiles: profileData || {
+          username: 'Auteur inconnu',
+          avatar_url: undefined
+        }
+      };
     },
     enabled: !!id,
   });
