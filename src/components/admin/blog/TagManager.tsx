@@ -1,19 +1,9 @@
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Plus, X } from 'lucide-react';
-import { toast } from 'sonner';
-
-interface Tag {
-  id: string;
-  name: string;
-  slug: string;
-  created_at: string;
-}
 
 interface TagManagerProps {
   selectedTags: string[];
@@ -22,48 +12,25 @@ interface TagManagerProps {
 
 const TagManager = ({ selectedTags, onTagsChange }: TagManagerProps) => {
   const [newTagName, setNewTagName] = useState('');
-  const queryClient = useQueryClient();
 
-  // Récupérer les tags
-  const { data: tags = [] } = useQuery({
-    queryKey: ['blog-tags'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('blog_tags')
-        .select('*')
-        .order('name');
-      
-      if (error) throw error;
-      return data as Tag[];
-    },
-  });
-
-  // Créer un nouveau tag
-  const createMutation = useMutation({
-    mutationFn: async (name: string) => {
-      const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      const { error } = await supabase
-        .from('blog_tags')
-        .insert({
-          name,
-          slug
-        });
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blog-tags'] });
-      setNewTagName('');
-      toast.success('Tag créé avec succès');
-    },
-    onError: () => {
-      toast.error('Erreur lors de la création du tag');
-    },
-  });
+  // Tags locaux temporaires
+  const [localTags, setLocalTags] = useState([
+    { id: '1', name: 'React' },
+    { id: '2', name: 'JavaScript' },
+    { id: '3', name: 'TypeScript' },
+    { id: '4', name: 'CSS' },
+    { id: '5', name: 'HTML' },
+    { id: '6', name: 'Node.js' },
+  ]);
 
   const handleCreateTag = () => {
     if (newTagName.trim()) {
-      createMutation.mutate(newTagName.trim());
+      const newTag = {
+        id: Date.now().toString(),
+        name: newTagName.trim()
+      };
+      setLocalTags([...localTags, newTag]);
+      setNewTagName('');
     }
   };
 
@@ -90,7 +57,7 @@ const TagManager = ({ selectedTags, onTagsChange }: TagManagerProps) => {
             <p className="text-sm text-gray-600 mb-2">Tags sélectionnés :</p>
             <div className="flex flex-wrap gap-2">
               {selectedTags.map((tagId) => {
-                const tag = tags.find(t => t.id === tagId);
+                const tag = localTags.find(t => t.id === tagId);
                 return tag ? (
                   <Badge key={tagId} variant="default" className="flex items-center gap-1">
                     {tag.name}
@@ -119,7 +86,7 @@ const TagManager = ({ selectedTags, onTagsChange }: TagManagerProps) => {
           />
           <Button 
             onClick={handleCreateTag}
-            disabled={!newTagName.trim() || createMutation.isPending}
+            disabled={!newTagName.trim()}
             size="sm"
           >
             <Plus className="h-4 w-4" />
@@ -130,7 +97,7 @@ const TagManager = ({ selectedTags, onTagsChange }: TagManagerProps) => {
         <div>
           <p className="text-sm text-gray-600 mb-2">Tags disponibles :</p>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-            {tags.filter(tag => !selectedTags.includes(tag.id)).map((tag) => (
+            {localTags.filter(tag => !selectedTags.includes(tag.id)).map((tag) => (
               <Badge
                 key={tag.id}
                 variant="outline"
@@ -143,7 +110,7 @@ const TagManager = ({ selectedTags, onTagsChange }: TagManagerProps) => {
           </div>
         </div>
 
-        {tags.length === 0 && (
+        {localTags.length === 0 && (
           <p className="text-gray-500 text-sm">Aucun tag disponible</p>
         )}
       </div>
