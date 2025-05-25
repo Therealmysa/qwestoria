@@ -1,12 +1,12 @@
-
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, Clock, User, ArrowLeft } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import BlogSocialActions from "@/components/blog/BlogSocialActions";
@@ -14,6 +14,7 @@ import BlogComments from "@/components/blog/BlogComments";
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const { data: post, isLoading, error } = useQuery({
     queryKey: ['blog-post', id],
@@ -87,6 +88,18 @@ const BlogPost = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <article className="max-w-4xl mx-auto">
+        {/* Bouton de retour */}
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/blog')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour aux articles
+          </Button>
+        </div>
+
         <Card>
           <CardHeader className="space-y-6">
             {/* Titre de l'article */}
