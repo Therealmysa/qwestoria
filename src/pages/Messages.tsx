@@ -413,15 +413,6 @@ const Messages = () => {
                               className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
                             >
                               <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
-                                {/* Pseudo affiché au-dessus du message avec un style distinct */}
-                                <div className={`text-xs font-medium mb-1 ${
-                                  isMyMessage ? 'text-right' : 'text-left'
-                                }`}>
-                                  <span className="bg-black/20 dark:bg-white/20 px-2 py-1 rounded-full text-gray-700 dark:text-gray-300">
-                                    {senderProfile?.username || 'Chargement...'}
-                                  </span>
-                                </div>
-                                
                                 <div
                                   className={`px-3 py-2 rounded-lg relative ${
                                     isMyMessage
@@ -429,6 +420,14 @@ const Messages = () => {
                                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                   }`}
                                 >
+                                  {/* Pseudo avec une couleur qui contraste bien */}
+                                  <p className={`text-xs font-semibold mb-1 ${
+                                    isMyMessage 
+                                      ? 'text-blue-100' 
+                                      : 'text-blue-600 dark:text-blue-400'
+                                  }`}>
+                                    {senderProfile?.username || 'Chargement...'}
+                                  </p>
                                   <p className="text-sm break-words">{message.content}</p>
                                   <p className={`text-xs mt-1 ${
                                     isMyMessage
