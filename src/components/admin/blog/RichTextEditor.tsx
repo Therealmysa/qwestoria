@@ -362,7 +362,7 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
       )}
 
       {/* Éditeur */}
-      <div className="p-4">
+      <div className="p-4 relative">
         <EditorContent
           editor={editor}
           className="prose prose-sm max-w-none min-h-[300px] focus:outline-none"
