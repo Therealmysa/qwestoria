@@ -274,7 +274,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="container mx-auto py-8 px-4 h-[calc(100vh-200px)] flex flex-col">
+    <div className="container mx-auto py-8 px-4 h-[calc(100vh-280px)] flex flex-col">
       <div className="flex items-center gap-2 mb-6">
         <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
         <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
