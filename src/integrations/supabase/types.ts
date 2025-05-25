@@ -95,6 +95,7 @@ export type Database = {
           id: string
           image_url: string | null
           published: boolean
+          reading_time_minutes: number | null
           slug: string | null
           summary: string | null
           title: string
@@ -107,6 +108,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           published?: boolean
+          reading_time_minutes?: number | null
           slug?: string | null
           summary?: string | null
           title: string
@@ -119,6 +121,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           published?: boolean
+          reading_time_minutes?: number | null
           slug?: string | null
           summary?: string | null
           title?: string

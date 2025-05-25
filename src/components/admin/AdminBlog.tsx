@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,7 +44,8 @@ import {
   Save,
   BookOpen,
   Tag,
-  Folder
+  Folder,
+  Clock
 } from "lucide-react";
 import RichTextEditor from "./blog/RichTextEditor";
 import CategoryManager from "./blog/CategoryManager";
@@ -62,6 +62,7 @@ interface BlogPost {
   updated_at: string;
   author_id: string;
   slug: string | null;
+  reading_time_minutes: number | null;
 }
 
 const blogFormSchema = z.object({
@@ -74,6 +75,7 @@ const blogFormSchema = z.object({
   meta_description: z.string().optional(),
   categories: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
+  reading_time_minutes: z.number().min(1, "Le temps de lecture doit être d'au moins 1 minute").max(120, "Le temps de lecture ne peut pas dépasser 120 minutes"),
 });
 
 type BlogFormData = z.infer<typeof blogFormSchema>;
@@ -96,6 +98,7 @@ const AdminBlog = () => {
       published: false,
       featured: false,
       meta_description: "",
+      reading_time_minutes: 5,
     },
   });
 
@@ -131,6 +134,7 @@ const AdminBlog = () => {
             image_url: data.image_url || null,
             published: data.published,
             slug: slug,
+            reading_time_minutes: data.reading_time_minutes,
             updated_at: new Date().toISOString(),
           })
           .eq('id', editingPost.id);
@@ -147,6 +151,7 @@ const AdminBlog = () => {
             image_url: data.image_url || null,
             published: data.published,
             slug: slug,
+            reading_time_minutes: data.reading_time_minutes,
             author_id: user!.id,
           });
         
@@ -196,6 +201,7 @@ const AdminBlog = () => {
       content: post.content,
       image_url: post.image_url || "",
       published: post.published,
+      reading_time_minutes: post.reading_time_minutes || 5,
     });
     setDialogOpen(true);
   };
@@ -341,6 +347,34 @@ const AdminBlog = () => {
                                 onCheckedChange={field.onChange}
                               />
                             </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Temps de lecture */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Temps de lecture
+                      </h3>
+                      <FormField
+                        control={form.control}
+                        name="reading_time_minutes"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Minutes de lecture estimées</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                min="1" 
+                                max="120" 
+                                placeholder="5" 
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                              />
+                            </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />

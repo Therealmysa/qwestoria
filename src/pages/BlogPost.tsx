@@ -12,10 +12,8 @@ import {
   ArrowLeft,
   BookOpen,
   Loader2,
-  Share2,
-  Heart,
-  MessageCircle,
 } from "lucide-react";
+import BlogSocialActions from "@/components/blog/BlogSocialActions";
 
 interface BlogPost {
   id: string;
@@ -27,6 +25,7 @@ interface BlogPost {
   created_at: string;
   updated_at: string;
   author_id: string;
+  reading_time_minutes: number | null;
 }
 
 const BlogPost = () => {
@@ -69,19 +68,6 @@ const BlogPost = () => {
       month: "long",
       day: "numeric"
     });
-  };
-
-  const shareArticle = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: post?.title,
-        text: post?.summary || "",
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Lien copié dans le presse-papiers");
-    }
   };
 
   if (isLoading) {
@@ -152,35 +138,16 @@ const BlogPost = () => {
                 <Separator orientation="vertical" className="h-4" />
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  <span>5 min de lecture</span>
+                  <span>{post.reading_time_minutes || 5} min de lecture</span>
                 </div>
               </div>
               
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={shareArticle}
-                  className="text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-[#9b87f5]"
-                >
-                  <Share2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-500 hover:text-red-500 dark:text-gray-400"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-500 hover:text-blue-500 dark:text-gray-400"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Actions sociales */}
+              <BlogSocialActions 
+                postId={post.id}
+                postTitle={post.title}
+                postSummary={post.summary || undefined}
+              />
             </div>
 
             {/* Titre */}
@@ -235,6 +202,21 @@ const BlogPost = () => {
                 prose-hr:border-gray-200 dark:prose-hr:border-gray-700 prose-hr:my-8"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
+
+            {/* Actions sociales en bas de l'article */}
+            <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Cet article vous a plu ? Partagez-le !
+                </p>
+                <BlogSocialActions 
+                  postId={post.id}
+                  postTitle={post.title}
+                  postSummary={post.summary || undefined}
+                  className="bg-gray-50 dark:bg-gray-800/40 px-4 py-2 rounded-lg"
+                />
+              </div>
+            </div>
           </div>
         </article>
 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +38,7 @@ interface BlogPost {
   created_at: string;
   updated_at: string;
   author_id: string;
+  reading_time_minutes: number | null;
 }
 
 const Blog = () => {
@@ -167,7 +169,7 @@ const Blog = () => {
                   <span>{formatDate(post.created_at)}</span>
                   <Separator orientation="vertical" className="h-4" />
                   <Clock className="h-4 w-4" />
-                  <span>5 min de lecture</span>
+                  <span>{post.reading_time_minutes || 5} min de lecture</span>
                 </div>
                 <CardTitle 
                   className="text-xl text-gray-800 dark:text-white hover:text-primary dark:hover:text-[#9b87f5] transition-colors line-clamp-2 cursor-pointer"
