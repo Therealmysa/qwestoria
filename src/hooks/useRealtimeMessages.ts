@@ -33,9 +33,10 @@ export const useRealtimeMessages = (partnerId: string | null) => {
           .order("created_at", { ascending: true });
 
         if (error) throw error;
-        setMessages(data as Message[]);
+        setMessages(data as Message[] || []);
       } catch (error) {
         console.error("Error fetching messages:", error);
+        setMessages([]);
       } finally {
         setIsLoading(false);
       }
@@ -45,7 +46,7 @@ export const useRealtimeMessages = (partnerId: string | null) => {
 
     // Configuration du canal en temps réel
     const channel = supabase
-      .channel('messages-channel')
+      .channel(`messages-${user.id}-${partnerId}`)
       .on(
         'postgres_changes',
         {
@@ -57,7 +58,13 @@ export const useRealtimeMessages = (partnerId: string | null) => {
         (payload) => {
           console.log('New message received:', payload);
           const newMessage = payload.new as Message;
-          setMessages(prev => [...prev, newMessage]);
+          setMessages(prev => {
+            // Éviter les doublons
+            if (prev.some(msg => msg.id === newMessage.id)) {
+              return prev;
+            }
+            return [...prev, newMessage];
+          });
         }
       )
       .on(

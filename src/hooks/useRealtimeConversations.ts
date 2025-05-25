@@ -33,22 +33,29 @@ export const useRealtimeConversations = () => {
 
       // Grouper les messages par partenaire de conversation
       const conversationMap = new Map<string, Conversation>();
+      const profilesCache = new Map<string, any>();
       
-      for (const message of messagesData) {
+      for (const message of messagesData || []) {
         const partnerId = message.sender_id === user.id ? message.receiver_id : message.sender_id;
         
         if (!conversationMap.has(partnerId)) {
-          // Récupérer le profil utilisateur pour ce partenaire
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("username, avatar_url")
-            .eq("id", partnerId)
-            .single();
+          // Récupérer le profil utilisateur pour ce partenaire s'il n'est pas en cache
+          if (!profilesCache.has(partnerId)) {
+            const { data: profileData } = await supabase
+              .from("profiles")
+              .select("username, avatar_url")
+              .eq("id", partnerId)
+              .single();
+            
+            profilesCache.set(partnerId, profileData);
+          }
+          
+          const profile = profilesCache.get(partnerId);
           
           conversationMap.set(partnerId, {
             user_id: partnerId,
-            username: profileData?.username || "Utilisateur",
-            avatar_url: profileData?.avatar_url || null,
+            username: profile?.username || "Utilisateur",
+            avatar_url: profile?.avatar_url || null,
             last_message: message.content,
             last_message_time: message.created_at,
             unread_count: message.receiver_id === user.id && !message.read ? 1 : 0
@@ -77,7 +84,7 @@ export const useRealtimeConversations = () => {
 
     // Configuration du canal en temps réel pour les nouveaux messages
     const channel = supabase
-      .channel('conversations-channel')
+      .channel(`conversations-${user.id}`)
       .on(
         'postgres_changes',
         {

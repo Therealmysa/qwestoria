@@ -45,7 +45,7 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Utilisation des hooks temps réel
-  const { conversations, isLoading } = useRealtimeConversations();
+  const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
   const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
 
   useEffect(() => {
@@ -132,6 +132,9 @@ const Messages = () => {
 
       setNewMessage("");
       toast.success("Message envoyé");
+      
+      // Actualiser les conversations après l'envoi
+      refetchConversations();
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Impossible d'envoyer le message");
@@ -140,7 +143,34 @@ const Messages = () => {
     }
   };
 
-  const startConversationWithFriend = (friendId: string) => {
+  const startConversationWithFriend = async (friendId: string) => {
+    // Vérifier si une conversation existe déjà
+    const existingConv = conversations.find(conv => conv.user_id === friendId);
+    
+    if (!existingConv) {
+      // Si aucune conversation n'existe, créer un message de bienvenue
+      try {
+        const { error } = await supabase
+          .from("messages")
+          .insert([
+            {
+              sender_id: user?.id,
+              receiver_id: friendId,
+              content: "Salut ! 👋"
+            }
+          ]);
+
+        if (error) throw error;
+        
+        // Actualiser les conversations
+        await refetchConversations();
+        toast.success("Conversation créée");
+      } catch (error) {
+        console.error("Error creating conversation:", error);
+        toast.error("Impossible de créer la conversation");
+      }
+    }
+    
     setSelectedConversation(friendId);
     setActiveTab("messages");
   };
