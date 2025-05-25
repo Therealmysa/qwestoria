@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   MessageSquare,
   Send,
@@ -323,7 +325,7 @@ const Messages = () => {
                     <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                   </div>
                 ) : filteredConversations.length > 0 ? (
-                  <div className="h-full overflow-y-auto">
+                  <ScrollArea className="h-full">
                     {filteredConversations.map((conversation) => (
                       <div
                         key={conversation.user_id}
@@ -361,7 +363,7 @@ const Messages = () => {
                         )}
                       </div>
                     ))}
-                  </div>
+                  </ScrollArea>
                 ) : (
                   <div className="text-center py-8">
                     <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -373,7 +375,7 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Messages avec avatars et pseudos style WhatsApp */}
+            {/* Messages avec ScrollArea */}
             <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
               {selectedConversation && selectedUser ? (
                 <>
@@ -394,69 +396,71 @@ const Messages = () => {
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="flex-grow overflow-y-auto p-4 h-[calc(100%-160px)]">
+                  <div className="flex-grow overflow-hidden">
                     {messagesLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                       </div>
                     ) : (
-                      <div className="space-y-4">
-                        {messages.map((message) => {
-                          const isMyMessage = message.sender_id === user?.id;
-                          const senderProfile = userProfiles[message.sender_id];
-                          
-                          console.log('Message:', message.id, 'isMyMessage:', isMyMessage, 'senderProfile:', senderProfile);
-                          
-                          return (
-                            <div
-                              key={message.id}
-                              className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
-                            >
-                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
-                                <div
-                                  className={`px-3 py-2 rounded-lg relative ${
-                                    isMyMessage
-                                      ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-sm'
-                                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
-                                  }`}
-                                >
-                                  {/* Pseudo avec une couleur qui contraste bien */}
-                                  <p className={`text-xs font-semibold mb-1 ${
-                                    isMyMessage 
-                                      ? 'text-blue-100' 
-                                      : 'text-blue-600 dark:text-blue-400'
+                      <ScrollArea className="h-full p-4">
+                        <div className="space-y-4">
+                          {messages.map((message) => {
+                            const isMyMessage = message.sender_id === user?.id;
+                            const senderProfile = userProfiles[message.sender_id];
+                            
+                            console.log('Message:', message.id, 'isMyMessage:', isMyMessage, 'senderProfile:', senderProfile);
+                            
+                            return (
+                              <div
+                                key={message.id}
+                                className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
+                              >
+                                <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
+                                  <div
+                                    className={`px-3 py-2 rounded-lg relative ${
+                                      isMyMessage
+                                        ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-sm'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
+                                    }`}
+                                  >
+                                    {/* Pseudo avec une couleur qui contraste bien */}
+                                    <p className={`text-xs font-semibold mb-1 ${
+                                      isMyMessage 
+                                        ? 'text-blue-100' 
+                                        : 'text-blue-600 dark:text-blue-400'
+                                    }`}>
+                                      {senderProfile?.username || 'Chargement...'}
+                                    </p>
+                                    <p className="text-sm break-words">{message.content}</p>
+                                    <p className={`text-xs mt-1 ${
+                                      isMyMessage
+                                        ? 'text-white/70'
+                                        : 'text-gray-500 dark:text-gray-400'
+                                    }`}>
+                                      {formatTime(message.created_at)}
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Avatar positionné à droite pour mes messages, à gauche pour les autres */}
+                                  <Avatar className={`h-6 w-6 absolute bottom-0 ${
+                                    isMyMessage ? '-right-7' : '-left-7'
                                   }`}>
-                                    {senderProfile?.username || 'Chargement...'}
-                                  </p>
-                                  <p className="text-sm break-words">{message.content}</p>
-                                  <p className={`text-xs mt-1 ${
-                                    isMyMessage
-                                      ? 'text-white/70'
-                                      : 'text-gray-500 dark:text-gray-400'
-                                  }`}>
-                                    {formatTime(message.created_at)}
-                                  </p>
+                                    {senderProfile?.avatar_url ? (
+                                      <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                    ) : (
+                                      <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
+                                        {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                      </AvatarFallback>
+                                    )}
+                                  </Avatar>
                                 </div>
-                                
-                                {/* Avatar positionné à droite pour mes messages, à gauche pour les autres */}
-                                <Avatar className={`h-6 w-6 absolute bottom-0 ${
-                                  isMyMessage ? '-right-7' : '-left-7'
-                                }`}>
-                                  {senderProfile?.avatar_url ? (
-                                    <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
-                                  ) : (
-                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
-                                      {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            );
+                          })}
+                        </div>
+                      </ScrollArea>
                     )}
-                  </CardContent>
+                  </div>
                   
                   <div className="p-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex gap-2">
