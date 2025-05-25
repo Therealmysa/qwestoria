@@ -412,7 +412,7 @@ const Messages = () => {
                               key={message.id}
                               className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
                             >
-                              <div className={`max-w-xs lg:max-w-md relative ${!isMyMessage ? 'ml-8' : ''}`}>
+                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
                                 <div
                                   className={`px-3 py-2 rounded-lg relative ${
                                     isMyMessage
@@ -434,8 +434,10 @@ const Messages = () => {
                                   </p>
                                 </div>
                                 
-                                {/* Avatar positionné en bas à gauche de la bulle pour tous les messages */}
-                                <Avatar className="h-6 w-6 absolute -left-7 bottom-0">
+                                {/* Avatar positionné à droite pour mes messages, à gauche pour les autres */}
+                                <Avatar className={`h-6 w-6 absolute bottom-0 ${
+                                  isMyMessage ? '-right-7' : '-left-7'
+                                }`}>
                                   {senderProfile?.avatar_url ? (
                                     <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
                                   ) : (
