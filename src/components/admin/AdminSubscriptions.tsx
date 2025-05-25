@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,13 +13,29 @@ const AdminSubscriptions = () => {
         .from('user_subscriptions')
         .select(`
           *,
-          subscription_plans(name, price_monthly),
-          profiles!user_subscriptions_user_id_fkey(username, avatar_url)
+          subscription_plans(name, price_monthly)
         `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+
+      // Récupérer les profils utilisateurs séparément
+      const userIds = data?.map(sub => sub.user_id) || [];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds);
+
+      // Joindre manuellement les données
+      const subscriptionsWithProfiles = data?.map(subscription => {
+        const profile = profilesData?.find(p => p.id === subscription.user_id);
+        return {
+          ...subscription,
+          profiles: profile
+        };
+      });
+
+      return subscriptionsWithProfiles;
     }
   });
 
@@ -116,7 +131,7 @@ const AdminSubscriptions = () => {
                         {subscription.profiles?.avatar_url ? (
                           <img
                             src={subscription.profiles.avatar_url}
-                            alt={subscription.profiles.username}
+                            alt={subscription.profiles.username || 'Utilisateur'}
                             className="h-8 w-8 rounded-full"
                           />
                         ) : (
