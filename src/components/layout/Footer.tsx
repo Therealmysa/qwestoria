@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Instagram, Twitch, Twitter } from "lucide-react";
 import { motion } from "framer-motion";
@@ -74,7 +75,7 @@ const Footer = () => {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-900">
-                  BradFlow
+                  Qwestoria
                 </h3>
                 <p className="text-xs text-gray-600">La communauté Fortnite ultime</p>
               </div>
@@ -156,7 +157,7 @@ const Footer = () => {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <p className="text-gray-500 mb-2 sm:mb-0">
-            &copy; {new Date().getFullYear()} BradFlow. Tous droits réservés.
+            &copy; {new Date().getFullYear()} Qwestoria. Tous droits réservés.
           </p>
           <div className="flex gap-4">
             {["Confidentialité", "Conditions", "Cookies"].map((item, index) => (

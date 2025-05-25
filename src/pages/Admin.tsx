@@ -96,7 +96,7 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Administration BradHub
+            Administration Qwestoria
             {profile?.is_owner && (
               <span className="ml-3 text-sm bg-yellow-500 text-white px-3 py-1 rounded-full">
                 Propriétaire
