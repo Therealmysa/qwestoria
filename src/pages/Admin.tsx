@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone } from "lucide-react";
+import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -13,6 +13,7 @@ import AdminMissions from "@/components/admin/AdminMissions";
 import AdminShop from "@/components/admin/AdminShop";
 import AdminSubscriptions from "@/components/admin/AdminSubscriptions";
 import AdminAdvertisements from "@/components/admin/AdminAdvertisements";
+import AdminBlog from "@/components/admin/AdminBlog";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -88,6 +89,12 @@ const Admin = () => {
       label: "Publicités",
       icon: Megaphone,
       component: AdminAdvertisements
+    },
+    {
+      id: "blog",
+      label: "Blog",
+      icon: BookOpen,
+      component: AdminBlog
     }
   ];
 
@@ -109,7 +116,7 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7">
             {tabs.map((tab) => (
               <TabsTrigger 
                 key={tab.id} 
