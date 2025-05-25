@@ -9,11 +9,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Search, Crown, Shield, Ban } from "lucide-react";
+import { Search, Crown, Shield, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const AdminUsers = () => {
+interface AdminUsersProps {
+  isOwner: boolean;
+}
+
+const AdminUsers = ({ isOwner }: AdminUsersProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const queryClient = useQueryClient();
@@ -130,6 +134,12 @@ const AdminUsers = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
+                        {user.is_owner && (
+                          <Badge variant="default" className="text-xs bg-yellow-500">
+                            <Star className="h-3 w-3 mr-1" />
+                            Propriétaire
+                          </Badge>
+                        )}
                         {user.is_admin && (
                           <Badge variant="destructive" className="text-xs">
                             <Shield className="h-3 w-3 mr-1" />
@@ -154,6 +164,7 @@ const AdminUsers = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => setSelectedUser(user)}
+                            disabled={user.is_owner}
                           >
                             Gérer
                           </Button>
@@ -163,16 +174,18 @@ const AdminUsers = () => {
                             <DialogTitle>Gérer {user.username}</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-4">
-                            <div className="flex items-center space-x-2">
-                              <Switch
-                                id="is_admin"
-                                checked={user.is_admin}
-                                onCheckedChange={(checked) =>
-                                  handleUserUpdate({ is_admin: checked })
-                                }
-                              />
-                              <Label htmlFor="is_admin">Administrateur</Label>
-                            </div>
+                            {isOwner && !user.is_owner && (
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  id="is_admin"
+                                  checked={user.is_admin}
+                                  onCheckedChange={(checked) =>
+                                    handleUserUpdate({ is_admin: checked })
+                                  }
+                                />
+                                <Label htmlFor="is_admin">Administrateur</Label>
+                              </div>
+                            )}
                             <div className="flex items-center space-x-2">
                               <Switch
                                 id="is_vip"
@@ -183,6 +196,11 @@ const AdminUsers = () => {
                               />
                               <Label htmlFor="is_vip">Statut VIP</Label>
                             </div>
+                            {!isOwner && user.is_admin && (
+                              <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded">
+                                Seul le propriétaire peut modifier le statut administrateur.
+                              </p>
+                            )}
                           </div>
                         </DialogContent>
                       </Dialog>

@@ -308,6 +308,7 @@ export type Database = {
           fortnite_username: string | null
           id: string
           is_admin: boolean | null
+          is_owner: boolean | null
           is_vip: boolean | null
           platform: string | null
           updated_at: string | null
@@ -321,6 +322,7 @@ export type Database = {
           fortnite_username?: string | null
           id: string
           is_admin?: boolean | null
+          is_owner?: boolean | null
           is_vip?: boolean | null
           platform?: string | null
           updated_at?: string | null
@@ -334,6 +336,7 @@ export type Database = {
           fortnite_username?: string | null
           id?: string
           is_admin?: boolean | null
+          is_owner?: boolean | null
           is_vip?: boolean | null
           platform?: string | null
           updated_at?: string | null
@@ -630,6 +633,14 @@ export type Database = {
       increment_ad_impressions: {
         Args: { ad_id: string }
         Returns: undefined
+      }
+      is_admin_or_owner: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_site_owner: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
     }
     Enums: {

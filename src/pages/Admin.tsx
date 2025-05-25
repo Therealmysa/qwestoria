@@ -18,7 +18,7 @@ const Admin = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Vérifier si l'utilisateur est admin
+  // Vérifier si l'utilisateur est admin ou propriétaire
   const { data: profile, isLoading } = useQuery({
     queryKey: ['admin-profile', user?.id],
     queryFn: async () => {
@@ -26,7 +26,7 @@ const Admin = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, is_owner')
         .eq('id', user.id)
         .single();
       
@@ -47,7 +47,8 @@ const Admin = () => {
     );
   }
 
-  if (!user || !profile?.is_admin) {
+  // Vérifier si l'utilisateur est admin ou propriétaire
+  if (!user || (!profile?.is_admin && !profile?.is_owner)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -62,7 +63,7 @@ const Admin = () => {
       id: "users",
       label: "Utilisateurs",
       icon: Users,
-      component: AdminUsers
+      component: () => <AdminUsers isOwner={profile?.is_owner || false} />
     },
     {
       id: "missions",
@@ -96,6 +97,11 @@ const Admin = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Administration BradHub
+            {profile?.is_owner && (
+              <span className="ml-3 text-sm bg-yellow-500 text-white px-3 py-1 rounded-full">
+                Propriétaire
+              </span>
+            )}
           </h1>
           <p className="text-gray-600">
             Panneau de contrôle pour la gestion de la plateforme
