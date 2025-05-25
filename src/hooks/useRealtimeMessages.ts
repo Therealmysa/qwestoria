@@ -45,7 +45,9 @@ export const useRealtimeMessages = (partnerId: string | null) => {
     fetchInitialMessages();
 
     // Configuration du canal en temps réel avec un nom unique
-    const channelName = `messages-${Math.min(user.id, partnerId)}-${Math.max(user.id, partnerId)}`;
+    // Créer un nom de canal consistant en triant les IDs
+    const sortedIds = [user.id, partnerId].sort();
+    const channelName = `messages-${sortedIds[0]}-${sortedIds[1]}`;
     console.log('Setting up realtime channel:', channelName);
     
     const channel = supabase
