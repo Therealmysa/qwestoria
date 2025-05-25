@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +40,8 @@ import {
   Clock,
   CalendarClock,
   Loader2,
+  MessageSquare,
+  UserPlus,
 } from "lucide-react";
 
 interface TeammatePost {
@@ -105,10 +106,42 @@ const Teammates = () => {
     availability: "anytime"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [friendshipStatuses, setFriendshipStatuses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPosts();
   }, [user]);
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      checkFriendshipStatuses();
+    }
+  }, [posts, user]);
+
+  const checkFriendshipStatuses = async () => {
+    if (!user) return;
+
+    const userIds = posts.map(post => post.user_id);
+    
+    try {
+      const { data: friendships, error } = await supabase
+        .from("friendships")
+        .select("sender_id, receiver_id, status")
+        .or(`and(sender_id.eq.${user.id},receiver_id.in.(${userIds.join(',')})),and(sender_id.in.(${userIds.join(',')}),receiver_id.eq.${user.id})`);
+
+      if (error) throw error;
+
+      const statusMap: Record<string, string> = {};
+      friendships.forEach(friendship => {
+        const otherUserId = friendship.sender_id === user.id ? friendship.receiver_id : friendship.sender_id;
+        statusMap[otherUserId] = friendship.status;
+      });
+
+      setFriendshipStatuses(statusMap);
+    } catch (error) {
+      console.error("Error checking friendship statuses:", error);
+    }
+  };
 
   const fetchPosts = async () => {
     setIsLoading(true);
@@ -231,6 +264,108 @@ const Teammates = () => {
       console.error("Error sending message:", error);
       toast.error("Impossible d'envoyer le message");
     }
+  };
+
+  const handleSendFriendRequest = async (receiverId: string, username: string) => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour envoyer une demande d'ami");
+      return;
+    }
+
+    try {
+      // Vérifier si une demande existe déjà
+      const { data: existingRequest, error: checkError } = await supabase
+        .from("friendships")
+        .select("*")
+        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${user.id})`)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      if (existingRequest) {
+        if (existingRequest.status === 'pending') {
+          toast.error("Une demande d'ami est déjà en cours avec cet utilisateur");
+        } else if (existingRequest.status === 'accepted') {
+          toast.error("Vous êtes déjà amis avec cet utilisateur");
+        } else {
+          toast.error("Impossible d'envoyer une demande à cet utilisateur");
+        }
+        return;
+      }
+
+      // Créer la demande d'ami
+      const { error } = await supabase
+        .from("friendships")
+        .insert([
+          {
+            sender_id: user.id,
+            receiver_id: receiverId,
+            status: "pending"
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast.success(`Demande d'ami envoyée à ${username}`);
+      
+      // Mettre à jour le statut local
+      setFriendshipStatuses(prev => ({
+        ...prev,
+        [receiverId]: 'pending'
+      }));
+      
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      toast.error("Impossible d'envoyer la demande d'ami");
+    }
+  };
+
+  const getFriendshipButtonContent = (userId: string, username: string) => {
+    const status = friendshipStatuses[userId];
+    
+    if (status === 'accepted') {
+      return (
+        <Button 
+          className="w-full bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]"
+          onClick={() => handleContactPlayer('', username, userId)}
+        >
+          <MessageSquare className="h-4 w-4 mr-2" />
+          Contacter l'ami
+        </Button>
+      );
+    }
+    
+    if (status === 'pending') {
+      return (
+        <Button 
+          className="w-full" 
+          variant="outline"
+          disabled
+        >
+          Demande envoyée
+        </Button>
+      );
+    }
+    
+    return (
+      <div className="flex gap-2 w-full">
+        <Button 
+          className="flex-1 bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]"
+          onClick={() => handleContactPlayer('', username, userId)}
+        >
+          <MessageSquare className="h-4 w-4 mr-1" />
+          Message
+        </Button>
+        <Button 
+          variant="outline"
+          onClick={() => handleSendFriendRequest(userId, username)}
+        >
+          <UserPlus className="h-4 w-4" />
+        </Button>
+      </div>
+    );
   };
 
   const getFilteredPosts = () => {
@@ -644,12 +779,7 @@ const Teammates = () => {
                   </CardContent>
                   
                   <CardFooter className="border-t border-gray-100 dark:border-gray-800 pt-3">
-                    <Button 
-                      className="w-full bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]"
-                      onClick={() => handleContactPlayer(post.id, post.profiles.username, post.user_id)}
-                    >
-                      Contacter le joueur
-                    </Button>
+                    {getFriendshipButtonContent(post.user_id, post.profiles.username)}
                   </CardFooter>
                 </Card>
               ))}
