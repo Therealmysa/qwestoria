@@ -36,7 +36,6 @@ import {
   AlignRight,
   AlignJustify,
   Table as TableIcon,
-  Palette
 } from 'lucide-react';
 
 interface RichTextEditorProps {
@@ -367,8 +366,12 @@ const RichTextEditor = ({ content, onChange, placeholder }: RichTextEditorProps)
         <EditorContent
           editor={editor}
           className="prose prose-sm max-w-none min-h-[300px] focus:outline-none"
-          placeholder={placeholder}
         />
+        {placeholder && !content && (
+          <div className="absolute top-4 left-4 text-gray-400 pointer-events-none">
+            {placeholder}
+          </div>
+        )}
       </div>
     </div>
   );
