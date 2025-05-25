@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,17 +54,6 @@ const Messages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [userProfiles, setUserProfiles] = useState<{ [key: string]: UserProfile }>({});
 
-  // Redirection si non connecté
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
-
-  // Utilisation des hooks temps réel
-  const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
-  const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
-
   // Définir fetchFriends avant les useEffect qui l'utilisent
   const fetchFriends = async () => {
     try {
@@ -104,6 +94,17 @@ const Messages = () => {
       console.error("Error fetching friends:", error);
     }
   };
+
+  // Redirection si non connecté
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Utilisation des hooks temps réel
+  const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
+  const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
 
   useEffect(() => {
     if (user) {
@@ -420,8 +421,8 @@ const Messages = () => {
                                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                   }`}
                                 >
-                                  {/* Afficher le pseudo pour tous les messages */}
-                                  <p className="text-xs font-semibold mb-1 text-primary dark:text-[#9b87f5]">
+                                  {/* Afficher le pseudo en blanc pour tous les messages */}
+                                  <p className="text-xs font-semibold mb-1 text-white">
                                     {senderProfile?.username || 'Chargement...'}
                                   </p>
                                   <p className="text-sm break-words">{message.content}</p>
