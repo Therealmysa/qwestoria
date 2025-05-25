@@ -275,7 +275,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="container mx-auto py-8 px-4 min-h-[calc(100vh-120px)]">
+    <div className="container mx-auto py-8 px-4 h-[calc(100vh-120px)] flex flex-col">
       <div className="flex items-center gap-2 mb-6">
         <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
         <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
@@ -283,8 +283,8 @@ const Messages = () => {
         </h1>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col">
+        <TabsList className="grid w-full grid-cols-4 flex-shrink-0">
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             Messages
@@ -303,11 +303,11 @@ const Messages = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="messages" className="mt-6 h-[calc(100vh-280px)]">
+        <TabsContent value="messages" className="mt-6 flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Conversations List */}
-            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full">
-              <CardHeader className="pb-4">
+            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full flex flex-col">
+              <CardHeader className="pb-4 flex-shrink-0">
                 <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -319,7 +319,7 @@ const Messages = () => {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="p-0 h-[calc(100%-140px)]">
+              <CardContent className="p-0 flex-1 overflow-hidden">
                 {isLoading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
@@ -375,11 +375,11 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Messages avec ScrollArea */}
+            {/* Messages */}
             <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
               {selectedConversation && selectedUser ? (
                 <>
-                  <CardHeader className="border-b border-gray-100 dark:border-gray-700">
+                  <CardHeader className="border-b border-gray-100 dark:border-gray-700 flex-shrink-0">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
                         {selectedUser.avatar_url ? (
@@ -396,7 +396,7 @@ const Messages = () => {
                     </div>
                   </CardHeader>
                   
-                  <div className="flex-grow overflow-hidden">
+                  <div className="flex-1 overflow-hidden">
                     {messagesLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
@@ -426,8 +426,8 @@ const Messages = () => {
                                     {/* Pseudo avec une couleur qui contraste bien */}
                                     <p className={`text-xs font-semibold mb-1 ${
                                       isMyMessage 
-                                        ? 'text-blue-100' 
-                                        : 'text-blue-600 dark:text-blue-400'
+                                        ? 'text-blue-200' 
+                                        : 'text-blue-500 dark:text-blue-300'
                                     }`}>
                                       {senderProfile?.username || 'Chargement...'}
                                     </p>
@@ -462,7 +462,7 @@ const Messages = () => {
                     )}
                   </div>
                   
-                  <div className="p-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
                     <div className="flex gap-2">
                       <Textarea
                         placeholder="Tapez votre message..."
