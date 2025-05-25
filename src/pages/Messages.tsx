@@ -402,7 +402,7 @@ const Messages = () => {
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                       </div>
                     ) : (
-                      <ScrollArea className="h-full p-4">
+                      <ScrollArea className="h-full max-h-[60vh] p-4">
                         <div className="space-y-4">
                           {messages.map((message) => {
                             const isMyMessage = message.sender_id === user?.id;
