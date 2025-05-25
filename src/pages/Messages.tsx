@@ -64,6 +64,47 @@ const Messages = () => {
   const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
   const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
 
+  // Définir fetchFriends avant les useEffect qui l'utilisent
+  const fetchFriends = async () => {
+    try {
+      // Récupérer les amitiés acceptées
+      const { data: friendships, error } = await supabase
+        .from("friendships")
+        .select("*")
+        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
+        .eq("status", "accepted");
+
+      if (error) throw error;
+
+      // Récupérer les profils des amis
+      const friendIds = friendships.map(friendship => 
+        friendship.sender_id === user?.id ? friendship.receiver_id : friendship.sender_id
+      );
+
+      if (friendIds.length > 0) {
+        const { data: friendProfiles, error: profileError } = await supabase
+          .from("profiles")
+          .select("id, username, avatar_url")
+          .in("id", friendIds);
+
+        if (profileError) throw profileError;
+
+        const friendsData = friendProfiles.map(profile => ({
+          id: profile.id,
+          user_id: profile.id,
+          username: profile.username,
+          avatar_url: profile.avatar_url
+        }));
+
+        setFriends(friendsData);
+      } else {
+        setFriends([]);
+      }
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchFriends();
@@ -116,46 +157,6 @@ const Messages = () => {
       </div>
     );
   }
-
-  const fetchFriends = async () => {
-    try {
-      // Récupérer les amitiés acceptées
-      const { data: friendships, error } = await supabase
-        .from("friendships")
-        .select("*")
-        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
-        .eq("status", "accepted");
-
-      if (error) throw error;
-
-      // Récupérer les profils des amis
-      const friendIds = friendships.map(friendship => 
-        friendship.sender_id === user?.id ? friendship.receiver_id : friendship.sender_id
-      );
-
-      if (friendIds.length > 0) {
-        const { data: friendProfiles, error: profileError } = await supabase
-          .from("profiles")
-          .select("id, username, avatar_url")
-          .in("id", friendIds);
-
-        if (profileError) throw profileError;
-
-        const friendsData = friendProfiles.map(profile => ({
-          id: profile.id,
-          user_id: profile.id,
-          username: profile.username,
-          avatar_url: profile.avatar_url
-        }));
-
-        setFriends(friendsData);
-      } else {
-        setFriends([]);
-      }
-    } catch (error) {
-      console.error("Error fetching friends:", error);
-    }
-  };
 
   const markMessagesAsRead = async (partnerId: string) => {
     try {
