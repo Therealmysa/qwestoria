@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { 
   Card, 
   CardContent, 
@@ -35,14 +36,29 @@ interface Friend {
   avatar_url: string | null;
 }
 
+interface UserProfile {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+}
+
 const Messages = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("messages");
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userProfiles, setUserProfiles] = useState<{ [key: string]: UserProfile }>({});
+
+  // Redirection si non connecté
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
 
   // Utilisation des hooks temps réel
   const { conversations, isLoading, refetchConversations } = useRealtimeConversations();
@@ -59,6 +75,47 @@ const Messages = () => {
       markMessagesAsRead(selectedConversation);
     }
   }, [selectedConversation, messages]);
+
+  // Récupérer les profils des utilisateurs pour les messages
+  useEffect(() => {
+    const fetchUserProfiles = async () => {
+      if (messages.length > 0) {
+        const userIds = [...new Set(messages.map(msg => msg.sender_id))];
+        const missingUserIds = userIds.filter(id => !userProfiles[id]);
+        
+        if (missingUserIds.length > 0) {
+          try {
+            const { data, error } = await supabase
+              .from("profiles")
+              .select("id, username, avatar_url")
+              .in("id", missingUserIds);
+
+            if (error) throw error;
+
+            const profilesMap = data.reduce((acc, profile) => {
+              acc[profile.id] = profile;
+              return acc;
+            }, {} as { [key: string]: UserProfile });
+
+            setUserProfiles(prev => ({ ...prev, ...profilesMap }));
+          } catch (error) {
+            console.error("Error fetching user profiles:", error);
+          }
+        }
+      }
+    };
+
+    fetchUserProfiles();
+  }, [messages, userProfiles]);
+
+  // Ne pas afficher le contenu si l'utilisateur n'est pas connecté
+  if (!user || loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary dark:text-[#9b87f5]" />
+      </div>
+    );
+  }
 
   const fetchFriends = async () => {
     try {
@@ -310,7 +367,7 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Messages */}
+            {/* Messages avec avatars et pseudos */}
             <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
               {selectedConversation && selectedUser ? (
                 <>
@@ -338,29 +395,65 @@ const Messages = () => {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {messages.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                          >
+                        {messages.map((message) => {
+                          const isMyMessage = message.sender_id === user?.id;
+                          const senderProfile = userProfiles[message.sender_id];
+                          
+                          return (
                             <div
-                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                message.sender_id === user?.id
-                                  ? 'bg-primary dark:bg-[#9b87f5] text-white'
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white'
-                              }`}
+                              key={message.id}
+                              className={`flex items-start gap-2 ${isMyMessage ? 'justify-end' : 'justify-start'}`}
                             >
-                              <p className="text-sm">{message.content}</p>
-                              <p className={`text-xs mt-1 ${
-                                message.sender_id === user?.id
-                                  ? 'text-white/70'
-                                  : 'text-gray-500 dark:text-gray-400'
-                              }`}>
-                                {formatTime(message.created_at)}
-                              </p>
+                              {!isMyMessage && (
+                                <Avatar className="h-8 w-8 mt-1">
+                                  {senderProfile?.avatar_url ? (
+                                    <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                  ) : (
+                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
+                                      {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                    </AvatarFallback>
+                                  )}
+                                </Avatar>
+                              )}
+                              
+                              <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-first' : ''}`}>
+                                {!isMyMessage && (
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 ml-2">
+                                    {senderProfile?.username || 'Utilisateur inconnu'}
+                                  </p>
+                                )}
+                                <div
+                                  className={`px-4 py-2 rounded-lg ${
+                                    isMyMessage
+                                      ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-md'
+                                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-md'
+                                  }`}
+                                >
+                                  <p className="text-sm">{message.content}</p>
+                                  <p className={`text-xs mt-1 ${
+                                    isMyMessage
+                                      ? 'text-white/70'
+                                      : 'text-gray-500 dark:text-gray-400'
+                                  }`}>
+                                    {formatTime(message.created_at)}
+                                  </p>
+                                </div>
+                              </div>
+                              
+                              {isMyMessage && (
+                                <Avatar className="h-8 w-8 mt-1">
+                                  {user.user_metadata?.avatar_url ? (
+                                    <AvatarImage src={user.user_metadata.avatar_url} alt="Vous" />
+                                  ) : (
+                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
+                                      {user.user_metadata?.username?.substring(0, 2).toUpperCase() || 'ME'}
+                                    </AvatarFallback>
+                                  )}
+                                </Avatar>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </CardContent>
