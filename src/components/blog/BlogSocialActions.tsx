@@ -1,8 +1,10 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Share2, Copy } from "lucide-react";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 interface BlogSocialActionsProps {
   postId: string;
@@ -12,14 +14,100 @@ interface BlogSocialActionsProps {
 }
 
 const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: BlogSocialActionsProps) => {
+  const { user } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-    toast.success(isLiked ? "Like retiré" : "Article liké !");
+  useEffect(() => {
+    fetchCounts();
+    if (user) {
+      checkIfLiked();
+    }
+  }, [postId, user]);
+
+  const fetchCounts = async () => {
+    try {
+      // Récupérer le nombre de likes
+      const { data: likeData, error: likeError } = await supabase
+        .rpc('get_blog_post_like_count', { post_id: postId });
+      
+      if (likeError) throw likeError;
+      setLikeCount(likeData || 0);
+
+      // Récupérer le nombre de commentaires
+      const { data: commentData, error: commentError } = await supabase
+        .rpc('get_blog_post_comment_count', { post_id: postId });
+      
+      if (commentError) throw commentError;
+      setCommentCount(commentData || 0);
+    } catch (error) {
+      console.error('Erreur lors du chargement des compteurs:', error);
+    }
+  };
+
+  const checkIfLiked = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('user_has_liked_post', { 
+          post_id: postId, 
+          user_id: user.id 
+        });
+      
+      if (error) throw error;
+      setIsLiked(data || false);
+    } catch (error) {
+      console.error('Erreur lors de la vérification du like:', error);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour liker un article");
+      return;
+    }
+
+    if (isLoading) return;
+    setIsLoading(true);
+
+    try {
+      if (isLiked) {
+        // Supprimer le like
+        const { error } = await supabase
+          .from('blog_post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+        
+        setIsLiked(false);
+        setLikeCount(prev => prev - 1);
+        toast.success("Like retiré");
+      } else {
+        // Ajouter le like
+        const { error } = await supabase
+          .from('blog_post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id
+          });
+
+        if (error) throw error;
+        
+        setIsLiked(true);
+        setLikeCount(prev => prev + 1);
+        toast.success("Article liké !");
+      }
+    } catch (error) {
+      console.error('Erreur lors du like:', error);
+      toast.error("Erreur lors du like");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleShare = async () => {
@@ -49,10 +137,7 @@ const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: B
   };
 
   const handleComment = () => {
-    setShowComments(!showComments);
-    if (!showComments) {
-      toast.info("Fonction commentaires bientôt disponible !");
-    }
+    toast.info("Fonction commentaires bientôt disponible !");
   };
 
   return (
@@ -61,6 +146,7 @@ const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: B
         variant="ghost"
         size="sm"
         onClick={handleLike}
+        disabled={isLoading}
         className={`text-gray-500 hover:text-red-500 dark:text-gray-400 transition-colors ${
           isLiked ? "text-red-500" : ""
         }`}
@@ -76,6 +162,7 @@ const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: B
         className="text-gray-500 hover:text-blue-500 dark:text-gray-400 transition-colors"
       >
         <MessageCircle className="h-4 w-4" />
+        {commentCount > 0 && <span className="ml-1 text-xs">{commentCount}</span>}
       </Button>
 
       <Button

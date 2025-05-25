@@ -87,6 +87,70 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_post_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           author_id: string
@@ -618,6 +682,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_blog_post_comment_count: {
+        Args: { post_id: string }
+        Returns: number
+      }
+      get_blog_post_like_count: {
+        Args: { post_id: string }
+        Returns: number
+      }
       get_leaderboard: {
         Args: { sort_by: string }
         Returns: {
@@ -643,6 +715,10 @@ export type Database = {
       }
       is_site_owner: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      user_has_liked_post: {
+        Args: { post_id: string; user_id: string }
         Returns: boolean
       }
     }
