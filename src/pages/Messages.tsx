@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,40 +13,20 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   MessageSquare,
   Send,
   Search,
-  User,
-  Clock,
   Loader2,
   Mail,
-  MailOpen,
   UserPlus,
   Users,
 } from "lucide-react";
 import FriendRequests from "@/components/messages/FriendRequests";
 import AddFriend from "@/components/messages/AddFriend";
-
-interface Message {
-  id: string;
-  content: string;
-  created_at: string;
-  read: boolean;
-  sender_id: string;
-  receiver_id: string;
-}
-
-interface Conversation {
-  user_id: string;
-  username: string;
-  avatar_url: string | null;
-  last_message: string;
-  last_message_time: string;
-  unread_count: number;
-}
+import { useRealtimeMessages } from "@/hooks/useRealtimeMessages";
+import { useRealtimeConversations } from "@/hooks/useRealtimeConversations";
 
 interface Friend {
   id: string;
@@ -57,30 +36,29 @@ interface Friend {
 }
 
 const Messages = () => {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("messages");
-  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Utilisation des hooks temps réel
+  const { conversations, isLoading } = useRealtimeConversations();
+  const { messages, isLoading: messagesLoading } = useRealtimeMessages(selectedConversation);
+
   useEffect(() => {
     if (user) {
-      fetchConversations();
       fetchFriends();
     }
   }, [user]);
 
   useEffect(() => {
     if (selectedConversation) {
-      fetchMessages(selectedConversation);
       markMessagesAsRead(selectedConversation);
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, messages]);
 
   const fetchFriends = async () => {
     try {
@@ -122,73 +100,6 @@ const Messages = () => {
     }
   };
 
-  const fetchConversations = async () => {
-    try {
-      setIsLoading(true);
-      // This is a simplified approach - in a real app you'd want to optimize this query
-      const { data: messagesData, error } = await supabase
-        .from("messages")
-        .select("*")
-        .or(`sender_id.eq.${user?.id},receiver_id.eq.${user?.id}`)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Group messages by conversation partner
-      const conversationMap = new Map<string, Conversation>();
-      
-      for (const message of messagesData) {
-        const partnerId = message.sender_id === user?.id ? message.receiver_id : message.sender_id;
-        
-        if (!conversationMap.has(partnerId)) {
-          // Fetch user profile for this partner
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("username, avatar_url")
-            .eq("id", partnerId)
-            .single();
-          
-          conversationMap.set(partnerId, {
-            user_id: partnerId,
-            username: profileData?.username || "Utilisateur",
-            avatar_url: profileData?.avatar_url || null,
-            last_message: message.content,
-            last_message_time: message.created_at,
-            unread_count: message.receiver_id === user?.id && !message.read ? 1 : 0
-          });
-        } else {
-          const conv = conversationMap.get(partnerId)!;
-          if (message.receiver_id === user?.id && !message.read) {
-            conv.unread_count++;
-          }
-        }
-      }
-
-      setConversations(Array.from(conversationMap.values()));
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-      toast.error("Impossible de charger les conversations");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchMessages = async (partnerId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user?.id})`)
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      setMessages(data as Message[]);
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-      toast.error("Impossible de charger les messages");
-    }
-  };
-
   const markMessagesAsRead = async (partnerId: string) => {
     try {
       await supabase
@@ -197,15 +108,6 @@ const Messages = () => {
         .eq("sender_id", partnerId)
         .eq("receiver_id", user?.id)
         .eq("read", false);
-      
-      // Update local state
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.user_id === partnerId 
-            ? { ...conv, unread_count: 0 }
-            : conv
-        )
-      );
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
@@ -229,8 +131,6 @@ const Messages = () => {
       if (error) throw error;
 
       setNewMessage("");
-      fetchMessages(selectedConversation);
-      fetchConversations(); // Refresh conversations to update last message
       toast.success("Message envoyé");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -386,31 +286,37 @@ const Messages = () => {
                   </CardHeader>
                   
                   <CardContent className="flex-grow overflow-y-auto p-4 max-h-96">
-                    <div className="space-y-4">
-                      {messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                        >
+                    {messagesLoading ? (
+                      <div className="flex justify-center items-center py-8">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {messages.map((message) => (
                           <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              message.sender_id === user?.id
-                                ? 'bg-primary dark:bg-[#9b87f5] text-white'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white'
-                            }`}
+                            key={message.id}
+                            className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
                           >
-                            <p className="text-sm">{message.content}</p>
-                            <p className={`text-xs mt-1 ${
-                              message.sender_id === user?.id
-                                ? 'text-white/70'
-                                : 'text-gray-500 dark:text-gray-400'
-                            }`}>
-                              {formatTime(message.created_at)}
-                            </p>
+                            <div
+                              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                                message.sender_id === user?.id
+                                  ? 'bg-primary dark:bg-[#9b87f5] text-white'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white'
+                              }`}
+                            >
+                              <p className="text-sm">{message.content}</p>
+                              <p className={`text-xs mt-1 ${
+                                message.sender_id === user?.id
+                                  ? 'text-white/70'
+                                  : 'text-gray-500 dark:text-gray-400'
+                              }`}>
+                                {formatTime(message.created_at)}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                   
                   <div className="p-4 border-t border-gray-100 dark:border-gray-700">
@@ -459,6 +365,7 @@ const Messages = () => {
           </div>
         </TabsContent>
 
+        
         <TabsContent value="friends" className="mt-6">
           <Card>
             <CardHeader>
