@@ -48,7 +48,7 @@ const BlogComments = ({ postId, className = "" }: BlogCommentsProps) => {
         .from('blog_post_comments')
         .select(`
           *,
-          profiles:user_id (
+          profiles!blog_post_comments_user_id_fkey (
             username,
             avatar_url
           )
@@ -306,6 +306,102 @@ const BlogComments = ({ postId, className = "" }: BlogCommentsProps) => {
       </div>
     </div>
   );
+
+  async function handleSubmitComment(e: React.FormEvent) {
+    e.preventDefault();
+    
+    if (!user) {
+      toast.error("Vous devez être connecté pour commenter");
+      return;
+    }
+
+    if (!newComment.trim()) {
+      toast.error("Le commentaire ne peut pas être vide");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('blog_post_comments')
+        .insert({
+          post_id: postId,
+          user_id: user.id,
+          content: newComment.trim()
+        });
+
+      if (error) throw error;
+
+      setNewComment("");
+      toast.success("Commentaire ajouté avec succès !");
+      fetchComments();
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du commentaire:', error);
+      toast.error("Erreur lors de l'ajout du commentaire");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleEditComment(commentId: string) {
+    if (!editContent.trim()) {
+      toast.error("Le commentaire ne peut pas être vide");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('blog_post_comments')
+        .update({ 
+          content: editContent.trim(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', commentId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setEditingComment(null);
+      setEditContent("");
+      toast.success("Commentaire modifié avec succès !");
+      fetchComments();
+    } catch (error) {
+      console.error('Erreur lors de la modification du commentaire:', error);
+      toast.error("Erreur lors de la modification du commentaire");
+    }
+  }
+
+  async function handleDeleteComment(commentId: string) {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?")) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('blog_post_comments')
+        .delete()
+        .eq('id', commentId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      toast.success("Commentaire supprimé avec succès !");
+      fetchComments();
+    } catch (error) {
+      console.error('Erreur lors de la suppression du commentaire:', error);
+      toast.error("Erreur lors de la suppression du commentaire");
+    }
+  }
+
+  function startEdit(comment: Comment) {
+    setEditingComment(comment.id);
+    setEditContent(comment.content);
+  }
+
+  function cancelEdit() {
+    setEditingComment(null);
+    setEditContent("");
+  }
 };
 
 export default BlogComments;
