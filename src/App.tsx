@@ -19,6 +19,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { useEffect } from "react";
 import Teammates from "./pages/Teammates";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import Messages from "./pages/Messages";
 import Admin from "./pages/Admin";
 import VipUpgrade from "./components/vip/VipUpgrade";
@@ -104,6 +105,14 @@ const App = () => (
                 element={
                   <Layout>
                     <Blog />
+                  </Layout>
+                }
+              />
+              <Route
+                path="/blog/:id"
+                element={
+                  <Layout>
+                    <BlogPost />
                   </Layout>
                 }
               />

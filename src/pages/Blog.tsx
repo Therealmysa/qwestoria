@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
@@ -41,6 +41,7 @@ interface BlogPost {
 
 const Blog = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,6 +100,10 @@ const Blog = () => {
     return content.substring(0, maxLength) + "...";
   };
 
+  const handleReadArticle = (postId: string) => {
+    navigate(`/blog/${postId}`);
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
@@ -147,7 +152,7 @@ const Blog = () => {
           {getFilteredAndSortedPosts().map((post) => (
             <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26]">
               {post.image_url && (
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-video overflow-hidden cursor-pointer" onClick={() => handleReadArticle(post.id)}>
                   <img
                     src={post.image_url}
                     alt={post.title}
@@ -164,7 +169,10 @@ const Blog = () => {
                   <Clock className="h-4 w-4" />
                   <span>5 min de lecture</span>
                 </div>
-                <CardTitle className="text-xl text-gray-800 dark:text-white hover:text-primary dark:hover:text-[#9b87f5] transition-colors line-clamp-2">
+                <CardTitle 
+                  className="text-xl text-gray-800 dark:text-white hover:text-primary dark:hover:text-[#9b87f5] transition-colors line-clamp-2 cursor-pointer"
+                  onClick={() => handleReadArticle(post.id)}
+                >
                   {post.title}
                 </CardTitle>
               </CardHeader>
@@ -195,7 +203,7 @@ const Blog = () => {
                 <Button 
                   variant="ghost" 
                   className="w-full text-primary dark:text-[#9b87f5] hover:bg-primary/10 dark:hover:bg-[#9b87f5]/20"
-                  onClick={() => toast.info("Fonctionnalité de lecture d'article bientôt disponible")}
+                  onClick={() => handleReadArticle(post.id)}
                 >
                   Lire l'article
                   <Eye className="ml-2 h-4 w-4" />
