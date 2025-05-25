@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
-import BradHubLogo from "@/components/BradHubLogo";
+import QwestoriaLogo from "@/components/BradHubLogo";
 import { Award, Users, ShoppingBag, Star } from "lucide-react";
 
 const Index = () => {
@@ -29,14 +29,14 @@ const Index = () => {
   const featureItems = [
     {
       title: "Missions quotidiennes",
-      description: "Accomplissez des missions et gagnez des BradCoins pour débloquer des récompenses exclusives.",
+      description: "Accomplissez des missions et gagnez des QwestCoins pour débloquer des récompenses exclusives.",
       icon: <Award className="text-amber-500 dark:text-amber-400" />,
       color: "from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5",
       glow: "shadow-amber-500/20 dark:shadow-amber-400/20"
     },
     {
       title: "Boutique de récompenses",
-      description: "Dépensez vos BradCoins dans notre boutique pour obtenir des cartes cadeaux et objets exclusifs.",
+      description: "Dépensez vos QwestCoins dans notre boutique pour obtenir des cartes cadeaux et objets exclusifs.",
       icon: <ShoppingBag className="text-purple-500 dark:text-purple-400" />,
       color: "from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5",
       glow: "shadow-purple-500/20 dark:shadow-purple-400/20"
@@ -102,7 +102,7 @@ const Index = () => {
               transition={{ duration: 0.6 }}
               className="mb-6 animate-bounce-slow"
             >
-              <BradHubLogo size="lg" />
+              <QwestoriaLogo size="lg" />
             </motion.div>
 
             <motion.h1
@@ -193,7 +193,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="mb-12 text-center text-3xl font-bold text-gradient"
             >
-              Ils adorent BradHub
+              Ils adorent Qwestoria
             </motion.h2>
             
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -221,9 +221,9 @@ const Index = () => {
                   </div>
                   <p className="text-gray-600 dark:text-gray-300">
                     {[
-                      "BradHub a complètement changé ma façon de jouer à Fortnite. J'adore les défis quotidiens et les récompenses sont géniales !",
-                      "J'ai trouvé des coéquipiers incroyables grâce à BradHub. La communauté est super sympa et l'interface est intuitive.",
-                      "Les missions sont vraiment amusantes et me motivent à me connecter tous les jours. J'ai déjà gagné plein de BradCoins !"
+                      "Qwestoria a complètement changé ma façon de jouer à Fortnite. J'adore les défis quotidiens et les récompenses sont géniales !",
+                      "J'ai trouvé des coéquipiers incroyables grâce à Qwestoria. La communauté est super sympa et l'interface est intuitive.",
+                      "Les missions sont vraiment amusantes et me motivent à me connecter tous les jours. J'ai déjà gagné plein de QwestCoins !"
                     ][i-1]}
                   </p>
                 </motion.div>
@@ -247,7 +247,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="mb-8 p-6 rounded-full bg-white/80 dark:bg-white/5 backdrop-blur-md shadow-xl animate-glow"
             >
-              <BradHubLogo size="lg" />
+              <QwestoriaLogo size="lg" />
             </motion.div>
 
             <motion.h2

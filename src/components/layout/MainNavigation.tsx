@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -128,7 +127,7 @@ const MainNavigation = () => {
       <DrawerContent className="bg-white dark:bg-gradient-to-r dark:from-[#1A1F2C] dark:to-[#2A243C] border-t border-purple-400/20">
         <div className="flex justify-between items-center px-4 pt-4 border-b border-gray-200 dark:border-purple-400/20 pb-3">
           <div className="flex items-center">
-            <BradHubLogo size="sm" />
+            <BradHubLogo size="md" />
           </div>
           <DrawerClose asChild>
             <Button

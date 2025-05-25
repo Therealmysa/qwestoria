@@ -2,12 +2,12 @@
 import { useNavigate } from "react-router-dom";
 import { Coins } from "lucide-react";
 
-interface BradHubLogoProps {
+interface QwestoriaLogoProps {
   size?: "sm" | "md" | "lg";
   withText?: boolean;
 }
 
-const BradHubLogo = ({ size = "md", withText = true }: BradHubLogoProps) => {
+const QwestoriaLogo = ({ size = "md", withText = true }: QwestoriaLogoProps) => {
   const navigate = useNavigate();
 
   const sizeClasses = {
@@ -56,11 +56,11 @@ const BradHubLogo = ({ size = "md", withText = true }: BradHubLogoProps) => {
         <span
           className={`font-bold ${textSizeClasses[size]} bg-gradient-to-r from-[#9b87f5] to-amber-500 bg-clip-text text-transparent transition-all duration-300 group-hover:from-[#8976e4] group-hover:to-amber-400`}
         >
-          BradFlow
+          Qwestoria
         </span>
       )}
     </div>
   );
 };
 
-export default BradHubLogo;
+export default QwestoriaLogo;

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +11,7 @@ import RankBadge from "@/components/rank/RankBadge";
 import useProfileCompletion from "@/hooks/useProfileCompletion";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-interface BradCoin {
+interface QwestCoin {
   balance: number;
 }
 
@@ -48,7 +49,7 @@ const Dashboard = () => {
   const fetchUserData = async () => {
     setIsLoading(true);
     try {
-      // Fetch user's BradCoins
+      // Fetch user's QwestCoins
       const { data: coinsData, error: coinsError } = await supabase
         .from("brad_coins")
         .select("balance")
@@ -56,7 +57,7 @@ const Dashboard = () => {
         .single();
 
       if (coinsError) throw coinsError;
-      setCoins((coinsData as BradCoin).balance);
+      setCoins((coinsData as QwestCoin).balance);
 
       // Fetch user's mission submissions
       const { data: submissionsData, error: submissionsError } = await supabase
@@ -222,11 +223,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* BradCoins Card - Improved with better light mode styling */}
+        {/* QwestCoins Card - Improved with better light mode styling */}
         <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow">
           <CardHeader className="pb-2 border-b border-gray-100 dark:border-gray-700">
             <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5]">
-              Solde BradCoins
+              Solde QwestCoins
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
@@ -238,7 +239,7 @@ const Dashboard = () => {
                 <span className="text-3xl font-bold text-gray-800 dark:text-white">
                   {isLoading ? "..." : coins}
                 </span>
-                <p className="text-sm text-gray-500 dark:text-gray-400">BradCoins</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">QwestCoins</p>
               </div>
             </div>
             
