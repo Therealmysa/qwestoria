@@ -137,7 +137,11 @@ const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: B
   };
 
   const handleComment = () => {
-    toast.info("Fonction commentaires bientôt disponible !");
+    // Faire défiler vers la section des commentaires
+    const commentsSection = document.getElementById('comments-section');
+    if (commentsSection) {
+      commentsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
