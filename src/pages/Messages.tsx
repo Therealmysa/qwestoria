@@ -367,7 +367,7 @@ const Messages = () => {
               </CardContent>
             </Card>
 
-            {/* Messages avec avatars et pseudos */}
+            {/* Messages avec avatars et pseudos style WhatsApp */}
             <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
               {selectedConversation && selectedUser ? (
                 <>
@@ -394,7 +394,7 @@ const Messages = () => {
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                       </div>
                     ) : (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {messages.map((message) => {
                           const isMyMessage = message.sender_id === user?.id;
                           const senderProfile = userProfiles[message.sender_id];
@@ -404,16 +404,16 @@ const Messages = () => {
                               key={message.id}
                               className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
                             >
-                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? '' : 'ml-2'}`}>
+                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? '' : 'ml-8'}`}>
                                 <div
-                                  className={`px-4 py-2 rounded-lg relative ${
+                                  className={`px-3 py-2 rounded-lg relative ${
                                     isMyMessage
                                       ? 'bg-primary dark:bg-[#9b87f5] text-white rounded-br-sm'
                                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                   }`}
                                 >
                                   {!isMyMessage && (
-                                    <p className="text-xs font-medium mb-1 text-primary dark:text-[#9b87f5]">
+                                    <p className="text-xs font-semibold mb-1 text-primary dark:text-[#9b87f5]">
                                       {senderProfile?.username || 'Utilisateur inconnu'}
                                     </p>
                                   )}
@@ -427,9 +427,9 @@ const Messages = () => {
                                   </p>
                                 </div>
                                 
-                                {/* Avatar positionné en bas à gauche de la bulle */}
+                                {/* Avatar positionné en bas à gauche de la bulle style WhatsApp */}
                                 {!isMyMessage && (
-                                  <Avatar className="h-6 w-6 absolute -left-8 bottom-0">
+                                  <Avatar className="h-6 w-6 absolute -left-7 bottom-0">
                                     {senderProfile?.avatar_url ? (
                                       <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
                                     ) : (
