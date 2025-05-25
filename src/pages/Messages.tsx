@@ -194,7 +194,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="container mx-auto py-8 px-4 h-[calc(100vh-200px)]">
+    <div className="container mx-auto py-8 px-4 min-h-[calc(100vh-120px)]">
       <div className="flex items-center gap-2 mb-6">
         <MessageSquare className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
         <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5]">
@@ -202,7 +202,7 @@ const Messages = () => {
         </h1>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
@@ -222,10 +222,10 @@ const Messages = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="messages" className="mt-6">
+        <TabsContent value="messages" className="mt-6 h-[calc(100vh-280px)]">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
             {/* Conversations List */}
-            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26]">
+            <Card className="lg:col-span-1 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] h-full">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg text-gray-800 dark:text-white">Conversations</CardTitle>
                 <div className="relative">
@@ -238,13 +238,13 @@ const Messages = () => {
                   />
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
+              <CardContent className="p-0 h-[calc(100%-140px)]">
                 {isLoading ? (
                   <div className="flex justify-center items-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
                   </div>
                 ) : filteredConversations.length > 0 ? (
-                  <div className="max-h-96 overflow-y-auto">
+                  <div className="h-full overflow-y-auto">
                     {filteredConversations.map((conversation) => (
                       <div
                         key={conversation.user_id}
@@ -295,7 +295,7 @@ const Messages = () => {
             </Card>
 
             {/* Messages */}
-            <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col">
+            <Card className="lg:col-span-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-[#221F26] flex flex-col h-full">
               {selectedConversation && selectedUser ? (
                 <>
                   <CardHeader className="border-b border-gray-100 dark:border-gray-700">
@@ -315,7 +315,7 @@ const Messages = () => {
                     </div>
                   </CardHeader>
                   
-                  <CardContent className="flex-grow overflow-y-auto p-4 max-h-96">
+                  <CardContent className="flex-grow overflow-y-auto p-4 h-[calc(100%-160px)]">
                     {messagesLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin text-primary dark:text-[#9b87f5]" />
@@ -395,7 +395,6 @@ const Messages = () => {
           </div>
         </TabsContent>
 
-        
         <TabsContent value="friends" className="mt-6">
           <Card>
             <CardHeader>
