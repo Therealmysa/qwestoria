@@ -102,12 +102,18 @@ const Messages = () => {
 
   const markMessagesAsRead = async (partnerId: string) => {
     try {
-      await supabase
+      const { error } = await supabase
         .from("messages")
         .update({ read: true })
         .eq("sender_id", partnerId)
         .eq("receiver_id", user?.id)
         .eq("read", false);
+
+      if (error) {
+        console.error("Error marking messages as read:", error);
+      } else {
+        console.log("Messages marked as read for partner:", partnerId);
+      }
     } catch (error) {
       console.error("Error marking messages as read:", error);
     }
@@ -116,20 +122,30 @@ const Messages = () => {
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation || !user) return;
 
+    console.log('Sending message:', newMessage.trim());
     setIsSending(true);
+    
     try {
-      const { error } = await supabase
+      const messageData = {
+        sender_id: user.id,
+        receiver_id: selectedConversation,
+        content: newMessage.trim()
+      };
+
+      console.log('Message data to insert:', messageData);
+
+      const { data, error } = await supabase
         .from("messages")
-        .insert([
-          {
-            sender_id: user.id,
-            receiver_id: selectedConversation,
-            content: newMessage.trim()
-          }
-        ]);
+        .insert([messageData])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting message:", error);
+        throw error;
+      }
 
+      console.log('Message inserted successfully:', data);
       setNewMessage("");
       toast.success("Message envoyé");
       

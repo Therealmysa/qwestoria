@@ -44,27 +44,39 @@ export const useRealtimeMessages = (partnerId: string | null) => {
 
     fetchInitialMessages();
 
-    // Configuration du canal en temps réel
+    // Configuration du canal en temps réel avec un nom unique
+    const channelName = `messages-${Math.min(user.id, partnerId)}-${Math.max(user.id, partnerId)}`;
+    console.log('Setting up realtime channel:', channelName);
+    
     const channel = supabase
-      .channel(`messages-${user.id}-${partnerId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id}))`
         },
         (payload) => {
-          console.log('New message received:', payload);
+          console.log('New message received via realtime:', payload);
           const newMessage = payload.new as Message;
-          setMessages(prev => {
-            // Éviter les doublons
-            if (prev.some(msg => msg.id === newMessage.id)) {
-              return prev;
-            }
-            return [...prev, newMessage];
-          });
+          
+          // Vérifier si le message concerne cette conversation
+          const isRelevantMessage = 
+            (newMessage.sender_id === user.id && newMessage.receiver_id === partnerId) ||
+            (newMessage.sender_id === partnerId && newMessage.receiver_id === user.id);
+          
+          if (isRelevantMessage) {
+            setMessages(prev => {
+              // Éviter les doublons
+              if (prev.some(msg => msg.id === newMessage.id)) {
+                console.log('Message already exists, skipping');
+                return prev;
+              }
+              console.log('Adding new message to state');
+              return [...prev, newMessage];
+            });
+          }
         }
       )
       .on(
@@ -73,21 +85,31 @@ export const useRealtimeMessages = (partnerId: string | null) => {
           event: 'UPDATE',
           schema: 'public',
           table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${partnerId}),and(sender_id.eq.${partnerId},receiver_id.eq.${user.id}))`
         },
         (payload) => {
-          console.log('Message updated:', payload);
+          console.log('Message updated via realtime:', payload);
           const updatedMessage = payload.new as Message;
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === updatedMessage.id ? updatedMessage : msg
-            )
-          );
+          
+          // Vérifier si le message concerne cette conversation
+          const isRelevantMessage = 
+            (updatedMessage.sender_id === user.id && updatedMessage.receiver_id === partnerId) ||
+            (updatedMessage.sender_id === partnerId && updatedMessage.receiver_id === user.id);
+          
+          if (isRelevantMessage) {
+            setMessages(prev => 
+              prev.map(msg => 
+                msg.id === updatedMessage.id ? updatedMessage : msg
+              )
+            );
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
 
     return () => {
+      console.log('Cleaning up realtime channel:', channelName);
       supabase.removeChannel(channel);
     };
   }, [partnerId, user]);
