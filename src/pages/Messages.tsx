@@ -117,12 +117,15 @@ const Messages = () => {
     }
   }, [selectedConversation, messages]);
 
-  // Récupérer les profils des utilisateurs pour les messages
+  // Récupérer les profils des utilisateurs pour les messages (y compris l'utilisateur actuel)
   useEffect(() => {
     const fetchUserProfiles = async () => {
-      if (messages.length > 0) {
-        const userIds = [...new Set(messages.map(msg => msg.sender_id))];
+      if (messages.length > 0 && user) {
+        // Inclure l'utilisateur actuel dans la liste des IDs à récupérer
+        const userIds = [...new Set([...messages.map(msg => msg.sender_id), user.id])];
         const missingUserIds = userIds.filter(id => !userProfiles[id]);
+        
+        console.log('Fetching profiles for users:', missingUserIds);
         
         if (missingUserIds.length > 0) {
           try {
@@ -132,6 +135,8 @@ const Messages = () => {
               .in("id", missingUserIds);
 
             if (error) throw error;
+
+            console.log('Profiles fetched:', data);
 
             const profilesMap = data.reduce((acc, profile) => {
               acc[profile.id] = profile;
@@ -147,7 +152,7 @@ const Messages = () => {
     };
 
     fetchUserProfiles();
-  }, [messages, userProfiles]);
+  }, [messages, user]);
 
   // Ne pas afficher le contenu si l'utilisateur n'est pas connecté
   if (!user || loading) {
@@ -400,12 +405,14 @@ const Messages = () => {
                           const isMyMessage = message.sender_id === user?.id;
                           const senderProfile = userProfiles[message.sender_id];
                           
+                          console.log('Message:', message.id, 'isMyMessage:', isMyMessage, 'senderProfile:', senderProfile);
+                          
                           return (
                             <div
                               key={message.id}
                               className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
                             >
-                              <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? '' : 'ml-8'}`}>
+                              <div className={`max-w-xs lg:max-w-md relative ${!isMyMessage ? 'ml-8' : ''}`}>
                                 <div
                                   className={`px-3 py-2 rounded-lg relative ${
                                     isMyMessage
@@ -413,11 +420,10 @@ const Messages = () => {
                                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-bl-sm'
                                   }`}
                                 >
-                                  {!isMyMessage && (
-                                    <p className="text-xs font-semibold mb-1 text-primary dark:text-[#9b87f5]">
-                                      {senderProfile?.username || 'Utilisateur inconnu'}
-                                    </p>
-                                  )}
+                                  {/* Afficher le pseudo pour tous les messages */}
+                                  <p className="text-xs font-semibold mb-1 text-primary dark:text-[#9b87f5]">
+                                    {senderProfile?.username || 'Chargement...'}
+                                  </p>
                                   <p className="text-sm break-words">{message.content}</p>
                                   <p className={`text-xs mt-1 ${
                                     isMyMessage
@@ -428,18 +434,16 @@ const Messages = () => {
                                   </p>
                                 </div>
                                 
-                                {/* Avatar positionné en bas à gauche de la bulle style WhatsApp */}
-                                {!isMyMessage && (
-                                  <Avatar className="h-6 w-6 absolute -left-7 bottom-0">
-                                    {senderProfile?.avatar_url ? (
-                                      <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
-                                    ) : (
-                                      <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
-                                        {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
-                                      </AvatarFallback>
-                                    )}
-                                  </Avatar>
-                                )}
+                                {/* Avatar positionné en bas à gauche de la bulle pour tous les messages */}
+                                <Avatar className="h-6 w-6 absolute -left-7 bottom-0">
+                                  {senderProfile?.avatar_url ? (
+                                    <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                  ) : (
+                                    <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-xs">
+                                      {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                    </AvatarFallback>
+                                  )}
+                                </Avatar>
                               </div>
                             </div>
                           );
