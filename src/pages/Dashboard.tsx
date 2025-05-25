@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Transactions from "@/components/Transactions";
-import { Coins, CheckCircle2, XCircle, Clock3, Trophy, BadgeCheck, ShoppingBag } from "lucide-react";
+import { Coins, CheckCircle2, XCircle, Clock3, Trophy, BadgeCheck, ShoppingBag, Shield } from "lucide-react";
 import { getRankByPoints } from "@/utils/rankUtils";
 import RankBadge from "@/components/rank/RankBadge";
 import useProfileCompletion from "@/hooks/useProfileCompletion";
@@ -205,6 +204,20 @@ const Dashboard = () => {
                 <BadgeCheck className="h-4 w-4" />
                 Voir les missions disponibles
               </button>
+
+              {/* Add admin panel button for admin/owner users */}
+              {(profile?.is_admin || profile?.is_owner) && (
+                <button 
+                  onClick={() => navigate("/admin")} 
+                  className="mt-2 w-full py-2 px-4 rounded-md bg-red-500/10 hover:bg-red-500/20 
+                            dark:bg-red-500/10 dark:hover:bg-red-500/20 
+                            text-red-600 dark:text-red-400 
+                            transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Panneau d'Administration
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>

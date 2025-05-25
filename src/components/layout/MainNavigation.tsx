@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -33,6 +34,7 @@ import {
   LogOut,
   MessageSquare,
   BookOpen,
+  Shield,
 } from "lucide-react";
 import {
   Drawer,
@@ -313,6 +315,15 @@ const MainNavigation = () => {
                   >
                     Dashboard
                   </DropdownMenuItem>
+                  {(profile?.is_admin || profile?.is_owner) && (
+                    <DropdownMenuItem
+                      className="hover:bg-primary/10 hover:text-primary dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5] cursor-pointer"
+                      onClick={() => navigate("/admin")}
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Panel Admin
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     className="hover:bg-primary/10 hover:text-primary dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5] cursor-pointer"
                     onClick={() => navigate("/profile")}
