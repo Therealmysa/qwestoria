@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, UserPlus, Loader2 } from "lucide-react";
+import { Search, UserPlus, Loader2, MessageSquare } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -21,6 +21,38 @@ const AddFriend = () => {
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [friendshipStatuses, setFriendshipStatuses] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      checkFriendshipStatuses();
+    }
+  }, [searchResults, user]);
+
+  const checkFriendshipStatuses = async () => {
+    if (!user) return;
+
+    const userIds = searchResults.map(result => result.id);
+    
+    try {
+      const { data: friendships, error } = await supabase
+        .from("friendships")
+        .select("sender_id, receiver_id, status")
+        .or(`and(sender_id.eq.${user.id},receiver_id.in.(${userIds.join(',')})),and(sender_id.in.(${userIds.join(',')}),receiver_id.eq.${user.id})`);
+
+      if (error) throw error;
+
+      const statusMap: Record<string, string> = {};
+      friendships.forEach(friendship => {
+        const otherUserId = friendship.sender_id === user.id ? friendship.receiver_id : friendship.sender_id;
+        statusMap[otherUserId] = friendship.status;
+      });
+
+      setFriendshipStatuses(statusMap);
+    } catch (error) {
+      console.error("Error checking friendship statuses:", error);
+    }
+  };
 
   const searchUsers = async () => {
     if (!searchQuery.trim()) {
@@ -90,8 +122,11 @@ const AddFriend = () => {
 
       toast.success("Demande d'ami envoyée");
       
-      // Retirer l'utilisateur des résultats de recherche
-      setSearchResults(prev => prev.filter(user => user.id !== receiverId));
+      // Mettre à jour le statut local
+      setFriendshipStatuses(prev => ({
+        ...prev,
+        [receiverId]: 'pending'
+      }));
       
     } catch (error) {
       console.error("Error sending friend request:", error);
@@ -99,6 +134,86 @@ const AddFriend = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const sendMessage = async (receiverId: string, username: string) => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour envoyer un message");
+      return;
+    }
+
+    try {
+      // Créer un message de bienvenue
+      const { error } = await supabase
+        .from("messages")
+        .insert([
+          {
+            sender_id: user.id,
+            receiver_id: receiverId,
+            content: `Salut ${username} ! 👋`
+          }
+        ]);
+
+      if (error) throw error;
+      
+      toast.success(`Message envoyé à ${username}`);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Impossible d'envoyer le message");
+    }
+  };
+
+  const getActionButton = (userProfile: UserProfile) => {
+    const status = friendshipStatuses[userProfile.id];
+    
+    if (status === 'accepted') {
+      return (
+        <Button
+          size="sm"
+          onClick={() => sendMessage(userProfile.id, userProfile.username)}
+          disabled={isLoading}
+          className="bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4]"
+        >
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <MessageSquare className="h-4 w-4 mr-1" />
+              Message
+            </>
+          )}
+        </Button>
+      );
+    }
+    
+    if (status === 'pending') {
+      return (
+        <Button
+          size="sm"
+          variant="outline"
+          disabled
+        >
+          Demande envoyée
+        </Button>
+      );
+    }
+    
+    return (
+      <Button
+        size="sm"
+        onClick={() => sendFriendRequest(userProfile.id)}
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <>
+            <UserPlus className="h-4 w-4 mr-1" />
+            Ajouter
+          </>
+        )}
+      </Button>
+    );
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -160,20 +275,7 @@ const AddFriend = () => {
                     <p className="font-medium">{userProfile.username}</p>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => sendFriendRequest(userProfile.id)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4 mr-1" />
-                      Ajouter
-                    </>
-                  )}
-                </Button>
+                {getActionButton(userProfile)}
               </div>
             ))}
           </div>
