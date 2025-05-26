@@ -15,7 +15,6 @@ interface ShopItem {
   category: string;
   image_url?: string;
   is_vip_only: boolean;
-  is_active: boolean;
   available_until?: string;
   created_at: string;
 }
@@ -27,7 +26,6 @@ const ShopItems = () => {
       const { data, error } = await supabase
         .from('shop_items')
         .select('*')
-        .eq('is_active', true)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
