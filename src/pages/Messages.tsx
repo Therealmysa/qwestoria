@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -53,6 +54,7 @@ const Messages = () => {
   const [isSending, setIsSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [userProfiles, setUserProfiles] = useState<{ [key: string]: UserProfile }>({});
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const fetchFriends = async () => {
     try {
@@ -143,6 +145,10 @@ const Messages = () => {
 
     fetchUserProfiles();
   }, [messages, user]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   if (!user || loading) {
     return (
@@ -268,7 +274,7 @@ const Messages = () => {
         </div>
       </div>
 
-      {/* Contenu principal avec hauteur calculée */}
+      {/* Contenu principal avec hauteur calculée pour rester dans l'écran */}
       <div className="relative z-10 flex-1 min-h-0 p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           {/* Navigation des tabs */}
@@ -305,7 +311,7 @@ const Messages = () => {
             </TabsList>
           </div>
 
-          {/* Contenu des tabs avec hauteur restante */}
+          {/* Contenu des tabs avec hauteur calculée pour rester dans l'écran */}
           <div className="flex-1 min-h-0">
             <TabsContent value="messages" className="h-full m-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
@@ -383,12 +389,12 @@ const Messages = () => {
                   </Card>
                 </div>
 
-                {/* Zone de messages */}
+                {/* Zone de messages avec LAYOUT FIXE */}
                 <div className="lg:col-span-2">
                   <Card className="h-full bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-[1.02] flex flex-col">
                     {selectedConversation && selectedUser ? (
                       <>
-                        {/* Header de conversation */}
+                        {/* Header de conversation FIXE */}
                         <CardHeader className="flex-shrink-0 border-b border-white/15 p-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
@@ -406,71 +412,70 @@ const Messages = () => {
                           </div>
                         </CardHeader>
                         
-                        {/* Zone de messages avec scroll */}
-                        <div className="flex-1 min-h-0">
+                        {/* Zone de messages SCROLLABLE qui prend tout l'espace disponible */}
+                        <div className="flex-1 min-h-0 relative">
                           {messagesLoading ? (
                             <div className="flex justify-center items-center h-full">
                               <Loader2 className="h-6 w-6 animate-spin text-[#9b87f5]" />
                             </div>
                           ) : (
-                            <ScrollArea className="h-full">
-                              <div className="p-4 space-y-4">
-                                {messages.map((message) => {
-                                  const isMyMessage = message.sender_id === user?.id;
-                                  const senderProfile = userProfiles[message.sender_id];
-                                  
-                                  return (
-                                    <div
-                                      key={message.id}
-                                      className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
-                                    >
-                                      <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
-                                        <div
-                                          className={`px-3 py-2 rounded-lg relative backdrop-blur-xl ${
-                                            isMyMessage
-                                              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-sm shadow-lg'
-                                              : 'bg-black/20 border border-white/15 text-white rounded-bl-sm'
-                                          }`}
-                                        >
-                                          <p className={`text-xs font-semibold mb-1 ${
-                                            isMyMessage 
-                                              ? 'text-blue-200' 
-                                              : 'text-blue-300'
-                                          }`}>
-                                            {senderProfile?.username || 'Chargement...'}
-                                          </p>
-                                          <p className="text-sm break-words">{message.content}</p>
-                                          <p className={`text-xs mt-1 ${
-                                            isMyMessage
-                                              ? 'text-white/70'
-                                              : 'text-gray-400'
-                                          }`}>
-                                            {formatTime(message.created_at)}
-                                          </p>
-                                        </div>
-                                        
-                                        <Avatar className={`h-6 w-6 absolute bottom-0 ${
-                                          isMyMessage ? '-right-7' : '-left-7'
+                            <div className="h-full overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-purple-600/60 scrollbar-track-black/20">
+                              {messages.map((message) => {
+                                const isMyMessage = message.sender_id === user?.id;
+                                const senderProfile = userProfiles[message.sender_id];
+                                
+                                return (
+                                  <div
+                                    key={message.id}
+                                    className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
+                                  >
+                                    <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
+                                      <div
+                                        className={`px-3 py-2 rounded-lg relative backdrop-blur-xl ${
+                                          isMyMessage
+                                            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-sm shadow-lg'
+                                            : 'bg-black/20 border border-white/15 text-white rounded-bl-sm'
+                                        }`}
+                                      >
+                                        <p className={`text-xs font-semibold mb-1 ${
+                                          isMyMessage 
+                                            ? 'text-blue-200' 
+                                            : 'text-blue-300'
                                         }`}>
-                                          {senderProfile?.avatar_url ? (
-                                            <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
-                                          ) : (
-                                            <AvatarFallback className="bg-purple-600/20 text-purple-300 text-xs">
-                                              {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
-                                            </AvatarFallback>
-                                          )}
-                                        </Avatar>
+                                          {senderProfile?.username || 'Chargement...'}
+                                        </p>
+                                        <p className="text-sm break-words">{message.content}</p>
+                                        <p className={`text-xs mt-1 ${
+                                          isMyMessage
+                                            ? 'text-white/70'
+                                            : 'text-gray-400'
+                                        }`}>
+                                          {formatTime(message.created_at)}
+                                        </p>
                                       </div>
+                                      
+                                      <Avatar className={`h-6 w-6 absolute bottom-0 ${
+                                        isMyMessage ? '-right-7' : '-left-7'
+                                      }`}>
+                                        {senderProfile?.avatar_url ? (
+                                          <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                        ) : (
+                                          <AvatarFallback className="bg-purple-600/20 text-purple-300 text-xs">
+                                            {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                          </AvatarFallback>
+                                        )}
+                                      </Avatar>
                                     </div>
-                                  );
-                                })}
-                              </div>
-                            </ScrollArea>
+                                  </div>
+                                );
+                              })}
+                              <div ref={messagesEndRef} />
+                            </div>
                           )}
                         </div>
                         
-                        {/* Zone d'envoi FIXE */}
-                        <div className="flex-shrink-0 p-4 border-t border-white/15">
+                        {/* Zone d'envoi FIXE en bas - TOUJOURS VISIBLE */}
+                        <div className="flex-shrink-0 p-4 border-t border-white/15 bg-black/10 backdrop-blur-xl">
                           <div className="flex gap-2">
                             <Textarea
                               placeholder="Tapez votre message..."
