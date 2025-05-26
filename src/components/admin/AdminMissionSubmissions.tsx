@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +33,7 @@ const AdminMissionSubmissions = () => {
     }
   });
 
-  // Fonction améliorée pour supprimer les fichiers du storage Supabase
+  // Fonction corrigée pour supprimer les fichiers du storage Supabase
   const deleteFileFromStorage = async (fileUrl: string) => {
     if (!fileUrl) return;
     
@@ -42,22 +41,34 @@ const AdminMissionSubmissions = () => {
       console.log('Attempting to delete file from URL:', fileUrl);
       
       // Extraire le chemin du fichier depuis l'URL publique Supabase
-      // Format URL: https://wzgnionuvdjxvnpocytb.supabase.co/storage/v1/object/public/temp/temp/filename
-      const urlParts = fileUrl.split('/');
-      const bucketIndex = urlParts.findIndex(part => part === 'temp');
+      // Format URL: https://wzgnionuvdjxvnpocytb.supabase.co/storage/v1/object/public/temp/filename
+      const url = new URL(fileUrl);
+      const pathSegments = url.pathname.split('/');
       
-      if (bucketIndex === -1) {
-        console.error('Could not find bucket name in URL');
+      // Trouver l'index de "public" dans le chemin
+      const publicIndex = pathSegments.findIndex(segment => segment === 'public');
+      
+      if (publicIndex === -1 || publicIndex >= pathSegments.length - 1) {
+        console.error('Invalid Supabase storage URL format');
         return;
       }
       
-      // Récupérer tout ce qui vient après le nom du bucket
-      const filePath = urlParts.slice(bucketIndex + 1).join('/');
+      // Le chemin du fichier commence après "public" et le nom du bucket
+      // Format: /storage/v1/object/public/temp/temp/filename
+      // On veut récupérer: temp/filename (en sautant le bucket name)
+      const bucketName = pathSegments[publicIndex + 1]; // "temp"
+      const filePath = pathSegments.slice(publicIndex + 2).join('/'); // "temp/filename" ou juste "filename"
       
-      console.log('Extracted file path:', filePath);
+      console.log('Bucket:', bucketName);
+      console.log('File path to delete:', filePath);
+      
+      if (!filePath) {
+        console.error('Could not extract file path from URL');
+        return;
+      }
       
       const { error } = await supabase.storage
-        .from('temp')
+        .from(bucketName)
         .remove([filePath]);
       
       if (error) {
@@ -106,6 +117,7 @@ const AdminMissionSubmissions = () => {
 
       // Supprimer le fichier de preuve du storage si il existe et que la mission est validée ou rejetée
       if (submission?.screenshot_url && (status === 'verified' || status === 'rejected')) {
+        console.log('Deleting file for submission:', submissionId, 'Status:', status);
         await deleteFileFromStorage(submission.screenshot_url);
       }
 
