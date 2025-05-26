@@ -55,9 +55,16 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative overflow-hidden bg-white border-t border-gray-100">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-white to-blue-50/30"></div>
+    <footer className="relative overflow-hidden bg-white dark:bg-gradient-to-br dark:from-[#0a0a1a] dark:via-[#1a1a35] dark:to-[#2a1a45] border-t border-gray-100 dark:border-white/10">
+      {/* Glass effect overlay for dark mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-white to-blue-50/30 dark:from-black/20 dark:via-purple-900/10 dark:to-blue-900/10 dark:backdrop-blur-xl"></div>
+      
+      {/* Animated background particles */}
+      <div className="hidden dark:block absolute inset-0 overflow-hidden">
+        <div className="absolute w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-float" style={{ top: '20%', left: '10%', animationDelay: '0s' }}></div>
+        <div className="absolute w-24 h-24 bg-blue-500/10 rounded-full blur-xl animate-float" style={{ top: '60%', right: '15%', animationDelay: '2s' }}></div>
+        <div className="absolute w-40 h-40 bg-indigo-500/5 rounded-full blur-xl animate-float" style={{ bottom: '20%', left: '20%', animationDelay: '4s' }}></div>
+      </div>
 
       <div className="relative z-10 container mx-auto px-6 py-6">
         {/* Main content */}
@@ -74,13 +81,13 @@ const Footer = () => {
                 <BradHubLogo size="sm" withText={false} />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   Qwestoria
                 </h3>
-                <p className="text-xs text-gray-600">La communauté Fortnite ultime</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">La communauté Fortnite ultime</p>
               </div>
             </div>
-            <p className="text-gray-500 text-xs text-center lg:text-left max-w-xs">
+            <p className="text-gray-500 dark:text-gray-400 text-xs text-center lg:text-left max-w-xs">
               Rejoignez des milliers de joueurs dans l'aventure Fortnite la plus épique !
             </p>
           </motion.div>
@@ -92,7 +99,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Navigation</h4>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Navigation</h4>
             <div className="grid grid-cols-2 gap-2">
               {footerLinks.map((link, index) => (
                 <motion.div
@@ -102,7 +109,7 @@ const Footer = () => {
                 >
                   <Link 
                     to={link.path} 
-                    className="group relative inline-block text-gray-600 hover:text-purple-600 transition-all duration-300 text-sm"
+                    className="group relative inline-block text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 text-sm"
                   >
                     <span className="relative z-10">{link.name}</span>
                     <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
@@ -119,7 +126,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Suivez-nous</h4>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Suivez-nous</h4>
             <div className="flex flex-wrap justify-center lg:justify-end gap-2">
               {socialLinks.map((link, index) => (
                 <motion.a
@@ -135,7 +142,7 @@ const Footer = () => {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
                   <div className={`absolute inset-0 bg-gradient-to-r ${link.color} rounded-lg blur opacity-50 group-hover:opacity-75 transition-all duration-300`}></div>
-                  <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-white shadow-sm border border-gray-200 text-gray-700 group-hover:text-white group-hover:border-transparent transition-all duration-300">
+                  <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-white dark:bg-white/10 dark:backdrop-blur-md shadow-sm border border-gray-200 dark:border-white/20 text-gray-700 dark:text-gray-300 group-hover:text-white group-hover:border-transparent dark:group-hover:bg-white/20 transition-all duration-300">
                     {link.icon}
                   </div>
                 </motion.a>
@@ -146,7 +153,7 @@ const Footer = () => {
         
         {/* Divider */}
         <div className="relative mb-4">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/20 to-transparent"></div>
         </div>
 
         {/* Bottom section */}
@@ -156,7 +163,7 @@ const Footer = () => {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <p className="text-gray-500 mb-2 sm:mb-0">
+          <p className="text-gray-500 dark:text-gray-400 mb-2 sm:mb-0">
             &copy; {new Date().getFullYear()} Qwestoria. Tous droits réservés.
           </p>
           <div className="flex gap-4">
@@ -164,7 +171,7 @@ const Footer = () => {
               <Link 
                 key={item}
                 to={`/${item.toLowerCase()}`} 
-                className="group relative text-gray-500 hover:text-purple-600 transition-all duration-300"
+                className="group relative text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300"
               >
                 {item}
                 <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-purple-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
