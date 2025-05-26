@@ -1,3 +1,4 @@
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -258,6 +259,48 @@ const Navbar = () => {
               <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
             </Button>
           )}
+
+          {/* Desktop Theme Toggle - Hidden on mobile */}
+          <div className="hidden md:block">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="rounded-full border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-[#9b87f5] transition-all duration-200"
+                >
+                  {getThemeIcon()}
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="bg-white dark:bg-[#1A1F2C] border-gray-200 dark:border-gray-700"
+              >
+                <DropdownMenuItem 
+                  onClick={() => setTheme("light")} 
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5]"
+                >
+                  <Sun className="mr-2 h-4 w-4 text-amber-500" />
+                  <span>Clair</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setTheme("dark")} 
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5]"
+                >
+                  <Moon className="mr-2 h-4 w-4 text-purple-400" />
+                  <span>Sombre</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => setTheme("system")} 
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-[#9b87f5]/20 dark:hover:text-[#9b87f5]"
+                >
+                  <Monitor className="mr-2 h-4 w-4 text-gray-500" />
+                  <span>Système</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           {!loading &&
             (user ? (
