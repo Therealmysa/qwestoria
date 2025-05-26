@@ -112,11 +112,19 @@ const BradCoinsShop = () => {
             }}
             className="relative group"
           >
-            {/* Badge populaire pour le troisième pack */}
+            {/* Badge populaire pour le troisième pack - VERSION AMÉLIORÉE */}
             {index === 2 && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
-                  🔥 POPULAIRE
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+                <div className="relative">
+                  <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white px-6 py-3 rounded-full text-sm font-black shadow-2xl animate-pulse border-2 border-white/20">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🔥</span>
+                      <span className="tracking-wide">POPULAIRE</span>
+                      <span className="text-lg">🔥</span>
+                    </div>
+                  </div>
+                  {/* Effet de glow autour du badge */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-full blur-md opacity-40 -z-10 scale-110 animate-pulse"></div>
                 </div>
               </div>
             )}
