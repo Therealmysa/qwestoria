@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -6,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useTheme } from "@/components/theme/theme-provider";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,7 +25,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import BradHubLogo from "../BradHubLogo";
-import { ThemeToggle } from "../theme/theme-toggle";
 import { cn } from "@/lib/utils";
 import {
   Menu,
@@ -34,6 +35,9 @@ import {
   MessageSquare,
   BookOpen,
   Shield,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import {
   Drawer,
@@ -48,6 +52,7 @@ const MainNavigation = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const { setTheme } = useTheme();
 
   useEffect(() => {
     const {
@@ -188,6 +193,43 @@ const MainNavigation = () => {
                 </motion.div>
               </Link>
             </DrawerClose>
+            
+            {/* Theme options in mobile menu */}
+            <div className="border-t border-gray-200 dark:border-purple-400/20 pt-2 mt-2">
+              <div className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                Thème
+              </div>
+              <DrawerClose asChild>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setTheme("light")}
+                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] flex items-center"
+                >
+                  <Sun className="h-4 w-4 mr-3 text-amber-500" />
+                  Clair
+                </motion.button>
+              </DrawerClose>
+              <DrawerClose asChild>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setTheme("dark")}
+                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] flex items-center"
+                >
+                  <Moon className="h-4 w-4 mr-3 text-purple-400" />
+                  Sombre
+                </motion.button>
+              </DrawerClose>
+              <DrawerClose asChild>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setTheme("system")}
+                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] flex items-center"
+                >
+                  <Monitor className="h-4 w-4 mr-3 text-gray-500" />
+                  Système
+                </motion.button>
+              </DrawerClose>
+            </div>
           </nav>
         </div>
       </DrawerContent>
@@ -266,15 +308,44 @@ const MainNavigation = () => {
                           </Link>
                         </NavigationMenuLink>
                       </li>
+                      <li className="border-t border-gray-200 dark:border-purple-400/20 pt-2">
+                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+                          Thème
+                        </div>
+                        <button
+                          onClick={() => setTheme("light")}
+                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] dark:text-gray-200"
+                        >
+                          <div className="text-sm flex items-center">
+                            <Sun className="mr-2 h-4 w-4 text-amber-500" />
+                            Clair
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => setTheme("dark")}
+                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] dark:text-gray-200"
+                        >
+                          <div className="text-sm flex items-center">
+                            <Moon className="mr-2 h-4 w-4 text-purple-400" />
+                            Sombre
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => setTheme("system")}
+                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-[#9b87f5]/10 dark:hover:text-[#9b87f5] dark:text-gray-200"
+                        >
+                          <div className="text-sm flex items-center">
+                            <Monitor className="mr-2 h-4 w-4 text-gray-500" />
+                            Système
+                          </div>
+                        </button>
+                      </li>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
           </div>
-
-          {/* Theme toggle */}
-          <ThemeToggle />
 
           {/* Auth Controls - always on the far right */}
           {!loading &&
