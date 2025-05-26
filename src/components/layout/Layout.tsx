@@ -14,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
   const hideFooter = location.pathname === "/messages";
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#1A1F2C] dark:to-[#2A243C]">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#0f0f23] dark:via-[#1a1a2e] dark:to-[#16213e]">
       <MainNavigation />
       <motion.main 
         initial={{ opacity: 0, y: 10 }}
