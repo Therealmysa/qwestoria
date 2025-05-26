@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import VipUpgrade from "@/components/vip/VipUpgrade";
 import BradCoinsShop from "@/components/shop/BradCoinsShop";
 import ShopItems from "@/components/shop/ShopItems";
@@ -12,7 +13,7 @@ const Shop = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-[#0a0a12] dark:via-[#1a1625] dark:to-[#2a1f40] p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 text-center relative">
+        <div className="mb-12 text-center relative">
           {/* Effet de particules décoratif */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-4 left-1/4 w-2 h-2 bg-purple-400 rounded-full animate-pulse opacity-60"></div>
@@ -50,6 +51,19 @@ const Shop = () => {
               <div className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-full border border-amber-200 dark:border-amber-700/50">
                 <Sparkles className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Contenu Exclusif</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Séparation décorative */}
+        <div className="relative mb-8">
+          <Separator className="bg-gradient-to-r from-transparent via-purple-300/40 to-transparent dark:via-purple-500/40" />
+          <div className="absolute inset-0 flex justify-center items-center">
+            <div className="bg-gray-50 dark:bg-[#1a1625] px-6 py-2 rounded-full border border-purple-200 dark:border-purple-700/50">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">Boutique</span>
               </div>
             </div>
           </div>
