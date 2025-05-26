@@ -76,33 +76,33 @@ const Leaderboard = () => {
 
   const getMedalColor = (rank: number) => {
     switch (rank) {
-      case 1: return "text-amber-400";  // Gold
-      case 2: return "text-gray-400 dark:text-gray-300";   // Silver
-      case 3: return "text-amber-600";  // Bronze
+      case 1: return "text-amber-400";
+      case 2: return "text-gray-400 dark:text-gray-300";
+      case 3: return "text-amber-600";
       default: return "text-gray-500";
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-6 text-3xl font-bold text-[#9b87f5]">Classement</h1>
+      <h1 className="mb-6 text-3xl font-bold text-[#9b87f5] text-gradient-modern">Classement</h1>
 
       <div className="flex space-x-2 mb-6">
         <button
-          className={`px-4 py-2 rounded-md transition-colors ${
+          className={`px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-[1.02] ${
             filter === "coins"
-              ? "bg-[#9b87f5] text-white shadow-md"
-              : "bg-gray-100 dark:bg-[#221F26] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A292C] border border-gray-200 dark:border-gray-700"
+              ? "bg-gradient-to-r from-[#9b87f5] to-blue-600 text-white shadow-lg shadow-purple-500/30"
+              : "dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 shadow-xl"
           }`}
           onClick={() => setFilter("coins")}
         >
           <Coins className="inline-block h-4 w-4 mr-1" /> Par BradCoins
         </button>
         <button
-          className={`px-4 py-2 rounded-md transition-colors ${
+          className={`px-4 py-2 rounded-md transition-all duration-300 transform hover:scale-[1.02] ${
             filter === "missions"
-              ? "bg-[#9b87f5] text-white shadow-md"
-              : "bg-gray-100 dark:bg-[#221F26] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2A292C] border border-gray-200 dark:border-gray-700"
+              ? "bg-gradient-to-r from-[#9b87f5] to-blue-600 text-white shadow-lg shadow-purple-500/30"
+              : "dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 shadow-xl"
           }`}
           onClick={() => setFilter("missions")}
         >
@@ -112,9 +112,9 @@ const Leaderboard = () => {
 
       {/* User's rank card */}
       {userRank && (
-        <Card className="mb-6 border-[#9b87f5]/30 bg-gradient-to-r from-[#9b87f5]/5 to-purple-100/50 dark:from-[#9b87f5]/10 dark:to-[#1d1825] text-gray-800 dark:text-white shadow-lg">
+        <Card className="mb-6 dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-800 dark:text-white">Votre classement</CardTitle>
+            <CardTitle className="text-gray-800 dark:text-white text-gradient-modern">Votre classement</CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
               Votre position dans le classement global
             </CardDescription>
@@ -131,12 +131,12 @@ const Leaderboard = () => {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium text-gray-800 dark:text-white">
-                  {userRank.username}
+                <div className="font-medium text-gray-800 dark:text-white flex items-center gap-2">
+                  <span>{userRank.username}</span>
                   {userRank.is_vip && (
-                    <Badge className="ml-2 bg-amber-500/80 text-black text-xs">VIP</Badge>
+                    <Badge className="bg-amber-500/80 text-black text-xs">VIP</Badge>
                   )}
-                </p>
+                </div>
                 <div className="flex text-sm text-gray-600 dark:text-gray-400">
                   <span className="flex items-center mr-3">
                     <Coins className="h-3 w-3 mr-1 text-amber-500" /> {userRank.total_coins}
@@ -151,9 +151,9 @@ const Leaderboard = () => {
         </Card>
       )}
 
-      <Card className="border-gray-200 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] text-gray-800 dark:text-white shadow-lg">
+      <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
         <CardHeader className="pb-4">
-          <CardTitle className="text-gray-800 dark:text-white">Top Joueurs</CardTitle>
+          <CardTitle className="text-gray-800 dark:text-white text-gradient-modern">Top Joueurs</CardTitle>
           <CardDescription className="text-gray-600 dark:text-gray-400">
             {filter === "coins" ? "Classement par nombre de BradCoins" : "Classement par missions complétées"}
           </CardDescription>
@@ -168,7 +168,7 @@ const Leaderboard = () => {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-b border-gray-200 dark:border-gray-700">
+                <TableRow className="border-b border-gray-200 dark:border-white/15">
                   <TableHead className="text-gray-600 dark:text-gray-400">Rang</TableHead>
                   <TableHead className="text-gray-600 dark:text-gray-400">Joueur</TableHead>
                   {filter === "coins" ? (
@@ -182,7 +182,7 @@ const Leaderboard = () => {
                 {leaderboardData.map((userData) => (
                   <TableRow 
                     key={userData.id} 
-                    className={`border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                    className={`border-b border-gray-200 dark:border-white/15 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors ${
                       user && user.id === userData.id ? "bg-[#9b87f5]/10 dark:bg-[#9b87f5]/10" : ""
                     }`}
                   >
@@ -205,12 +205,12 @@ const Leaderboard = () => {
                             <User className="h-4 w-4" />
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-gray-800 dark:text-white">
-                          {userData.username}
+                        <div className="font-medium text-gray-800 dark:text-white flex items-center gap-2">
+                          <span>{userData.username}</span>
                           {userData.is_vip && (
-                            <Badge className="ml-2 bg-amber-500/80 text-black text-xs">VIP</Badge>
+                            <Badge className="bg-amber-500/80 text-black text-xs">VIP</Badge>
                           )}
-                        </span>
+                        </div>
                       </div>
                     </TableCell>
                     {filter === "coins" ? (

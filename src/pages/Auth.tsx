@@ -141,9 +141,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#1A1F2C] to-[#221F26] p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40] p-4 bg-particles">
+      {/* Floating background particles */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute w-40 h-40 bg-purple-500/10 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
+        <div className="absolute w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
+        <div className="absolute w-48 h-48 bg-indigo-500/8 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
+      </div>
+
       <motion.div 
-        className="w-full max-w-md"
+        className="w-full max-w-md relative z-10"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -156,15 +163,15 @@ const Auth = () => {
             <div className="absolute h-10 w-10 rounded-full bg-gradient-to-r from-[#9b87f5] to-amber-400 shadow-inner"></div>
             <span className="relative text-lg font-bold text-white">BC</span>
           </div>
-          <h1 className="ml-3 text-3xl font-bold text-gradient">BradFlow</h1>
+          <h1 className="ml-3 text-3xl font-bold text-gradient-modern">BradFlow</h1>
         </motion.div>
 
-        <Card className="border-[#9b87f5] bg-[#221F26] text-white shadow-xl shadow-[#9b87f5]/10">
+        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-[#9b87f5]">
+            <CardTitle className="text-2xl font-bold text-[#9b87f5] text-gradient-modern">
               {isLogin ? "Connexion" : "Inscription"} à BradFlow
             </CardTitle>
-            <CardDescription className="text-gray-300">
+            <CardDescription className="text-gray-300 dark:text-gray-400">
               {isLogin
                 ? "Accédez à votre compte"
                 : "Rejoignez la communauté BradFlow"}
@@ -180,14 +187,14 @@ const Auth = () => {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium text-gray-300">
+                        <FormLabel className="text-sm font-medium text-gray-300 dark:text-gray-300">
                           Nom d'utilisateur
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             placeholder="Votre pseudo"
-                            className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                            className="dark:bg-black/20 dark:border-white/15 dark:text-white border-purple-200 focus:border-purple-400 dark:focus:border-purple-400"
                           />
                         </FormControl>
                         <FormMessage />
@@ -201,7 +208,7 @@ const Auth = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-300">
+                      <FormLabel className="text-sm font-medium text-gray-300 dark:text-gray-300">
                         Email
                       </FormLabel>
                       <FormControl>
@@ -209,7 +216,7 @@ const Auth = () => {
                           {...field}
                           type="email"
                           placeholder="votre@email.com"
-                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                          className="dark:bg-black/20 dark:border-white/15 dark:text-white border-purple-200 focus:border-purple-400 dark:focus:border-purple-400"
                         />
                       </FormControl>
                       <FormMessage />
@@ -222,7 +229,7 @@ const Auth = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-gray-300">
+                      <FormLabel className="text-sm font-medium text-gray-300 dark:text-gray-300">
                         Mot de passe
                       </FormLabel>
                       <FormControl>
@@ -230,7 +237,7 @@ const Auth = () => {
                           {...field}
                           type="password"
                           placeholder="••••••••"
-                          className="border-[#9b87f5] bg-[#1A1F2C] text-white"
+                          className="dark:bg-black/20 dark:border-white/15 dark:text-white border-purple-200 focus:border-purple-400 dark:focus:border-purple-400"
                         />
                       </FormControl>
                       <FormMessage />
@@ -242,7 +249,7 @@ const Auth = () => {
               <CardFooter className="flex flex-col space-y-4">
                 <Button
                   type="submit"
-                  className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-amber-500 text-white transition-all hover:from-[#8A76E5] hover:to-amber-600"
+                  className="w-full gap-2 bg-gradient-to-r from-[#9b87f5] to-blue-600 text-white transition-all hover:from-[#8A76E5] hover:to-blue-700 shadow-lg hover:shadow-xl"
                   disabled={loading}
                 >
                   {loading ? (
@@ -258,7 +265,7 @@ const Auth = () => {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="w-full text-[#9b87f5] hover:bg-[#1A1F2C] hover:text-white"
+                  className="w-full text-[#9b87f5] hover:bg-white/10 dark:hover:bg-black/20 hover:text-white transition-all"
                   onClick={() => setIsLogin(!isLogin)}
                 >
                   {isLogin

@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -56,13 +57,13 @@ const BlogPost = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
             <div className="space-y-4">
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
             </div>
           </div>
         </div>
@@ -77,7 +78,7 @@ const BlogPost = () => {
           <h1 className="text-2xl font-bold text-red-600 mb-4">
             Article non trouvé
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             L'article que vous recherchez n'existe pas ou a été supprimé.
           </p>
         </div>
@@ -93,23 +94,23 @@ const BlogPost = () => {
           <Button
             variant="ghost"
             onClick={() => navigate('/blog')}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md hover:bg-white/95 dark:hover:bg-black/30 transition-all duration-300"
           >
             <ArrowLeft className="h-4 w-4" />
             Retour aux articles
           </Button>
         </div>
 
-        <Card>
+        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="space-y-6">
             {/* Titre de l'article */}
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight">
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-gradient-modern">
               {post.title}
             </h1>
 
             {/* Résumé si disponible */}
             {post.summary && (
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-lg text-muted-foreground dark:text-gray-300 leading-relaxed">
                 {post.summary}
               </p>
             )}
@@ -126,7 +127,7 @@ const BlogPost = () => {
             )}
 
             {/* Métadonnées de l'article */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground dark:text-gray-400">
               {/* Auteur */}
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
@@ -165,17 +166,17 @@ const BlogPost = () => {
               postSummary={post.summary}
             />
 
-            <Separator />
+            <Separator className="dark:bg-white/15" />
           </CardHeader>
 
           <CardContent className="space-y-6">
             {/* Contenu de l'article */}
             <div 
-              className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-blockquote:text-foreground prose-li:text-foreground"
+              className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-blockquote:text-foreground prose-li:text-foreground dark:prose-headings:text-white dark:prose-p:text-gray-300"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            <Separator />
+            <Separator className="dark:bg-white/15" />
 
             {/* Section des commentaires */}
             <div id="comments-section">

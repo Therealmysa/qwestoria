@@ -131,22 +131,18 @@ const Dashboard = () => {
 
   const currentRank = getRankByPoints(coins);
   
-  // Calculate next rank progress percentage
   const calculateNextRankProgress = () => {
-    // This is a simplified calculation - you should replace with actual tier logic
     return Math.min(100, (coins / (coins + 200)) * 100);
   };
 
-  // Get the next rank tier name
   const getNextRankName = () => {
-    // Simplified - replace with actual next rank logic
     return currentRank;
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary dark:text-[#9b87f5]">
+        <h1 className="text-3xl font-bold text-primary dark:text-[#9b87f5] text-gradient-modern">
           Tableau de bord
         </h1>
         
@@ -156,10 +152,10 @@ const Dashboard = () => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* User Profile Summary Card - Improved with better light mode styling */}
-        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-gray-700">
-            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5]">
+        {/* User Profile Summary Card */}
+        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-white/15">
+            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5] text-gradient-modern">
               Profil Joueur
             </CardTitle>
           </CardHeader>
@@ -175,7 +171,7 @@ const Dashboard = () => {
                 )}
               </Avatar>
               <div>
-                <h3 className="font-semibold text-lg text-primary dark:text-[#9b87f5]">
+                <h3 className="font-semibold text-lg text-primary dark:text-[#9b87f5] text-gradient-modern">
                   {profile?.username || user?.email?.split("@")[0] || "Utilisateur"}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -184,7 +180,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/15">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Trophy className="h-5 w-5 text-primary dark:text-[#9b87f5] mr-2" />
@@ -193,7 +189,6 @@ const Dashboard = () => {
                 <RankBadge rankTier={currentRank} />
               </div>
               
-              {/* Add clickable mission button */}
               <button 
                 onClick={() => navigate("/missions")} 
                 className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
@@ -205,7 +200,6 @@ const Dashboard = () => {
                 Voir les missions disponibles
               </button>
 
-              {/* Add admin panel button for admin/owner users */}
               {(profile?.is_admin || profile?.is_owner) && (
                 <button 
                   onClick={() => navigate("/admin")} 
@@ -222,10 +216,10 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* BradCoins Card - Improved with better light mode styling */}
-        <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-gray-700">
-            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5]">
+        {/* BradCoins Card */}
+        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-white/15">
+            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5] text-gradient-modern">
               Solde BradCoins
             </CardTitle>
           </CardHeader>
@@ -242,7 +236,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/15">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Progression vers le prochain rang
               </h4>
@@ -265,7 +259,6 @@ const Dashboard = () => {
                 )}
               </div>
               
-              {/* Add shop button */}
               <button 
                 onClick={() => navigate("/shop")} 
                 className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
@@ -280,18 +273,18 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Transactions Card - using the Transactions component */}
+        {/* Transactions Card */}
         <div className="lg:col-span-1">
           <Transactions />
         </div>
       </div>
 
-      {/* Recent Submissions - Improved with better light mode styling */}
-      <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+      {/* Recent Submissions */}
+      <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2 text-gradient-modern">
         <BadgeCheck className="h-5 w-5 text-primary dark:text-[#9b87f5]" />
         Missions récentes
       </h2>
-      <Card className="border-primary/20 dark:border-[#9b87f5]/50 bg-white dark:bg-[#221F26] shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+      <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
         {isLoading ? (
           <div className="p-6 text-center text-gray-500 dark:text-gray-400 animate-pulse">
             <div className="mx-auto h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
@@ -301,7 +294,7 @@ const Dashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-sm text-gray-500 dark:text-gray-400">
+                <tr className="border-b border-gray-100 dark:border-white/15 text-left text-sm text-gray-500 dark:text-gray-400">
                   <th className="px-6 py-3 font-medium">Mission</th>
                   <th className="px-6 py-3 font-medium">Récompense</th>
                   <th className="px-6 py-3 font-medium">Date</th>
@@ -312,7 +305,7 @@ const Dashboard = () => {
                 {submissions.map((submission) => (
                   <tr
                     key={submission.id}
-                    className="border-b border-gray-100 dark:border-gray-700 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1A1F2C]"
+                    className="border-b border-gray-100 dark:border-white/15 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5"
                   >
                     <td className="px-6 py-4">{submission.mission.title}</td>
                     <td className="px-6 py-4 flex items-center gap-1">

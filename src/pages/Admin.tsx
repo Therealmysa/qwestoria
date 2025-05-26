@@ -48,7 +48,6 @@ const Admin = () => {
     );
   }
 
-  // Vérifier si l'utilisateur est admin ou propriétaire
   if (!user || (!profile?.is_admin && !profile?.is_owner)) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -99,45 +98,47 @@ const Admin = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-[#0a0a12] dark:via-[#1a1625] dark:to-[#2a1f40] p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-gradient-modern mb-2">
             Administration Qwestoria
             {profile?.is_owner && (
-              <span className="ml-3 text-sm bg-yellow-500 text-white px-3 py-1 rounded-full">
+              <span className="ml-3 text-sm bg-yellow-500 text-black px-3 py-1 rounded-full">
                 Propriétaire
               </span>
             )}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Panneau de contrôle pour la gestion de la plateforme
           </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7">
-            {tabs.map((tab) => (
-              <TabsTrigger 
-                key={tab.id} 
-                value={tab.id}
-                className="flex items-center gap-2 text-sm"
-              >
-                <tab.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl dark:shadow-purple-500/20">
+            <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7 bg-transparent">
+              {tabs.map((tab) => (
+                <TabsTrigger 
+                  key={tab.id} 
+                  value={tab.id}
+                  className="flex items-center gap-2 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9b87f5] data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+                >
+                  <tab.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>
-              <Card>
+              <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-gradient-modern">
                     <tab.icon className="h-5 w-5" />
                     {tab.label}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="dark:text-gray-300">
                     Gestion et administration {tab.label.toLowerCase()}
                   </CardDescription>
                 </CardHeader>
