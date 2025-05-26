@@ -85,10 +85,10 @@ const AdminSubscriptions = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {statCards.map((stat, index) => (
-          <Card key={stat.title} className="relative overflow-hidden">
-            <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-5`}></div>
+          <Card key={stat.title} className="relative overflow-hidden card-enhanced">
+            <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-10 dark:opacity-20`}></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
                 {stat.title}
               </CardTitle>
               <div className={`p-2 rounded-lg bg-gradient-to-r ${stat.color}`}>
@@ -96,7 +96,7 @@ const AdminSubscriptions = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-gray-900">
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
                 {stat.value}
               </div>
             </CardContent>
@@ -104,79 +104,88 @@ const AdminSubscriptions = () => {
         ))}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Gestion des Abonnements</CardTitle>
+      <Card className="card-enhanced">
+        <CardHeader className="border-b border-gray-200 dark:border-white/10">
+          <CardTitle className="text-white dark:text-white">Gestion des Abonnements</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {isLoading ? (
-            <div className="text-center py-8">Chargement...</div>
+            <div className="text-center py-8 text-gray-600 dark:text-gray-300">Chargement...</div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Utilisateur</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Début</TableHead>
-                  <TableHead>Expiration</TableHead>
-                  <TableHead>Prix</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {subscriptions?.map((subscription) => (
-                  <TableRow key={subscription.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        {subscription.profiles?.avatar_url ? (
-                          <img
-                            src={subscription.profiles.avatar_url}
-                            alt={subscription.profiles.username || 'Utilisateur'}
-                            className="h-8 w-8 rounded-full"
-                          />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                            {subscription.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                          </div>
-                        )}
-                        <span className="font-medium">{subscription.profiles?.username || 'Utilisateur'}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Crown className="h-3 w-3" />
-                        {subscription.subscription_plans?.name || 'Plan inconnu'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          subscription.status === 'active' ? 'default' :
-                          subscription.status === 'cancelled' ? 'destructive' :
-                          'secondary'
-                        }
-                      >
-                        {subscription.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(subscription.started_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {subscription.expires_at 
-                        ? new Date(subscription.expires_at).toLocaleDateString()
-                        : 'Illimité'
-                      }
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono">
-                        €{((subscription.subscription_plans?.price_monthly || 0) / 100).toFixed(2)}/mois
-                      </span>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                    <TableHead className="text-gray-700 dark:text-gray-300">Utilisateur</TableHead>
+                    <TableHead className="text-gray-700 dark:text-gray-300">Plan</TableHead>
+                    <TableHead className="text-gray-700 dark:text-gray-300">Statut</TableHead>
+                    <TableHead className="text-gray-700 dark:text-gray-300">Début</TableHead>
+                    <TableHead className="text-gray-700 dark:text-gray-300">Expiration</TableHead>
+                    <TableHead className="text-right text-gray-700 dark:text-gray-300">Prix</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {subscriptions?.map((subscription) => (
+                    <TableRow key={subscription.id} className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          {subscription.profiles?.avatar_url ? (
+                            <img
+                              src={subscription.profiles.avatar_url}
+                              alt={subscription.profiles.username || 'Utilisateur'}
+                              className="h-8 w-8 rounded-full"
+                            />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                              {subscription.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                            </div>
+                          )}
+                          <span className="font-medium text-gray-900 dark:text-white">{subscription.profiles?.username || 'Utilisateur'}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 border-purple-200 dark:border-purple-700">
+                          <Crown className="h-3 w-3" />
+                          {subscription.subscription_plans?.name || 'Plan inconnu'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            subscription.status === 'active' ? 'default' :
+                            subscription.status === 'cancelled' ? 'destructive' :
+                            'secondary'
+                          }
+                          className={
+                            subscription.status === 'active' 
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700'
+                              : subscription.status === 'cancelled'
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-700'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600'
+                          }
+                        >
+                          {subscription.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-700 dark:text-gray-300">
+                        {new Date(subscription.started_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-gray-700 dark:text-gray-300">
+                        {subscription.expires_at 
+                          ? new Date(subscription.expires_at).toLocaleDateString()
+                          : 'Illimité'
+                        }
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <span className="font-mono text-gray-900 dark:text-white">
+                          €{((subscription.subscription_plans?.price_monthly || 0) / 100).toFixed(2)}/mois
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

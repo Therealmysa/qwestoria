@@ -229,8 +229,8 @@ const AdminBlog = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Chargement des articles...</span>
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Chargement des articles...</span>
       </div>
     );
   }
@@ -239,29 +239,32 @@ const AdminBlog = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <BookOpen className="h-7 w-7" />
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
+            <BookOpen className="h-7 w-7 text-purple-500" />
             Gestion du Blog CMS
           </h2>
-          <p className="text-gray-600">Créez et gérez les articles de blog avec un éditeur avancé</p>
+          <p className="text-gray-600 dark:text-gray-300">Créez et gérez les articles de blog avec un éditeur avancé</p>
         </div>
         
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingPost(null);
-              setSelectedCategories([]);
-              setSelectedTags([]);
-              form.reset();
-            }}>
+            <Button 
+              onClick={() => {
+                setEditingPost(null);
+                setSelectedCategories([]);
+                setSelectedTags([]);
+                form.reset();
+              }}
+              className="button-primary"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Nouvel Article
             </Button>
           </DialogTrigger>
           
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto dark:bg-black/80 dark:backdrop-blur-2xl dark:border-white/15">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+              <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                 <FileText className="h-5 w-5" />
                 {editingPost ? "Modifier l'article" : "Créer un nouvel article"}
               </DialogTitle>
@@ -277,12 +280,12 @@ const AdminBlog = () => {
                       name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Titre de l'article</FormLabel>
+                          <FormLabel className="text-gray-700 dark:text-gray-300">Titre de l'article</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Entrez un titre accrocheur..." 
                               {...field}
-                              className="text-lg font-medium"
+                              className="text-lg font-medium input-enhanced"
                             />
                           </FormControl>
                           <FormMessage />
@@ -295,11 +298,12 @@ const AdminBlog = () => {
                       name="summary"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Résumé de l'article</FormLabel>
+                          <FormLabel className="text-gray-700 dark:text-gray-300">Résumé de l'article</FormLabel>
                           <FormControl>
                             <Input 
                               placeholder="Résumé court qui apparaîtra dans les listes..." 
                               {...field} 
+                              className="input-enhanced"
                             />
                           </FormControl>
                           <FormMessage />
@@ -312,7 +316,7 @@ const AdminBlog = () => {
                       name="content"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Contenu de l'article</FormLabel>
+                          <FormLabel className="text-gray-700 dark:text-gray-300">Contenu de l'article</FormLabel>
                           <FormControl>
                             <RichTextEditor
                               content={field.value}
@@ -329,8 +333,8 @@ const AdminBlog = () => {
                   {/* Colonne latérale - Paramètres */}
                   <div className="space-y-6">
                     {/* Statut de publication */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
+                      <h3 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                         <Eye className="h-4 w-4" />
                         Publication
                       </h3>
@@ -340,7 +344,7 @@ const AdminBlog = () => {
                         name="published"
                         render={({ field }) => (
                           <FormItem className="flex items-center justify-between">
-                            <FormLabel>Publier l'article</FormLabel>
+                            <FormLabel className="text-gray-700 dark:text-gray-300">Publier l'article</FormLabel>
                             <FormControl>
                               <Switch
                                 checked={field.value}
@@ -353,8 +357,8 @@ const AdminBlog = () => {
                     </div>
 
                     {/* Temps de lecture */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
+                      <h3 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
                         <Clock className="h-4 w-4" />
                         Temps de lecture
                       </h3>
@@ -363,7 +367,7 @@ const AdminBlog = () => {
                         name="reading_time_minutes"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Minutes de lecture estimées</FormLabel>
+                            <FormLabel className="text-gray-700 dark:text-gray-300">Minutes de lecture estimées</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -372,6 +376,7 @@ const AdminBlog = () => {
                                 placeholder="5" 
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
+                                className="input-enhanced"
                               />
                             </FormControl>
                             <FormMessage />
@@ -381,15 +386,15 @@ const AdminBlog = () => {
                     </div>
 
                     {/* Image à la une */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-medium mb-3">Image à la une</h3>
+                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
+                      <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Image à la une</h3>
                       <FormField
                         control={form.control}
                         name="image_url"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
-                              <Input placeholder="URL de l'image..." {...field} />
+                              <Input placeholder="URL de l'image..." {...field} className="input-enhanced" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -400,7 +405,7 @@ const AdminBlog = () => {
                           <img 
                             src={form.watch('image_url')} 
                             alt="Aperçu" 
-                            className="w-full h-32 object-cover rounded"
+                            className="w-full h-32 object-cover rounded border border-white/10"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                             }}
@@ -410,7 +415,7 @@ const AdminBlog = () => {
                     </div>
 
                     {/* Catégories */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
                       <CategoryManager
                         selectedCategories={selectedCategories}
                         onCategoriesChange={setSelectedCategories}
@@ -418,7 +423,7 @@ const AdminBlog = () => {
                     </div>
 
                     {/* Tags */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
                       <TagManager
                         selectedTags={selectedTags}
                         onTagsChange={setSelectedTags}
@@ -427,15 +432,16 @@ const AdminBlog = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-end space-x-2 pt-6 border-t">
+                <div className="flex justify-end space-x-2 pt-6 border-t border-gray-200 dark:border-white/10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setDialogOpen(false)}
+                    className="dark:bg-black/20 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
                   >
                     Annuler
                   </Button>
-                  <Button type="submit" disabled={saveMutation.isPending}>
+                  <Button type="submit" disabled={saveMutation.isPending} className="button-primary">
                     {saveMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : (
@@ -452,46 +458,46 @@ const AdminBlog = () => {
 
       {/* Statistiques améliorées */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="flex items-center">
+        <div className="card-enhanced">
+          <div className="flex items-center p-4">
             <FileText className="h-8 w-8 text-blue-500" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Total Articles</p>
-              <p className="text-2xl font-bold">{posts?.length || 0}</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Articles</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{posts?.length || 0}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="flex items-center">
+        <div className="card-enhanced">
+          <div className="flex items-center p-4">
             <Eye className="h-8 w-8 text-green-500" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Publiés</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Publiés</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {posts?.filter(p => p.published).length || 0}
               </p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="flex items-center">
+        <div className="card-enhanced">
+          <div className="flex items-center p-4">
             <Calendar className="h-8 w-8 text-orange-500" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Brouillons</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Brouillons</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {posts?.filter(p => !p.published).length || 0}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="flex items-center">
+        <div className="card-enhanced">
+          <div className="flex items-center p-4">
             <Folder className="h-8 w-8 text-purple-500" />
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500">Cette semaine</p>
-              <p className="text-2xl font-bold">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Cette semaine</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {posts?.filter(p => {
                   const weekAgo = new Date();
                   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -504,91 +510,102 @@ const AdminBlog = () => {
       </div>
 
       {/* Liste des articles améliorée */}
-      <div className="bg-white rounded-lg border shadow-sm">
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-medium">Articles récents</h3>
+      <div className="card-enhanced">
+        <div className="p-4 border-b border-gray-200 dark:border-white/10">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Articles récents</h3>
         </div>
         
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Article</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead>Auteur</TableHead>
-              <TableHead>Créé le</TableHead>
-              <TableHead>Modifié le</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts?.map((post) => (
-              <TableRow key={post.id}>
-                <TableCell>
-                  <div className="flex items-start space-x-3">
-                    {post.image_url && (
-                      <img 
-                        src={post.image_url} 
-                        alt="" 
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium text-gray-900">{post.title}</p>
-                      {post.summary && (
-                        <p className="text-sm text-gray-500 truncate max-w-xs">
-                          {post.summary}
-                        </p>
-                      )}
-                      {post.slug && (
-                        <p className="text-xs text-blue-500">/{post.slug}</p>
-                      )}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={post.published ? "default" : "secondary"}>
-                    {post.published ? "Publié" : "Brouillon"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-gray-600">Vous</span>
-                </TableCell>
-                <TableCell>{formatDate(post.created_at)}</TableCell>
-                <TableCell>{formatDate(post.updated_at)}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(post)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(post.id)}
-                      disabled={deleteMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                <TableHead className="text-gray-700 dark:text-gray-300">Article</TableHead>
+                <TableHead className="text-gray-700 dark:text-gray-300">Statut</TableHead>
+                <TableHead className="text-gray-700 dark:text-gray-300">Auteur</TableHead>
+                <TableHead className="text-gray-700 dark:text-gray-300">Créé le</TableHead>
+                <TableHead className="text-gray-700 dark:text-gray-300">Modifié le</TableHead>
+                <TableHead className="text-right text-gray-700 dark:text-gray-300">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {posts?.map((post) => (
+                <TableRow key={post.id} className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                  <TableCell>
+                    <div className="flex items-start space-x-3">
+                      {post.image_url && (
+                        <img 
+                          src={post.image_url} 
+                          alt="" 
+                          className="w-12 h-12 object-cover rounded border border-white/10"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{post.title}</p>
+                        {post.summary && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                            {post.summary}
+                          </p>
+                        )}
+                        {post.slug && (
+                          <p className="text-xs text-blue-500 dark:text-blue-400">/{post.slug}</p>
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={post.published ? "default" : "secondary"}
+                      className={
+                        post.published 
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700'
+                          : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600'
+                      }
+                    >
+                      {post.published ? "Publié" : "Brouillon"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Vous</span>
+                  </TableCell>
+                  <TableCell className="text-gray-700 dark:text-gray-300">{formatDate(post.created_at)}</TableCell>
+                  <TableCell className="text-gray-700 dark:text-gray-300">{formatDate(post.updated_at)}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(post)}
+                        className="dark:hover:bg-white/10 dark:text-gray-300"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(post.id)}
+                        disabled={deleteMutation.isPending}
+                        className="dark:hover:bg-white/10 dark:text-gray-300 hover:text-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
         {posts?.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
               Aucun article
             </h3>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
               Commencez par créer votre premier article avec l'éditeur avancé.
             </p>
-            <Button onClick={() => setDialogOpen(true)}>
+            <Button onClick={() => setDialogOpen(true)} className="button-primary">
               <Plus className="h-4 w-4 mr-2" />
               Créer le premier article
             </Button>
