@@ -55,7 +55,7 @@ export const getFortniteShop = async (): Promise<FortniteShopPayload> => {
     
     if (error) {
       console.error('Edge function error:', error);
-      throw error;
+      throw new Error(`Edge function error: ${error.message}`);
     }
     
     if (!data) {
@@ -65,13 +65,35 @@ export const getFortniteShop = async (): Promise<FortniteShopPayload> => {
     
     console.log('Edge function returned data:', data);
     
-    // Ensure the data structure is correct
+    // Validation de la structure des données
     if (!data.data || !Array.isArray(data.data.entries)) {
       console.error('Invalid data structure:', data);
       throw new Error("Invalid data structure returned from edge function");
     }
     
-    return data;
+    // Validation supplémentaire des entrées
+    const validEntries = data.data.entries.filter(entry => {
+      return entry && 
+             entry.id && 
+             entry.name && 
+             entry.images && 
+             entry.images.icon;
+    });
+    
+    if (validEntries.length === 0) {
+      console.warn('No valid entries found in shop data');
+    }
+    
+    console.log(`Processed ${validEntries.length} valid shop entries`);
+    
+    return {
+      ...data,
+      data: {
+        ...data.data,
+        entries: validEntries
+      }
+    };
+    
   } catch (error) {
     console.error('Error in getFortniteShop:', error);
     throw error;
