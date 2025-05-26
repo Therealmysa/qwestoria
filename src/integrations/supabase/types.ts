@@ -222,6 +222,83 @@ export type Database = {
           },
         ]
       }
+      bradcoins_pricing: {
+        Row: {
+          bradcoins_amount: number
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          price_cents: number
+          stripe_price_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          bradcoins_amount: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          price_cents: number
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bradcoins_amount?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_cents?: number
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bradcoins_purchases: {
+        Row: {
+          bradcoins_amount: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          price_paid_cents: number
+          pricing_id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          bradcoins_amount: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          price_paid_cents: number
+          pricing_id: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          bradcoins_amount?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          price_paid_cents?: number
+          pricing_id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bradcoins_purchases_pricing_id_fkey"
+            columns: ["pricing_id"]
+            isOneToOne: false
+            referencedRelation: "bradcoins_pricing"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friendships: {
         Row: {
           created_at: string
@@ -477,6 +554,42 @@ export type Database = {
           is_vip_only?: boolean | null
           name?: string
           price?: number
+        }
+        Relationships: []
+      }
+      stripe_subscribers: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

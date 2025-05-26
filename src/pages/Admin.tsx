@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +13,7 @@ import AdminShop from "@/components/admin/AdminShop";
 import AdminSubscriptions from "@/components/admin/AdminSubscriptions";
 import AdminAdvertisements from "@/components/admin/AdminAdvertisements";
 import AdminBlog from "@/components/admin/AdminBlog";
+import AdminBradCoins from "@/components/admin/AdminBradCoins";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -76,6 +76,12 @@ const Admin = () => {
       label: "Boutique",
       icon: ShoppingBag,
       component: AdminShop
+    },
+    {
+      id: "bradcoins",
+      label: "BradCoins",
+      icon: Settings,
+      component: AdminBradCoins
     },
     {
       id: "subscriptions",
