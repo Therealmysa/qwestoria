@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Folder } from 'lucide-react';
 
 interface CategoryManagerProps {
   selectedCategories: string[];
@@ -44,7 +44,10 @@ const CategoryManager = ({ selectedCategories, onCategoriesChange }: CategoryMan
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-medium mb-3">Catégories</h3>
+        <h3 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
+          <Folder className="h-4 w-4" />
+          Catégories
+        </h3>
         
         {/* Créer une nouvelle catégorie */}
         <div className="flex gap-2 mb-4">
@@ -53,11 +56,13 @@ const CategoryManager = ({ selectedCategories, onCategoriesChange }: CategoryMan
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleCreateCategory()}
+            className="input-enhanced"
           />
           <Button 
             onClick={handleCreateCategory}
             disabled={!newCategoryName.trim()}
             size="sm"
+            className="button-primary"
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -70,8 +75,8 @@ const CategoryManager = ({ selectedCategories, onCategoriesChange }: CategoryMan
               key={category.id}
               className={`flex items-center gap-1 px-3 py-1 rounded-full border cursor-pointer transition-colors ${
                 selectedCategories.includes(category.id)
-                  ? 'bg-blue-100 border-blue-300'
-                  : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                  ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700 text-purple-800 dark:text-purple-300'
+                  : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-300'
               }`}
               onClick={() => toggleCategory(category.id)}
             >
@@ -84,7 +89,7 @@ const CategoryManager = ({ selectedCategories, onCategoriesChange }: CategoryMan
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  className="h-4 w-4 p-0 hover:bg-transparent dark:text-purple-300 dark:hover:text-purple-200"
                   onClick={(e) => {
                     e.stopPropagation();
                     onCategoriesChange(selectedCategories.filter(id => id !== category.id));
@@ -98,7 +103,7 @@ const CategoryManager = ({ selectedCategories, onCategoriesChange }: CategoryMan
         </div>
 
         {localCategories.length === 0 && (
-          <p className="text-gray-500 text-sm">Aucune catégorie disponible</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune catégorie disponible</p>
         )}
       </div>
     </div>
