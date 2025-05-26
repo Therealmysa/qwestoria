@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -105,6 +104,15 @@ const AdminMissions = () => {
 
   const deleteMissionMutation = useMutation({
     mutationFn: async (missionId: string) => {
+      // D'abord supprimer les soumissions associées
+      const { error: submissionsError } = await supabase
+        .from('mission_submissions')
+        .delete()
+        .eq('mission_id', missionId);
+      
+      if (submissionsError) throw submissionsError;
+
+      // Ensuite supprimer la mission
       const { error } = await supabase
         .from('missions')
         .delete()
@@ -123,7 +131,8 @@ const AdminMissions = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
       toast.success("Mission supprimée");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Erreur lors de la suppression:', error);
       toast.error("Erreur lors de la suppression");
     }
   });
@@ -172,6 +181,12 @@ const AdminMissions = () => {
       ends_at: mission.ends_at ? new Date(mission.ends_at) : undefined
     });
     setShowEditDialog(true);
+  };
+
+  const handleDeleteMission = (missionId: string) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette mission ? Toutes les soumissions associées seront également supprimées.")) {
+      deleteMissionMutation.mutate(missionId);
+    }
   };
 
   const getMissionStatus = (mission: any) => {
@@ -417,7 +432,7 @@ const AdminMissions = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => deleteMissionMutation.mutate(mission.id)}
+                              onClick={() => handleDeleteMission(mission.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

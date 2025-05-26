@@ -17,6 +17,8 @@ import { toast } from "sonner";
 
 const AdminShop = () => {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -60,10 +62,39 @@ const AdminShop = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
       toast.success("Article créé avec succès");
       setShowCreateDialog(false);
-      setFormData({ name: "", description: "", price: 0, category: "pack", image_url: "", is_vip_only: false });
+      resetForm();
     },
     onError: () => {
       toast.error("Erreur lors de la création");
+    }
+  });
+
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ id, itemData }: { id: string, itemData: any }) => {
+      const { error } = await supabase
+        .from('shop_items')
+        .update(itemData)
+        .eq('id', id);
+      
+      if (error) throw error;
+
+      // Log admin action
+      await supabase.from('admin_logs').insert({
+        admin_id: (await supabase.auth.getUser()).data.user?.id,
+        action: 'update_shop_item',
+        target_type: 'shop_item',
+        target_id: id,
+        details: itemData
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
+      toast.success("Article mis à jour");
+      setShowEditDialog(false);
+      resetForm();
+    },
+    onError: () => {
+      toast.error("Erreur lors de la mise à jour");
     }
   });
 
@@ -93,9 +124,115 @@ const AdminShop = () => {
     }
   });
 
+  const resetForm = () => {
+    setFormData({ 
+      name: "", 
+      description: "", 
+      price: 0, 
+      category: "pack", 
+      image_url: "", 
+      is_vip_only: false 
+    });
+    setSelectedItem(null);
+  };
+
   const handleCreateItem = () => {
     createItemMutation.mutate(formData);
   };
+
+  const handleEditItem = (item: any) => {
+    setSelectedItem(item);
+    setFormData({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      image_url: item.image_url || "",
+      is_vip_only: item.is_vip_only || false
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleUpdateItem = () => {
+    if (!selectedItem) return;
+    updateItemMutation.mutate({ id: selectedItem.id, itemData: formData });
+  };
+
+  const handleDeleteItem = (itemId: string) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
+      deleteItemMutation.mutate(itemId);
+    }
+  };
+
+  const ItemForm = ({ isEdit = false }) => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="name">Nom</Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="Nom de l'article"
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Description de l'article"
+        />
+      </div>
+      <div>
+        <Label htmlFor="price">Prix (BradCoins)</Label>
+        <Input
+          id="price"
+          type="number"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) })}
+        />
+      </div>
+      <div>
+        <Label htmlFor="category">Catégorie</Label>
+        <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pack">Pack</SelectItem>
+            <SelectItem value="skin">Skin</SelectItem>
+            <SelectItem value="emote">Emote</SelectItem>
+            <SelectItem value="vbucks">V-Bucks</SelectItem>
+            <SelectItem value="accessory">Accessoire</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="image_url">URL de l'image</Label>
+        <Input
+          id="image_url"
+          value={formData.image_url}
+          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+          placeholder="https://..."
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_vip_only"
+          checked={formData.is_vip_only}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_vip_only: checked })}
+        />
+        <Label htmlFor="is_vip_only">VIP uniquement</Label>
+      </div>
+      <Button 
+        onClick={isEdit ? handleUpdateItem : handleCreateItem} 
+        className="w-full"
+      >
+        {isEdit ? "Mettre à jour" : "Créer"} l'article
+      </Button>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -114,70 +251,7 @@ const AdminShop = () => {
                 <DialogHeader>
                   <DialogTitle>Créer un nouvel article</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nom</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Nom de l'article"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Description de l'article"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="price">Prix (BradCoins)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Catégorie</Label>
-                    <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pack">Pack</SelectItem>
-                        <SelectItem value="skin">Skin</SelectItem>
-                        <SelectItem value="emote">Emote</SelectItem>
-                        <SelectItem value="vbucks">V-Bucks</SelectItem>
-                        <SelectItem value="accessory">Accessoire</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="image_url">URL de l'image</Label>
-                    <Input
-                      id="image_url"
-                      value={formData.image_url}
-                      onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                      placeholder="https://..."
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="is_vip_only"
-                      checked={formData.is_vip_only}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_vip_only: checked })}
-                    />
-                    <Label htmlFor="is_vip_only">VIP uniquement</Label>
-                  </div>
-                  <Button onClick={handleCreateItem} className="w-full">
-                    Créer l'article
-                  </Button>
-                </div>
+                <ItemForm />
               </DialogContent>
             </Dialog>
           </CardTitle>
@@ -238,13 +312,17 @@ const AdminShop = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditItem(item)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => deleteItemMutation.mutate(item.id)}
+                          onClick={() => handleDeleteItem(item.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -257,6 +335,15 @@ const AdminShop = () => {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Modifier l'article</DialogTitle>
+          </DialogHeader>
+          <ItemForm isEdit={true} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
