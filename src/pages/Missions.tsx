@@ -111,9 +111,13 @@ const Missions = () => {
     return userSubmissions.find(submission => submission.mission_id === missionId);
   };
 
-  // Corriger la logique: on peut soumettre si on n'a pas encore soumis cette mission spécifique OU si elle a été rejetée
+  // Corriger la logique: on peut soumettre une mission si on n'a pas encore de soumission validée pour cette mission spécifique
   const canSubmitMission = (missionId: string) => {
     const submission = getUserSubmissionForMission(missionId);
+    // On peut soumettre si :
+    // 1. Aucune soumission pour cette mission
+    // 2. La soumission a été rejetée
+    // On ne peut PAS soumettre si la mission est déjà validée ou en attente
     return !submission || submission.status === 'rejected';
   };
 
@@ -196,16 +200,18 @@ const Missions = () => {
       // Vérifier si l'utilisateur a déjà une soumission en attente pour cette mission spécifique
       const { data: existingSubmission } = await supabase
         .from('mission_submissions')
-        .select('id')
+        .select('id, status')
         .eq('mission_id', missionId)
         .eq('user_id', user!.id)
-        .eq('status', 'pending')
         .single();
 
-      if (existingSubmission) {
+      // Empêcher la soumission si il y a déjà une soumission validée ou en attente
+      if (existingSubmission && (existingSubmission.status === 'pending' || existingSubmission.status === 'verified')) {
         toast({
           title: "Error",
-          description: "You already have a pending submission for this mission.",
+          description: existingSubmission.status === 'verified' 
+            ? "You have already completed this mission."
+            : "You already have a pending submission for this mission.",
           variant: "destructive",
         });
         return;

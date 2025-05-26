@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,17 +34,27 @@ const AdminMissionSubmissions = () => {
     }
   });
 
-  // Fonction améliorée pour supprimer les fichiers
+  // Fonction améliorée pour supprimer les fichiers du storage Supabase
   const deleteFileFromStorage = async (fileUrl: string) => {
     if (!fileUrl) return;
     
     try {
-      // Extraire le chemin du fichier depuis l'URL
-      const url = new URL(fileUrl);
-      const pathParts = url.pathname.split('/');
-      const filePath = pathParts.slice(-2).join('/'); // temp/filename
+      console.log('Attempting to delete file from URL:', fileUrl);
       
-      console.log('Attempting to delete file:', filePath);
+      // Extraire le chemin du fichier depuis l'URL publique Supabase
+      // Format URL: https://wzgnionuvdjxvnpocytb.supabase.co/storage/v1/object/public/temp/temp/filename
+      const urlParts = fileUrl.split('/');
+      const bucketIndex = urlParts.findIndex(part => part === 'temp');
+      
+      if (bucketIndex === -1) {
+        console.error('Could not find bucket name in URL');
+        return;
+      }
+      
+      // Récupérer tout ce qui vient après le nom du bucket
+      const filePath = urlParts.slice(bucketIndex + 1).join('/');
+      
+      console.log('Extracted file path:', filePath);
       
       const { error } = await supabase.storage
         .from('temp')
