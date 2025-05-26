@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
     const { user_id, amount } = await req.json()
@@ -30,16 +30,45 @@ Deno.serve(async (req) => {
     }
 
     // Créer un compte BradCoins si l'utilisateur n'en a pas encore
-    const { error: insertError } = await supabaseClient
+    const { error: upsertError } = await supabaseClient
       .from('brad_coins')
-      .insert({ user_id, balance: 0 })
-      .onConflict('user_id')
+      .upsert({ 
+        user_id, 
+        balance: 0 
+      }, { 
+        onConflict: 'user_id',
+        ignoreDuplicates: true 
+      })
+
+    if (upsertError) {
+      console.error('Error upserting brad_coins:', upsertError)
+    }
+
+    // Récupérer le solde actuel
+    const { data: currentBalance, error: fetchError } = await supabaseClient
+      .from('brad_coins')
+      .select('balance')
+      .eq('user_id', user_id)
+      .single()
+
+    if (fetchError) {
+      console.error('Error fetching current balance:', fetchError)
+      return new Response(
+        JSON.stringify({ error: fetchError.message }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    const newBalance = (currentBalance?.balance || 0) + amount
 
     // Mettre à jour le solde
     const { error: updateError } = await supabaseClient
       .from('brad_coins')
       .update({ 
-        balance: supabaseClient.sql`balance + ${amount}`,
+        balance: newBalance,
         last_updated: new Date().toISOString()
       })
       .eq('user_id', user_id)
@@ -56,7 +85,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, new_balance: newBalance }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }

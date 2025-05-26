@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useToast } from "@/components/ui/use-toast";
-import { ExternalLink, Clock, Coins } from "lucide-react";
+import { ExternalLink, Clock, Coins, CheckCircle } from "lucide-react";
 
 interface Mission {
   id: string;
@@ -39,9 +38,15 @@ interface Mission {
   ends_at: string | null;
 }
 
+interface UserSubmission {
+  mission_id: string;
+  status: string;
+}
+
 const Missions = () => {
   const { user, profile, loading } = useAuth();
   const [missions, setMissions] = useState<Mission[]>([]);
+  const [userSubmissions, setUserSubmissions] = useState<UserSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [submissionData, setSubmissionData] = useState({
     fortniteUsername: profile?.fortnite_username || "",
@@ -58,6 +63,7 @@ const Missions = () => {
       navigate("/auth");
     } else {
       fetchMissions();
+      fetchUserSubmissions();
     }
   }, [user, loading, navigate]);
 
@@ -81,6 +87,64 @@ const Missions = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchUserSubmissions = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("mission_submissions")
+        .select("mission_id, status")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setUserSubmissions(data as UserSubmission[]);
+    } catch (error: any) {
+      console.error("Error fetching user submissions:", error.message);
+    }
+  };
+
+  const getUserSubmissionForMission = (missionId: string) => {
+    return userSubmissions.find(submission => submission.mission_id === missionId);
+  };
+
+  const canSubmitMission = (missionId: string) => {
+    const submission = getUserSubmissionForMission(missionId);
+    return !submission || (submission.status !== 'verified' && submission.status !== 'pending');
+  };
+
+  const getMissionButtonText = (missionId: string) => {
+    const submission = getUserSubmissionForMission(missionId);
+    if (!submission) return "Submit";
+    
+    switch (submission.status) {
+      case 'verified':
+        return "Completed";
+      case 'pending':
+        return "Pending";
+      case 'rejected':
+        return "Resubmit";
+      default:
+        return "Submit";
+    }
+  };
+
+  const getMissionButtonVariant = (missionId: string) => {
+    const submission = getUserSubmissionForMission(missionId);
+    if (!submission) return "default";
+    
+    switch (submission.status) {
+      case 'verified':
+        return "outline";
+      case 'pending':
+        return "outline";
+      case 'rejected':
+        return "destructive";
+      default:
+        return "default";
     }
   };
 
@@ -173,6 +237,9 @@ const Missions = () => {
         missionId: "",
       });
       setShowDialog(false);
+      
+      // Refresh user submissions
+      fetchUserSubmissions();
     } catch (error: any) {
       console.error('Error submitting mission:', error.message);
       toast({
@@ -218,76 +285,90 @@ const Missions = () => {
           <p className="text-center text-lg text-gray-400 dark:text-gray-400">No missions available at the moment.</p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {missions.map((mission) => (
-              <Card key={mission.id} className={`border-${isActive(mission) ? '[#9b87f5]' : 'gray'}/50 dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 text-gray-900 dark:text-white overflow-hidden`}>
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-semibold text-gradient-modern truncate">
-                      {mission.title}
-                    </CardTitle>
-                    {mission.is_vip_only && (
-                      <Badge className="bg-amber-500/80 text-black">VIP</Badge>
-                    )}
-                  </div>
-                  <CardDescription className="dark:text-gray-400">
-                    {mission.starts_at && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Clock className="h-3 w-3" />
-                        <span>
-                          {formatDate(mission.starts_at)} 
-                          {mission.ends_at && ` - ${formatDate(mission.ends_at)}`}
-                        </span>
+            {missions.map((mission) => {
+              const userSubmission = getUserSubmissionForMission(mission.id);
+              const isCompleted = userSubmission?.status === 'verified';
+              
+              return (
+                <Card key={mission.id} className={`border-${isActive(mission) ? '[#9b87f5]' : 'gray'}/50 dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 text-gray-900 dark:text-white overflow-hidden ${isCompleted ? 'ring-2 ring-green-500/50' : ''}`}>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-xl font-semibold text-gradient-modern truncate flex items-center gap-2">
+                        {mission.title}
+                        {isCompleted && <CheckCircle className="h-5 w-5 text-green-500" />}
+                      </CardTitle>
+                      <div className="flex gap-2">
+                        {mission.is_vip_only && (
+                          <Badge className="bg-amber-500/80 text-black">VIP</Badge>
+                        )}
+                        {isCompleted && (
+                          <Badge className="bg-green-500/80 text-white">Completed</Badge>
+                        )}
                       </div>
+                    </div>
+                    <CardDescription className="dark:text-gray-400">
+                      {mission.starts_at && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Clock className="h-3 w-3" />
+                          <span>
+                            {formatDate(mission.starts_at)} 
+                            {mission.ends_at && ` - ${formatDate(mission.ends_at)}`}
+                          </span>
+                        </div>
+                      )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm dark:text-gray-300">{mission.description}</p>
+                    <div className="flex items-center mt-4">
+                      <Coins className="h-5 w-5 text-amber-400 mr-1" />
+                      <span className="font-bold text-amber-400">{mission.reward_coins} BradCoins</span>
+                      {isCompleted && <span className="ml-2 text-green-500 text-sm">(Earned)</span>}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between pt-2">
+                    {mission.external_link && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => window.open(mission.external_link!, '_blank')}
+                        className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                      >
+                        <ExternalLink className="h-4 w-4 mr-1" /> View
+                      </Button>
                     )}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm dark:text-gray-300">{mission.description}</p>
-                  <div className="flex items-center mt-4">
-                    <Coins className="h-5 w-5 text-amber-400 mr-1" />
-                    <span className="font-bold text-amber-400">{mission.reward_coins} BradCoins</span>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between pt-2">
-                  {mission.external_link && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => window.open(mission.external_link!, '_blank')}
-                      className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-1" /> View
-                    </Button>
-                  )}
-                  
-                  {isActive(mission) && !mission.is_vip_only || (mission.is_vip_only && profile?.is_vip) ? (
-                    <Button 
-                      size="sm" 
-                      onClick={() => openSubmissionDialog(mission.id)}
-                      className="bg-[#9b87f5] hover:bg-[#8976e4]"
-                    >
-                      Submit
-                    </Button>
-                  ) : mission.is_vip_only && !profile?.is_vip ? (
-                    <Button 
-                      size="sm" 
-                      disabled
-                      className="bg-gray-700 text-gray-400 cursor-not-allowed"
-                    >
-                      VIP Only
-                    </Button>
-                  ) : !isActive(mission) ? (
-                    <Button 
-                      size="sm" 
-                      disabled
-                      className="bg-gray-700 text-gray-400 cursor-not-allowed"
-                    >
-                      Inactive
-                    </Button>
-                  ) : null}
-                </CardFooter>
-              </Card>
-            ))}
+                    
+                    {isActive(mission) && (!mission.is_vip_only || profile?.is_vip) ? (
+                      <Button 
+                        size="sm" 
+                        onClick={() => openSubmissionDialog(mission.id)}
+                        className={`${getMissionButtonVariant(mission.id) === 'default' ? 'bg-[#9b87f5] hover:bg-[#8976e4]' : ''}`}
+                        variant={getMissionButtonVariant(mission.id) as any}
+                        disabled={!canSubmitMission(mission.id)}
+                      >
+                        {getMissionButtonText(mission.id)}
+                      </Button>
+                    ) : mission.is_vip_only && !profile?.is_vip ? (
+                      <Button 
+                        size="sm" 
+                        disabled
+                        className="bg-gray-700 text-gray-400 cursor-not-allowed"
+                      >
+                        VIP Only
+                      </Button>
+                    ) : !isActive(mission) ? (
+                      <Button 
+                        size="sm" 
+                        disabled
+                        className="bg-gray-700 text-gray-400 cursor-not-allowed"
+                      >
+                        Inactive
+                      </Button>
+                    ) : null}
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
         )}
 
