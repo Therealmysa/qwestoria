@@ -301,6 +301,7 @@ const Navbar = () => {
             </DropdownMenu>
           </div>
 
+          {/* User Authentication Section */}
           {!loading &&
             (user ? (
               <DropdownMenu>
