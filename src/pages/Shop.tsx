@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VipUpgrade from "@/components/vip/VipUpgrade";
 import BradCoinsShop from "@/components/shop/BradCoinsShop";
-import PackDisplay from "@/components/shop/PackDisplay";
+import ShopItems from "@/components/shop/ShopItems";
 import { Coins, Crown, ShoppingBag } from "lucide-react";
 
 const Shop = () => {
@@ -49,7 +49,7 @@ const Shop = () => {
           </div>
 
           <TabsContent value="items" className="space-y-6">
-            <PackDisplay />
+            <ShopItems />
           </TabsContent>
 
           <TabsContent value="bradcoins" className="space-y-6">
