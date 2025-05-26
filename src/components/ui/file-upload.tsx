@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { UploadCloud, Loader2, CheckCircle, XCircle } from "lucide-react";
-import { uploadToCloudinary } from "@/services/cloudinary";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface FileUploadProps {
@@ -47,31 +47,32 @@ export function FileUpload({
       setUploadStatus("idle");
       setProgress(10);
       
-      // Simuler la progression (comme Cloudinary ne fournit pas de callback de progression)
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          const next = Math.min(prev + Math.random() * 15, 90);
-          return next;
-        });
-      }, 300);
+      // Générer un nom de fichier unique
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `temp/${fileName}`;
       
-      let url = "";
+      setProgress(30);
       
-      // Utiliser le service Cloudinary pour l'upload
-      if (secureUpload) {
-        // Importer dynamiquement pour éviter les problèmes de compilation
-        const { secureUploadToCloudinary } = await import("@/services/cloudinarySecure");
-        url = await secureUploadToCloudinary(file);
-      } else {
-        url = await uploadToCloudinary(file);
-      }
+      // Upload vers Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('temp')
+        .upload(filePath, file);
       
-      clearInterval(interval);
+      if (error) throw error;
+      
+      setProgress(70);
+      
+      // Obtenir l'URL publique
+      const { data: { publicUrl } } = supabase.storage
+        .from('temp')
+        .getPublicUrl(filePath);
+      
       setProgress(100);
       setUploadStatus("success");
       
       if (onUploadComplete) {
-        onUploadComplete(url);
+        onUploadComplete(publicUrl);
       }
       
       toast.success("Fichier uploadé avec succès");

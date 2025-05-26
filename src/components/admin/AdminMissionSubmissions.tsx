@@ -46,27 +46,41 @@ const AdminMissionSubmissions = () => {
       
       if (error) throw error;
 
+      const submission = submissions?.find(s => s.id === submissionId);
+      
       // Si validé, ajouter les BradCoins via l'edge function
-      if (status === 'verified') {
-        const submission = submissions?.find(s => s.id === submissionId);
-        if (submission) {
-          // Ajouter les BradCoins via l'edge function
-          const { error: coinsError } = await supabase.functions.invoke('update-bradcoins', {
-            body: {
-              user_id: submission.user_id,
-              amount: submission.missions.reward_coins
-            }
-          });
-
-          if (coinsError) throw coinsError;
-
-          // Créer une transaction
-          await supabase.from('transactions').insert({
+      if (status === 'verified' && submission) {
+        const { error: coinsError } = await supabase.functions.invoke('update-bradcoins', {
+          body: {
             user_id: submission.user_id,
-            amount: submission.missions.reward_coins,
-            type: 'mission_reward',
-            description: `Récompense pour la mission: ${submission.missions.title}`
-          });
+            amount: submission.missions.reward_coins
+          }
+        });
+
+        if (coinsError) throw coinsError;
+
+        // Créer une transaction
+        await supabase.from('transactions').insert({
+          user_id: submission.user_id,
+          amount: submission.missions.reward_coins,
+          type: 'mission_reward',
+          description: `Récompense pour la mission: ${submission.missions.title}`
+        });
+      }
+
+      // Supprimer le fichier de preuve du storage si il existe
+      if (submission?.screenshot_url && (status === 'verified' || status === 'rejected')) {
+        try {
+          // Extraire le chemin du fichier depuis l'URL
+          const url = new URL(submission.screenshot_url);
+          const pathParts = url.pathname.split('/');
+          const filePath = pathParts.slice(-2).join('/'); // temp/filename
+          
+          await supabase.storage
+            .from('temp')
+            .remove([filePath]);
+        } catch (error) {
+          console.error('Error deleting file:', error);
         }
       }
 

@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { FileUpload } from "@/components/ui/file-upload";
 import { useToast } from "@/components/ui/use-toast";
 import { ExternalLink, Clock, Coins } from "lucide-react";
 
@@ -45,10 +45,11 @@ const Missions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [submissionData, setSubmissionData] = useState({
     fortniteUsername: profile?.fortnite_username || "",
-    screenshot: null as File | null,
+    screenshotUrl: "",
     missionId: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -83,20 +84,35 @@ const Missions = () => {
     }
   };
 
-  const handleSubmissionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSubmissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSubmissionData({
       ...submissionData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSubmissionData({
-        ...submissionData,
-        screenshot: e.target.files[0],
-      });
-    }
+  const handleFileUpload = (url: string) => {
+    setSubmissionData({
+      ...submissionData,
+      screenshotUrl: url,
+    });
+  };
+
+  const uploadToSupabaseStorage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
+    
+    const { data, error } = await supabase.storage
+      .from('temp')
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('temp')
+      .getPublicUrl(fileName);
+
+    return publicUrl;
   };
 
   const handleSubmit = async (missionId: string) => {
@@ -112,20 +128,22 @@ const Missions = () => {
     try {
       setIsSubmitting(true);
 
-      let screenshotUrl = null;
+      // Check if user already has a pending submission for this mission
+      const { data: existingSubmission } = await supabase
+        .from('mission_submissions')
+        .select('id')
+        .eq('mission_id', missionId)
+        .eq('user_id', user!.id)
+        .eq('status', 'pending')
+        .single();
 
-      // If there's a screenshot, upload it to Supabase Storage
-      if (submissionData.screenshot) {
-        const fileExt = submissionData.screenshot.name.split('.').pop();
-        const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
-        
-        // This will need a storage bucket to be created first
-        // const { data: uploadData, error: uploadError } = await supabase.storage
-        //   .from('mission-submissions')
-        //   .upload(fileName, submissionData.screenshot);
-
-        // if (uploadError) throw uploadError;
-        // screenshotUrl = `${supabaseUrl}/storage/v1/object/public/mission-submissions/${uploadData.path}`;
+      if (existingSubmission) {
+        toast({
+          title: "Error",
+          description: "You already have a pending submission for this mission.",
+          variant: "destructive",
+        });
+        return;
       }
 
       const { data, error } = await supabase
@@ -135,7 +153,7 @@ const Missions = () => {
             mission_id: missionId,
             user_id: user!.id,
             fortnite_username: submissionData.fortniteUsername,
-            screenshot_url: screenshotUrl,
+            screenshot_url: submissionData.screenshotUrl || null,
             status: 'pending'
           }
         ])
@@ -151,9 +169,10 @@ const Missions = () => {
       // Reset submission data
       setSubmissionData({
         fortniteUsername: profile?.fortnite_username || "",
-        screenshot: null,
+        screenshotUrl: "",
         missionId: "",
       });
+      setShowDialog(false);
     } catch (error: any) {
       console.error('Error submitting mission:', error.message);
       toast({
@@ -176,6 +195,14 @@ const Missions = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
+  const openSubmissionDialog = (missionId: string) => {
+    setSubmissionData({
+      ...submissionData,
+      missionId: missionId,
+    });
+    setShowDialog(true);
   };
 
   return (
@@ -234,69 +261,13 @@ const Missions = () => {
                   )}
                   
                   {isActive(mission) && !mission.is_vip_only || (mission.is_vip_only && profile?.is_vip) ? (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          size="sm" 
-                          onClick={() => setSubmissionData({
-                            ...submissionData,
-                            missionId: mission.id
-                          })}
-                          className="bg-[#9b87f5] hover:bg-[#8976e4]"
-                        >
-                          Submit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">
-                        <DialogHeader>
-                          <DialogTitle>Submit Mission: {mission.title}</DialogTitle>
-                          <DialogDescription className="dark:text-gray-400">
-                            Fill out the details to submit your completed mission.
-                          </DialogDescription>
-                        </DialogHeader>
-                        
-                        <div className="grid gap-4 py-4">
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="fortniteUsername" className="text-right">
-                              Fortnite Username
-                            </Label>
-                            <Input
-                              id="fortniteUsername"
-                              name="fortniteUsername"
-                              value={submissionData.fortniteUsername}
-                              onChange={handleSubmissionChange}
-                              className="col-span-3 dark:bg-black/20 dark:border-white/15 bg-white/90"
-                              required
-                            />
-                          </div>
-                          
-                          <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="screenshot" className="text-right">
-                              Screenshot
-                            </Label>
-                            <Input
-                              id="screenshot"
-                              name="screenshot"
-                              type="file"
-                              accept="image/*"
-                              onChange={handleFileChange}
-                              className="col-span-3 dark:bg-black/20 dark:border-white/15 bg-white/90"
-                            />
-                          </div>
-                        </div>
-                        
-                        <DialogFooter>
-                          <Button 
-                            type="submit"
-                            className="bg-[#9b87f5] hover:bg-[#8976e4] text-white"
-                            disabled={isSubmitting || !submissionData.fortniteUsername}
-                            onClick={() => handleSubmit(mission.id)}
-                          >
-                            {isSubmitting ? 'Submitting...' : 'Submit Mission'}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <Button 
+                      size="sm" 
+                      onClick={() => openSubmissionDialog(mission.id)}
+                      className="bg-[#9b87f5] hover:bg-[#8976e4]"
+                    >
+                      Submit
+                    </Button>
                   ) : mission.is_vip_only && !profile?.is_vip ? (
                     <Button 
                       size="sm" 
@@ -319,6 +290,62 @@ const Missions = () => {
             ))}
           </div>
         )}
+
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">
+            <DialogHeader>
+              <DialogTitle>Submit Mission</DialogTitle>
+              <DialogDescription className="dark:text-gray-400">
+                Fill out the details to submit your completed mission.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="fortniteUsername" className="text-right">
+                  Fortnite Username
+                </Label>
+                <Input
+                  id="fortniteUsername"
+                  name="fortniteUsername"
+                  value={submissionData.fortniteUsername}
+                  onChange={handleSubmissionChange}
+                  className="col-span-3 dark:bg-black/20 dark:border-white/15 bg-white/90"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label className="text-right mt-2">
+                  Screenshot
+                </Label>
+                <div className="col-span-3">
+                  <FileUpload
+                    onUploadComplete={handleFileUpload}
+                    accept="image/*,video/*,.pdf,.doc,.docx"
+                    maxSizeMB={10}
+                    buttonText="Upload proof"
+                    secureUpload={false}
+                  />
+                  {submissionData.screenshotUrl && (
+                    <p className="text-sm text-green-600 mt-2">File uploaded successfully!</p>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                type="submit"
+                className="bg-[#9b87f5] hover:bg-[#8976e4] text-white"
+                disabled={isSubmitting || !submissionData.fortniteUsername}
+                onClick={() => handleSubmit(submissionData.missionId)}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Mission'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
