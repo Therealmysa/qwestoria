@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -122,15 +123,15 @@ const Admin = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl dark:shadow-purple-500/20">
-            <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:grid-cols-7 bg-transparent">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1 bg-transparent p-1">
               {tabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id}
-                  className="flex items-center gap-2 text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9b87f5] data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300"
+                  className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-2 text-xs lg:text-sm py-2 px-2 lg:px-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9b87f5] data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 min-h-[60px] lg:min-h-[40px]"
                 >
-                  <tab.icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <tab.icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="text-center break-words leading-tight">{tab.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
