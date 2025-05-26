@@ -253,7 +253,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40] flex flex-col overflow-hidden">
       {/* Background particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-40 h-40 bg-purple-500/10 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
@@ -263,8 +263,8 @@ const Messages = () => {
         <div className="absolute w-36 h-36 bg-blue-600/8 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
-      {/* Header FIXE */}
-      <div className="relative z-10 flex-shrink-0 p-4 border-b border-white/15 bg-black/20 backdrop-blur-2xl">
+      {/* Header FIXE - 80px de hauteur */}
+      <div className="relative z-10 h-20 flex-shrink-0 p-4 border-b border-white/15 bg-black/20 backdrop-blur-2xl">
         <div className="flex items-center gap-2">
           <MessageSquare className="h-8 w-8 text-[#9b87f5] animate-glow" />
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-blue-400 to-purple-600">
@@ -273,11 +273,11 @@ const Messages = () => {
         </div>
       </div>
 
-      {/* Contenu principal qui prend tout l'espace restant */}
-      <div className="relative z-10 flex-1 min-h-0 flex flex-col">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          {/* Navigation des tabs FIXE */}
-          <div className="flex-shrink-0 p-4 pb-0">
+      {/* Contenu principal - utilise tout l'espace restant */}
+      <div className="relative z-10 flex-1 min-h-0 overflow-hidden">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          {/* Navigation des tabs - hauteur fixe 100px */}
+          <div className="h-24 flex-shrink-0 p-4">
             <div className="bg-black/20 backdrop-blur-2xl border border-white/15 rounded-2xl p-4 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
                 <TabsTrigger 
@@ -312,12 +312,12 @@ const Messages = () => {
             </div>
           </div>
 
-          {/* Contenu des tabs qui prend tout l'espace restant */}
-          <div className="flex-1 min-h-0 p-4">
+          {/* Zone de contenu - prend tout l'espace restant avec scroll */}
+          <div className="flex-1 min-h-0 p-4 overflow-hidden">
             <TabsContent value="messages" className="h-full m-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
                 {/* Liste des conversations */}
-                <div className="lg:col-span-1">
+                <div className="lg:col-span-1 h-full">
                   <Card className="h-full bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-[1.02] flex flex-col">
                     <CardHeader className="flex-shrink-0 pb-4">
                       <CardTitle className="text-lg text-white">Conversations</CardTitle>
@@ -331,53 +331,51 @@ const Messages = () => {
                         />
                       </div>
                     </CardHeader>
-                    <CardContent className="flex-1 min-h-0 p-0">
+                    <CardContent className="flex-1 min-h-0 p-0 overflow-hidden">
                       {isLoading ? (
                         <div className="flex justify-center items-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin text-[#9b87f5]" />
                         </div>
                       ) : filteredConversations.length > 0 ? (
-                        <ScrollArea className="h-full">
-                          <div className="p-4 space-y-2">
-                            {filteredConversations.map((conversation) => (
-                              <div
-                                key={conversation.user_id}
-                                onClick={() => setSelectedConversation(conversation.user_id)}
-                                className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-white/5 rounded-lg transition-all duration-300 ${
-                                  selectedConversation === conversation.user_id ? 'bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30' : ''
-                                }`}
-                              >
-                                <Avatar className="h-10 w-10">
-                                  {conversation.avatar_url ? (
-                                    <AvatarImage src={conversation.avatar_url} alt={conversation.username} />
-                                  ) : (
-                                    <AvatarFallback className="bg-purple-600/20 text-purple-300">
-                                      {conversation.username.substring(0, 2).toUpperCase()}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                                <div className="flex-grow min-w-0">
-                                  <div className="flex justify-between items-center">
-                                    <h3 className="font-medium text-white truncate">
-                                      {conversation.username}
-                                    </h3>
-                                    <span className="text-xs text-gray-400">
-                                      {formatTime(conversation.last_message_time)}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-gray-300 truncate">
-                                    {conversation.last_message}
-                                  </p>
-                                </div>
-                                {conversation.unread_count > 0 && (
-                                  <Badge variant="default" className="bg-[#9b87f5] text-white text-xs">
-                                    {conversation.unread_count}
-                                  </Badge>
+                        <div className="h-full overflow-y-auto p-4 space-y-2">
+                          {filteredConversations.map((conversation) => (
+                            <div
+                              key={conversation.user_id}
+                              onClick={() => setSelectedConversation(conversation.user_id)}
+                              className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-white/5 rounded-lg transition-all duration-300 ${
+                                selectedConversation === conversation.user_id ? 'bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30' : ''
+                              }`}
+                            >
+                              <Avatar className="h-10 w-10">
+                                {conversation.avatar_url ? (
+                                  <AvatarImage src={conversation.avatar_url} alt={conversation.username} />
+                                ) : (
+                                  <AvatarFallback className="bg-purple-600/20 text-purple-300">
+                                    {conversation.username.substring(0, 2).toUpperCase()}
+                                  </AvatarFallback>
                                 )}
+                              </Avatar>
+                              <div className="flex-grow min-w-0">
+                                <div className="flex justify-between items-center">
+                                  <h3 className="font-medium text-white truncate">
+                                    {conversation.username}
+                                  </h3>
+                                  <span className="text-xs text-gray-400">
+                                    {formatTime(conversation.last_message_time)}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-300 truncate">
+                                  {conversation.last_message}
+                                </p>
                               </div>
-                            ))}
-                          </div>
-                        </ScrollArea>
+                              {conversation.unread_count > 0 && (
+                                <Badge variant="default" className="bg-[#9b87f5] text-white text-xs">
+                                  {conversation.unread_count}
+                                </Badge>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       ) : (
                         <div className="text-center py-8">
                           <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -391,12 +389,12 @@ const Messages = () => {
                 </div>
 
                 {/* Zone de messages */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 h-full">
                   <Card className="h-full bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-[1.02] flex flex-col">
                     {selectedConversation && selectedUser ? (
                       <>
-                        {/* Header de conversation FIXE */}
-                        <CardHeader className="flex-shrink-0 border-b border-white/15 p-4">
+                        {/* Header de conversation - hauteur fixe */}
+                        <CardHeader className="flex-shrink-0 border-b border-white/15 p-4 h-20">
                           <div className="flex items-center gap-3">
                             <Avatar className="h-10 w-10">
                               {selectedUser.avatar_url ? (
@@ -413,72 +411,70 @@ const Messages = () => {
                           </div>
                         </CardHeader>
                         
-                        {/* Zone de messages SCROLLABLE */}
-                        <div className="flex-1 min-h-0">
+                        {/* Zone de messages - scroll indépendant */}
+                        <div className="flex-1 min-h-0 overflow-hidden">
                           {messagesLoading ? (
                             <div className="flex justify-center items-center h-full">
                               <Loader2 className="h-6 w-6 animate-spin text-[#9b87f5]" />
                             </div>
                           ) : (
-                            <ScrollArea className="h-full">
-                              <div className="p-4 space-y-4">
-                                {messages.map((message) => {
-                                  const isMyMessage = message.sender_id === user?.id;
-                                  const senderProfile = userProfiles[message.sender_id];
-                                  
-                                  return (
-                                    <div
-                                      key={message.id}
-                                      className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
-                                    >
-                                      <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
-                                        <div
-                                          className={`px-3 py-2 rounded-lg relative backdrop-blur-xl ${
-                                            isMyMessage
-                                              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-sm shadow-lg'
-                                              : 'bg-black/20 border border-white/15 text-white rounded-bl-sm'
-                                          }`}
-                                        >
-                                          <p className={`text-xs font-semibold mb-1 ${
-                                            isMyMessage 
-                                              ? 'text-blue-200' 
-                                              : 'text-blue-300'
-                                          }`}>
-                                            {senderProfile?.username || 'Chargement...'}
-                                          </p>
-                                          <p className="text-sm break-words">{message.content}</p>
-                                          <p className={`text-xs mt-1 ${
-                                            isMyMessage
-                                              ? 'text-white/70'
-                                              : 'text-gray-400'
-                                          }`}>
-                                            {formatTime(message.created_at)}
-                                          </p>
-                                        </div>
-                                        
-                                        <Avatar className={`h-6 w-6 absolute bottom-0 ${
-                                          isMyMessage ? '-right-7' : '-left-7'
+                            <div className="h-full overflow-y-auto p-4 space-y-4">
+                              {messages.map((message) => {
+                                const isMyMessage = message.sender_id === user?.id;
+                                const senderProfile = userProfiles[message.sender_id];
+                                
+                                return (
+                                  <div
+                                    key={message.id}
+                                    className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} relative`}
+                                  >
+                                    <div className={`max-w-xs lg:max-w-md relative ${isMyMessage ? 'mr-8' : 'ml-8'}`}>
+                                      <div
+                                        className={`px-3 py-2 rounded-lg relative backdrop-blur-xl ${
+                                          isMyMessage
+                                            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-sm shadow-lg'
+                                            : 'bg-black/20 border border-white/15 text-white rounded-bl-sm'
+                                        }`}
+                                      >
+                                        <p className={`text-xs font-semibold mb-1 ${
+                                          isMyMessage 
+                                            ? 'text-blue-200' 
+                                            : 'text-blue-300'
                                         }`}>
-                                          {senderProfile?.avatar_url ? (
-                                            <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
-                                          ) : (
-                                            <AvatarFallback className="bg-purple-600/20 text-purple-300 text-xs">
-                                              {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
-                                            </AvatarFallback>
-                                          )}
-                                        </Avatar>
+                                          {senderProfile?.username || 'Chargement...'}
+                                        </p>
+                                        <p className="text-sm break-words">{message.content}</p>
+                                        <p className={`text-xs mt-1 ${
+                                          isMyMessage
+                                            ? 'text-white/70'
+                                            : 'text-gray-400'
+                                        }`}>
+                                          {formatTime(message.created_at)}
+                                        </p>
                                       </div>
+                                      
+                                      <Avatar className={`h-6 w-6 absolute bottom-0 ${
+                                        isMyMessage ? '-right-7' : '-left-7'
+                                      }`}>
+                                        {senderProfile?.avatar_url ? (
+                                          <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
+                                        ) : (
+                                          <AvatarFallback className="bg-purple-600/20 text-purple-300 text-xs">
+                                            {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
+                                          </AvatarFallback>
+                                        )}
+                                      </Avatar>
                                     </div>
-                                  );
-                                })}
-                                <div ref={messagesEndRef} />
-                              </div>
-                            </ScrollArea>
+                                  </div>
+                                );
+                              })}
+                              <div ref={messagesEndRef} />
+                            </div>
                           )}
                         </div>
                         
-                        {/* Zone d'envoi FIXE en bas */}
-                        <div className="flex-shrink-0 p-4 border-t border-white/15 bg-black/10 backdrop-blur-xl">
+                        {/* Zone d'envoi FIXE en bas - hauteur fixe */}
+                        <div className="flex-shrink-0 p-4 border-t border-white/15 bg-black/10 backdrop-blur-xl h-24">
                           <div className="flex gap-2">
                             <Textarea
                               placeholder="Tapez votre message..."
@@ -490,13 +486,13 @@ const Messages = () => {
                                   sendMessage();
                                 }
                               }}
-                              className="flex-grow resize-none bg-black/20 border border-white/15 backdrop-blur-xl text-white placeholder-white/50 focus:border-purple-500/50 min-h-[40px] max-h-[100px]"
+                              className="flex-grow resize-none bg-black/20 border border-white/15 backdrop-blur-xl text-white placeholder-white/50 focus:border-purple-500/50 min-h-[40px] max-h-[40px]"
                               rows={1}
                             />
                             <Button
                               onClick={sendMessage}
                               disabled={!newMessage.trim() || isSending}
-                              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white self-end"
+                              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white self-end h-[40px]"
                             >
                               {isSending ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -525,7 +521,7 @@ const Messages = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="friends" className="h-full m-0">
+            <TabsContent value="friends" className="h-full m-0 overflow-hidden">
               <Card className="h-full flex flex-col bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-[1.02]">
                 <CardHeader className="flex-shrink-0">
                   <CardTitle className="flex items-center gap-2 text-white">
@@ -533,9 +529,9 @@ const Messages = () => {
                     Mes amis ({friends.length})
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 min-h-0 p-6">
+                <CardContent className="flex-1 min-h-0 p-6 overflow-hidden">
                   {friends.length > 0 ? (
-                    <ScrollArea className="h-full">
+                    <div className="h-full overflow-y-auto">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {friends.map((friend) => (
                           <div
@@ -567,7 +563,7 @@ const Messages = () => {
                           </div>
                         ))}
                       </div>
-                    </ScrollArea>
+                    </div>
                   ) : (
                     <div className="text-center py-8">
                       <Users className="h-12 w-12 text-gray-400 mx-auto mb-3" />
@@ -586,13 +582,13 @@ const Messages = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="requests" className="h-full m-0">
+            <TabsContent value="requests" className="h-full m-0 overflow-hidden">
               <div className="h-full">
                 <FriendRequests />
               </div>
             </TabsContent>
 
-            <TabsContent value="add-friend" className="h-full m-0">
+            <TabsContent value="add-friend" className="h-full m-0 overflow-hidden">
               <div className="h-full">
                 <AddFriend />
               </div>
