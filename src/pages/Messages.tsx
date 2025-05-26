@@ -136,7 +136,7 @@ const Messages = () => {
 
   if (!user || loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40]">
+      <div className="h-screen flex justify-center items-center bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40]">
         <Loader2 className="h-8 w-8 animate-spin text-[#9b87f5]" />
       </div>
     );
@@ -234,9 +234,9 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40] flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40]">
       {/* Background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="absolute w-40 h-40 bg-purple-500/10 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
         <div className="absolute w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
         <div className="absolute w-48 h-48 bg-indigo-500/8 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
@@ -244,12 +244,14 @@ const Messages = () => {
         <div className="absolute w-36 h-36 bg-blue-600/8 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
+      {/* Header fixe */}
       <MessagesHeader />
 
-      <div className="relative z-10 flex-1 min-h-0 overflow-hidden">
+      {/* Contenu principal avec scroll */}
+      <div className="flex-1 min-h-0 relative z-10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          {/* Navigation des tabs - hauteur fixe 100px */}
-          <div className="h-24 flex-shrink-0 p-4">
+          {/* Navigation des tabs - hauteur fixe */}
+          <div className="flex-shrink-0 p-4">
             <div className="bg-black/20 backdrop-blur-2xl border border-white/15 rounded-2xl p-4 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300">
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
                 <TabsTrigger 
@@ -284,10 +286,11 @@ const Messages = () => {
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 p-4 overflow-hidden">
+          {/* Zone de contenu avec scroll */}
+          <div className="flex-1 min-h-0 px-4 pb-4">
             <TabsContent value="messages" className="h-full m-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-                <div className="lg:col-span-1 h-full">
+                <div className="lg:col-span-1">
                   <ConversationList
                     conversations={conversations}
                     isLoading={isLoading}
@@ -296,7 +299,7 @@ const Messages = () => {
                     formatTime={formatTime}
                   />
                 </div>
-                <div className="lg:col-span-2 h-full">
+                <div className="lg:col-span-2">
                   <MessageArea
                     selectedConversation={selectedConversation}
                     selectedUser={selectedUser}
@@ -314,7 +317,7 @@ const Messages = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="friends" className="h-full m-0 overflow-hidden">
+            <TabsContent value="friends" className="h-full m-0">
               <FriendsList 
                 friends={friends}
                 onStartConversation={startConversationWithFriend}
@@ -322,16 +325,12 @@ const Messages = () => {
               />
             </TabsContent>
 
-            <TabsContent value="requests" className="h-full m-0 overflow-hidden">
-              <div className="h-full">
-                <FriendRequests />
-              </div>
+            <TabsContent value="requests" className="h-full m-0">
+              <FriendRequests />
             </TabsContent>
 
-            <TabsContent value="add-friend" className="h-full m-0 overflow-hidden">
-              <div className="h-full">
-                <AddFriend />
-              </div>
+            <TabsContent value="add-friend" className="h-full m-0">
+              <AddFriend />
             </TabsContent>
           </div>
         </Tabs>

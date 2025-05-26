@@ -50,7 +50,7 @@ const ConversationList = ({
           />
         </div>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 p-0 overflow-hidden">
+      <CardContent className="flex-1 min-h-0 p-0">
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-[#9b87f5]" />
@@ -96,11 +96,13 @@ const ConversationList = ({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
-            <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-400">
-              {searchQuery ? "Aucune conversation trouvée" : "Aucune conversation"}
-            </p>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center py-8">
+              <Mail className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-400">
+                {searchQuery ? "Aucune conversation trouvée" : "Aucune conversation"}
+              </p>
+            </div>
           </div>
         )}
       </CardContent>

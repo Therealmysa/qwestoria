@@ -26,7 +26,7 @@ const FriendsList = ({ friends, onStartConversation, onSwitchToAddFriend }: Frie
           Mes amis ({friends.length})
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 min-h-0 p-6 overflow-hidden">
+      <CardContent className="flex-1 min-h-0 p-6">
         {friends.length > 0 ? (
           <div className="h-full overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -62,17 +62,19 @@ const FriendsList = ({ friends, onStartConversation, onSwitchToAddFriend }: Frie
             </div>
           </div>
         ) : (
-          <div className="text-center py-8">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-400">
-              Vous n'avez pas encore d'amis
-            </p>
-            <Button 
-              className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white" 
-              onClick={onSwitchToAddFriend}
-            >
-              Ajouter des amis
-            </Button>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-400">
+                Vous n'avez pas encore d'amis
+              </p>
+              <Button 
+                className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white" 
+                onClick={onSwitchToAddFriend}
+              >
+                Ajouter des amis
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
