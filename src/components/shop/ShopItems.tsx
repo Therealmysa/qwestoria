@@ -4,13 +4,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Package, BadgeCheck } from "lucide-react";
+import { Coins, Package } from "lucide-react";
 import { motion } from "framer-motion";
 
+interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image_url?: string;
+  is_vip_only: boolean;
+  is_active: boolean;
+  available_until?: string;
+  created_at: string;
+}
+
 const ShopItems = () => {
-  const { data: shopItems, isLoading } = useQuery({
+  const { data: shopItems, isLoading } = useQuery<ShopItem[]>({
     queryKey: ['shop-items'],
-    queryFn: async () => {
+    queryFn: async (): Promise<ShopItem[]> => {
       const { data, error } = await supabase
         .from('shop_items')
         .select('*')
@@ -22,9 +35,9 @@ const ShopItems = () => {
     }
   });
 
-  const { data: userCoins = 0 } = useQuery({
+  const { data: userCoins = 0 } = useQuery<number>({
     queryKey: ['user-coins'],
-    queryFn: async () => {
+    queryFn: async (): Promise<number> => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return 0;
 
@@ -38,12 +51,12 @@ const ShopItems = () => {
     }
   });
 
-  const handlePurchaseItem = async (item: any) => {
+  const handlePurchaseItem = async (item: ShopItem) => {
     console.log('Achat article:', item);
     // TODO: Implémenter la logique d'achat
   };
 
-  const isAvailable = (item: any) => {
+  const isAvailable = (item: ShopItem): boolean => {
     if (item.available_until) {
       return new Date(item.available_until) > new Date();
     }
