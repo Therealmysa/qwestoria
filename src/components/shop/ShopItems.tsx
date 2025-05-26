@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -40,12 +39,16 @@ const ShopItems = () => {
       if (!user) return 0;
 
       const { data, error } = await supabase
-        .from('transactions')
-        .select('amount')
-        .eq('user_id', user.id);
+        .from('brad_coins')
+        .select('balance')
+        .eq('user_id', user.id)
+        .single();
       
-      if (error) throw error;
-      return data?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
+      if (error) {
+        console.error('Error fetching user coins:', error);
+        return 0;
+      }
+      return data?.balance || 0;
     }
   });
 
