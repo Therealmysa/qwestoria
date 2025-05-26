@@ -1,3 +1,4 @@
+
 // src/services/fortniteApi.ts
 import { supabase } from "@/integrations/supabase/client";
 
@@ -45,11 +46,34 @@ export interface FortniteShopPayload {
 }
 
 export const getFortniteShop = async (): Promise<FortniteShopPayload> => {
-  const { data, error } = await supabase.functions.invoke<FortniteShopPayload>(
-    "fortnite-shop"
-  );
-  if (error) throw error;
-  if (!data) throw new Error("No data returned from edge function");
-  // `data` est déjà un objet conforme à FortniteShopPayload
-  return data;
+  console.log('Calling fortnite-shop edge function...');
+  
+  try {
+    const { data, error } = await supabase.functions.invoke<FortniteShopPayload>(
+      "fortnite-shop"
+    );
+    
+    if (error) {
+      console.error('Edge function error:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('No data returned from edge function');
+      throw new Error("No data returned from edge function");
+    }
+    
+    console.log('Edge function returned data:', data);
+    
+    // Ensure the data structure is correct
+    if (!data.data || !Array.isArray(data.data.entries)) {
+      console.error('Invalid data structure:', data);
+      throw new Error("Invalid data structure returned from edge function");
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error in getFortniteShop:', error);
+    throw error;
+  }
 };

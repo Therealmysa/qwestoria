@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -5,7 +6,7 @@ import {
   RawFortniteItem,
 } from "@/services/fortniteApi";
 import useProfileCompletion from "@/hooks/useProfileCompletion";
-import { Loader2, Calendar, X, Tag, Search, FilterX, Star, Package, Timer, Zap } from "lucide-react";
+import { Loader2, Calendar, X, Tag, Search, FilterX, Star, Package, Timer, Zap, AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -60,6 +61,7 @@ const FortniteShop = () => {
   const { isChecking } = useProfileCompletion();
   const [payload, setPayload] = useState<FortniteShopPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modalData, setModalData] = useState<{
     entry: RawFortniteItem;
     itemIndex?: number;
@@ -69,10 +71,23 @@ const FortniteShop = () => {
 
   useEffect(() => {
     if (!isChecking) {
+      console.log('Starting to fetch Fortnite shop data...');
+      setIsLoading(true);
+      setError(null);
+      
       getFortniteShop()
-        .then((res) => setPayload(res))
-        .catch(console.error)
-        .finally(() => setIsLoading(false));
+        .then((res) => {
+          console.log('Successfully received shop data:', res);
+          setPayload(res);
+          setError(null);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch shop data:', err);
+          setError(err.message || 'Erreur lors du chargement de la boutique');
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
   }, [isChecking]);
 
@@ -81,50 +96,82 @@ const FortniteShop = () => {
     setRarity("all");
   };
 
-  if (isLoading || isChecking)
+  if (isLoading || isChecking) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="animate-spin text-6xl text-white mb-4 mx-auto" />
           <p className="text-white text-xl font-semibold">Chargement de la boutique...</p>
+          <p className="text-blue-200 text-sm mt-2">Récupération des données Fortnite</p>
         </div>
       </div>
     );
-  if (!payload)
+  }
+
+  if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
-        <div className="bg-red-900/30 p-8 rounded-lg">
-          <p className="text-xl font-bold text-white">Erreur de chargement de la boutique</p>
+        <div className="bg-red-900/30 backdrop-blur-md p-8 rounded-2xl border border-red-500/30 max-w-md text-center">
+          <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-4">Erreur de chargement</h2>
+          <p className="text-red-200 mb-6">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            Réessayer
+          </Button>
         </div>
       </div>
     );
+  }
+
+  if (!payload || !payload.data || !payload.data.entries) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
+        <div className="bg-yellow-900/30 backdrop-blur-md p-8 rounded-2xl border border-yellow-500/30 max-w-md text-center">
+          <AlertCircle className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-4">Aucune donnée disponible</h2>
+          <p className="text-yellow-200 mb-6">La boutique Fortnite semble être vide pour le moment.</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-yellow-600 hover:bg-yellow-700 text-white"
+          >
+            Actualiser
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const { data } = payload;
   
   // Organize items: split between packs (entries with brItems length >1) and singles
   const packs = data.entries.filter((e) => (e.brItems?.length || 0) > 1);
-  const singles = data.entries.filter((e) => (e.brItems?.length || 0) === 1);
+  const singles = data.entries.filter((e) => (e.brItems?.length || 0) <= 1);
   
   // Apply filters to singles
-  const filteredSingles = singles.filter((e) =>
-    e.brItems!.some((i) =>
+  const filteredSingles = singles.filter((e) => {
+    if (!e.brItems || e.brItems.length === 0) return false;
+    return e.brItems.some((i) =>
       i.name.toLowerCase().includes(search.toLowerCase()) &&
       (rarity === "all" || i.rarity.value === rarity)
-    )
-  );
+    );
+  });
 
   // Apply filters to packs (a pack matches if any of its items match)
-  const filteredPacks = packs.filter((e) =>
-    e.brItems!.some((i) =>
+  const filteredPacks = packs.filter((e) => {
+    if (!e.brItems || e.brItems.length === 0) return false;
+    return e.brItems.some((i) =>
       i.name.toLowerCase().includes(search.toLowerCase()) &&
       (rarity === "all" || i.rarity.value === rarity)
-    )
-  );
+    );
+  });
 
   // Count items for stats
   const getItemCount = () => {
-    const singleItems = filteredSingles.reduce((count, entry) => count + entry.brItems!.length, 0);
-    const packItems = filteredPacks.reduce((count, entry) => count + entry.brItems!.length, 0);
+    const singleItems = filteredSingles.reduce((count, entry) => count + (entry.brItems?.length || 0), 0);
+    const packItems = filteredPacks.reduce((count, entry) => count + (entry.brItems?.length || 0), 0);
     return singleItems + packItems;
   };
 
@@ -348,49 +395,58 @@ const FortniteShop = () => {
             </div>
 
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filteredSingles.map((entry) => (
-                <Card
-                  key={entry.offerId}
-                  onClick={() => setModalData({ entry })}
-                  className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden group"
-                >
-                  <div className="relative">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(entry.brItems![0].rarity.value)} opacity-20`} />
-                    <img
-                      src={entry.brItems![0].images.featured || entry.brItems![0].images.icon}
-                      alt={entry.brItems![0].name}
-                      className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <Badge className={`absolute top-4 left-4 bg-gradient-to-r ${getRarityColor(entry.brItems![0].rarity.value)} text-white border-0 font-bold`}>
-                      {entry.brItems![0].rarity.displayValue}
-                    </Badge>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-xl font-bold text-white mb-1 truncate">
-                        {entry.brItems![0].name}
-                      </h3>
-                      <p className="text-gray-300 text-sm mb-2">
-                        {entry.brItems![0].type.displayValue}
-                      </p>
+              {filteredSingles.map((entry) => {
+                const item = entry.brItems?.[0];
+                if (!item) return null;
+                
+                return (
+                  <Card
+                    key={entry.offerId}
+                    onClick={() => setModalData({ entry })}
+                    className="cursor-pointer bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-md border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-2xl overflow-hidden group"
+                  >
+                    <div className="relative">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${getRarityColor(item.rarity.value)} opacity-20`} />
+                      <img
+                        src={item.images.featured || item.images.icon}
+                        alt={item.name}
+                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => {
+                          console.error('Image failed to load:', item.images);
+                          e.currentTarget.src = item.images.icon;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                      <Badge className={`absolute top-4 left-4 bg-gradient-to-r ${getRarityColor(item.rarity.value)} text-white border-0 font-bold`}>
+                        {item.rarity.displayValue}
+                      </Badge>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="text-xl font-bold text-white mb-1 truncate">
+                          {item.name}
+                        </h3>
+                        <p className="text-gray-300 text-sm mb-2">
+                          {item.type.displayValue}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <CardFooter className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-sm">
-                    <div className="flex items-center gap-2">
-                      <img src={data.vbuckIcon} alt="V-Bucks" className="h-6 w-6" />
-                      <span className="text-xl font-bold text-white">
-                        {entry.finalPrice ?? entry.regularPrice}
-                      </span>
-                    </div>
-                    <Button 
-                      size="sm" 
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg"
-                    >
-                      DÉTAILS
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                    
+                    <CardFooter className="flex justify-between items-center p-4 bg-black/30 backdrop-blur-sm">
+                      <div className="flex items-center gap-2">
+                        <img src={data.vbuckIcon} alt="V-Bucks" className="h-6 w-6" />
+                        <span className="text-xl font-bold text-white">
+                          {entry.finalPrice ?? entry.regularPrice}
+                        </span>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-lg"
+                      >
+                        DÉTAILS
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           </main>
 
