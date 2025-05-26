@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "@/components/theme/theme-provider";
 import {
   Menu,
   ChevronDown,
@@ -17,6 +18,9 @@ import {
   ShoppingBag,
   Users,
   Bell,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,6 +37,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { setTheme, theme } = useTheme();
 
   const handleLogout = async () => {
     console.log("Navbar: Logout button clicked");
@@ -50,6 +55,17 @@ const Navbar = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const getThemeIcon = () => {
+    switch (theme) {
+      case "light":
+        return <Sun className="h-4 w-4" />;
+      case "dark":
+        return <Moon className="h-4 w-4" />;
+      default:
+        return <Monitor className="h-4 w-4" />;
+    }
   };
 
   return (
@@ -126,7 +142,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile Navigation - Improved hamburger menu */}
+        {/* Mobile Navigation - Improved hamburger menu with theme toggle */}
         <div className="md:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -198,6 +214,33 @@ const Navbar = () => {
                 className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer"
               >
                 <Trophy className="h-4 w-4 mr-2" /> Classement
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              <DropdownMenuLabel className="flex items-center">
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  Thème
+                </span>
+              </DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => setTheme("light")}
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer"
+              >
+                <Sun className="h-4 w-4 mr-2 text-amber-500" />
+                Clair
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setTheme("dark")}
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer"
+              >
+                <Moon className="h-4 w-4 mr-2 text-purple-400" />
+                Sombre
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setTheme("system")}
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-[#9b87f5]/20 dark:focus:text-[#9b87f5] cursor-pointer"
+              >
+                <Monitor className="h-4 w-4 mr-2 text-gray-500" />
+                Système
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
