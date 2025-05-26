@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CheckCircle, XCircle, Eye, MessageSquare, ExternalLink } from "lucide-react";
+import { CheckCircle, XCircle, Eye, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -46,14 +45,16 @@ const AdminMissionSubmissions = () => {
       
       if (error) throw error;
 
-      // Si validé, ajouter les BradCoins et créer une transaction
+      // Si validé, ajouter les BradCoins via l'edge function
       if (status === 'verified') {
         const submission = submissions?.find(s => s.id === submissionId);
         if (submission) {
-          // Ajouter les BradCoins
-          const { error: coinsError } = await supabase.rpc('update_bradcoins_balance', {
-            user_id: submission.user_id,
-            amount: submission.missions.reward_coins
+          // Ajouter les BradCoins via l'edge function
+          const { error: coinsError } = await supabase.functions.invoke('update-bradcoins', {
+            body: {
+              user_id: submission.user_id,
+              amount: submission.missions.reward_coins
+            }
           });
 
           if (coinsError) throw coinsError;
