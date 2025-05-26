@@ -1,4 +1,3 @@
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -143,7 +142,7 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile Navigation - Improved hamburger menu with theme toggle */}
+        {/* Mobile Navigation - Menu hamburger avec theme toggle intégré */}
         <div className="md:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -260,7 +259,7 @@ const Navbar = () => {
             </Button>
           )}
 
-          {/* Desktop Theme Toggle - Hidden on mobile */}
+          {/* Desktop Theme Toggle - UNIQUEMENT sur desktop */}
           <div className="hidden md:block">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
