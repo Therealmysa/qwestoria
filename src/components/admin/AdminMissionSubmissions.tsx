@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,6 +33,32 @@ const AdminMissionSubmissions = () => {
     }
   });
 
+  // Fonction améliorée pour supprimer les fichiers
+  const deleteFileFromStorage = async (fileUrl: string) => {
+    if (!fileUrl) return;
+    
+    try {
+      // Extraire le chemin du fichier depuis l'URL
+      const url = new URL(fileUrl);
+      const pathParts = url.pathname.split('/');
+      const filePath = pathParts.slice(-2).join('/'); // temp/filename
+      
+      console.log('Attempting to delete file:', filePath);
+      
+      const { error } = await supabase.storage
+        .from('temp')
+        .remove([filePath]);
+      
+      if (error) {
+        console.error('Error deleting file from storage:', error);
+      } else {
+        console.log('File successfully deleted from storage:', filePath);
+      }
+    } catch (error) {
+      console.error('Error parsing file URL or deleting file:', error);
+    }
+  };
+
   const updateSubmissionMutation = useMutation({
     mutationFn: async ({ submissionId, status, notes }: { submissionId: string, status: string, notes?: string }) => {
       const updates: any = { status };
@@ -68,20 +93,9 @@ const AdminMissionSubmissions = () => {
         });
       }
 
-      // Supprimer le fichier de preuve du storage si il existe
+      // Supprimer le fichier de preuve du storage si il existe et que la mission est validée ou rejetée
       if (submission?.screenshot_url && (status === 'verified' || status === 'rejected')) {
-        try {
-          // Extraire le chemin du fichier depuis l'URL
-          const url = new URL(submission.screenshot_url);
-          const pathParts = url.pathname.split('/');
-          const filePath = pathParts.slice(-2).join('/'); // temp/filename
-          
-          await supabase.storage
-            .from('temp')
-            .remove([filePath]);
-        } catch (error) {
-          console.error('Error deleting file:', error);
-        }
+        await deleteFileFromStorage(submission.screenshot_url);
       }
 
       // Log admin action

@@ -111,9 +111,10 @@ const Missions = () => {
     return userSubmissions.find(submission => submission.mission_id === missionId);
   };
 
+  // Corriger la logique: on peut soumettre si on n'a pas encore soumis cette mission spécifique OU si elle a été rejetée
   const canSubmitMission = (missionId: string) => {
     const submission = getUserSubmissionForMission(missionId);
-    return !submission || (submission.status !== 'verified' && submission.status !== 'pending');
+    return !submission || submission.status === 'rejected';
   };
 
   const getMissionButtonText = (missionId: string) => {
@@ -192,7 +193,7 @@ const Missions = () => {
     try {
       setIsSubmitting(true);
 
-      // Check if user already has a pending submission for this mission
+      // Vérifier si l'utilisateur a déjà une soumission en attente pour cette mission spécifique
       const { data: existingSubmission } = await supabase
         .from('mission_submissions')
         .select('id')
