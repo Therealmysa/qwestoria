@@ -1,4 +1,3 @@
-
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,19 +126,24 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Improved hamburger menu */}
         <div className="md:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-300"
+                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary dark:hover:border-[#9b87f5] transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Menu className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white dark:bg-[#1A1F2C] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-white w-56">
+            <DropdownMenuContent 
+              className="bg-white dark:bg-[#1A1F2C] border-gray-200 dark:border-gray-700 text-gray-600 dark:text-white w-56 mr-4"
+              align="end"
+              sideOffset={8}
+            >
               <DropdownMenuLabel className="flex items-center">
                 <span className="font-bold text-primary dark:text-[#9b87f5]">
                   Navigation
