@@ -55,31 +55,6 @@ const AdminShop = () => {
     }
   });
 
-  const updateItemMutation = useMutation({
-    mutationFn: async ({ itemId, updates }: { itemId: string, updates: any }) => {
-      const { error } = await supabase
-        .from('shop_items')
-        .update(updates)
-        .eq('id', itemId);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
-      toast.success("Article mis à jour avec succès");
-      setSelectedItem(null);
-    },
-    onError: () => {
-      toast.error("Erreur lors de la mise à jour");
-    }
-  });
-
-  const handleItemUpdate = (updates: any) => {
-    if (selectedItem) {
-      updateItemMutation.mutate({ itemId: selectedItem.id, updates });
-    }
-  };
-
   return (
     <div className="space-y-3 sm:space-y-6">
       <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
@@ -134,13 +109,16 @@ const AdminShop = () => {
                           <div className="flex flex-wrap gap-1">
                             <Badge variant="outline" className="text-xs">
                               <Coins className="h-3 w-3 mr-1" />
-                              {item.price_bradcoins || item.price_euros + '€'}
+                              {item.price} BradCoins
                             </Badge>
                             {item.category && (
                               <Badge variant="secondary" className="text-xs">
                                 <Package className="h-3 w-3 mr-1" />
                                 {item.category}
                               </Badge>
+                            )}
+                            {item.is_vip_only && (
+                              <Badge variant="outline" className="text-xs text-purple-600">VIP</Badge>
                             )}
                           </div>
                         </div>
@@ -162,25 +140,11 @@ const AdminShop = () => {
                               <DialogTitle className="text-lg">Gérer {item.name}</DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor="is_available" className="text-sm">Disponible</Label>
-                                <Switch
-                                  id="is_available"
-                                  checked={item.is_available}
-                                  onCheckedChange={(checked) =>
-                                    handleItemUpdate({ is_available: checked })
-                                  }
-                                />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor="is_featured" className="text-sm">En vedette</Label>
-                                <Switch
-                                  id="is_featured"
-                                  checked={item.is_featured}
-                                  onCheckedChange={(checked) =>
-                                    handleItemUpdate({ is_featured: checked })
-                                  }
-                                />
+                              <div className="grid grid-cols-1 gap-2 text-xs">
+                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Prix</div>
+                                  <div className="font-semibold">{item.price} BradCoins</div>
+                                </div>
                               </div>
                             </div>
                           </DialogContent>
@@ -198,16 +162,16 @@ const AdminShop = () => {
                     
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Stock</div>
-                        <div className="font-semibold">{item.stock || 'Illimité'}</div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Catégorie</div>
+                        <div className="font-semibold">{item.category}</div>
                       </div>
                       <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Statut</div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Type</div>
                         <div className="font-semibold">
-                          {item.is_available ? (
-                            <span className="text-green-600">Disponible</span>
+                          {item.is_vip_only ? (
+                            <span className="text-purple-600">VIP</span>
                           ) : (
-                            <span className="text-red-600">Indisponible</span>
+                            <span className="text-green-600">Public</span>
                           )}
                         </div>
                       </div>
@@ -223,8 +187,8 @@ const AdminShop = () => {
                     <TableRow>
                       <TableHead>Article</TableHead>
                       <TableHead>Prix</TableHead>
-                      <TableHead>Stock</TableHead>
-                      <TableHead>Statut</TableHead>
+                      <TableHead>Catégorie</TableHead>
+                      <TableHead>Type</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -249,25 +213,18 @@ const AdminShop = () => {
                         <TableCell>
                           <Badge variant="outline" className="text-xs">
                             <Coins className="h-3 w-3 mr-1" />
-                            {item.price_bradcoins || item.price_euros + '€'}
+                            {item.price} BradCoins
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <span className="font-mono">
-                            {item.stock || 'Illimité'}
-                          </span>
+                          <span className="font-mono">{item.category}</span>
                         </TableCell>
                         <TableCell>
-                          <div className="flex space-x-1">
-                            {item.is_available ? (
-                              <Badge variant="outline" className="text-xs text-green-600">Disponible</Badge>
-                            ) : (
-                              <Badge variant="secondary" className="text-xs text-red-600">Indisponible</Badge>
-                            )}
-                            {item.is_featured && (
-                              <Badge variant="default" className="text-xs">Vedette</Badge>
-                            )}
-                          </div>
+                          {item.is_vip_only ? (
+                            <Badge variant="secondary" className="text-xs text-purple-600">VIP</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-xs text-green-600">Public</Badge>
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
@@ -286,25 +243,15 @@ const AdminShop = () => {
                                   <DialogTitle>Gérer {item.name}</DialogTitle>
                                 </DialogHeader>
                                 <div className="space-y-4">
-                                  <div className="flex items-center space-x-2">
-                                    <Switch
-                                      id="is_available"
-                                      checked={item.is_available}
-                                      onCheckedChange={(checked) =>
-                                        handleItemUpdate({ is_available: checked })
-                                      }
-                                    />
-                                    <Label htmlFor="is_available">Disponible</Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Switch
-                                      id="is_featured"
-                                      checked={item.is_featured}
-                                      onCheckedChange={(checked) =>
-                                        handleItemUpdate({ is_featured: checked })
-                                      }
-                                    />
-                                    <Label htmlFor="is_featured">En vedette</Label>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <Label className="text-sm">Prix</Label>
+                                      <p className="font-mono">{item.price} BradCoins</p>
+                                    </div>
+                                    <div>
+                                      <Label className="text-sm">Catégorie</Label>
+                                      <p>{item.category}</p>
+                                    </div>
                                   </div>
                                 </div>
                               </DialogContent>

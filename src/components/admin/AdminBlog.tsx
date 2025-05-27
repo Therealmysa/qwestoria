@@ -24,7 +24,7 @@ const AdminBlog = () => {
     queryFn: async () => {
       let query = supabase
         .from('blog_posts')
-        .select('*, profiles(username), blog_categories(name)')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
@@ -42,25 +42,24 @@ const AdminBlog = () => {
     queryFn: async () => {
       const { data: posts, error: postsError } = await supabase
         .from('blog_posts')
-        .select('is_published, views_count');
+        .select('published');
 
       if (postsError) throw postsError;
 
       const { data: comments, error: commentsError } = await supabase
-        .from('blog_comments')
+        .from('blog_post_comments')
         .select('id');
 
       if (commentsError) throw commentsError;
 
       const totalPosts = posts.length;
-      const publishedPosts = posts.filter(post => post.is_published).length;
-      const totalViews = posts.reduce((sum, post) => sum + (post.views_count || 0), 0);
+      const publishedPosts = posts.filter(post => post.published).length;
       const totalComments = comments.length;
 
       return {
         totalPosts,
         publishedPosts,
-        totalViews,
+        totalViews: 0, // Pas de colonne views_count dans le schéma
         totalComments
       };
     }
@@ -207,26 +206,21 @@ const AdminBlog = () => {
                   <Card key={post.id} className="p-3 dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-start space-x-3 flex-1 min-w-0">
-                        {post.featured_image && (
+                        {post.image_url && (
                           <img
-                            src={post.featured_image}
+                            src={post.image_url}
                             alt={post.title}
                             className="h-12 w-12 rounded object-cover flex-shrink-0"
                           />
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium text-sm mb-1 line-clamp-2">{post.title}</div>
-                          <div className="text-xs text-gray-500 mb-2">Par {post.profiles?.username}</div>
+                          <div className="text-xs text-gray-500 mb-2">Par {post.author_id}</div>
                           <div className="flex flex-wrap gap-1">
-                            {post.is_published ? (
+                            {post.published ? (
                               <Badge className="bg-green-500 text-white text-xs">Publié</Badge>
                             ) : (
                               <Badge variant="secondary" className="text-xs">Brouillon</Badge>
-                            )}
-                            {post.blog_categories && (
-                              <Badge variant="outline" className="text-xs">
-                                {post.blog_categories.name}
-                              </Badge>
                             )}
                           </div>
                         </div>
@@ -249,30 +243,14 @@ const AdminBlog = () => {
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                               <div className="flex items-center justify-between">
-                                <Label htmlFor="is_published" className="text-sm">Publié</Label>
+                                <Label htmlFor="published" className="text-sm">Publié</Label>
                                 <Switch
-                                  id="is_published"
-                                  checked={post.is_published}
+                                  id="published"
+                                  checked={post.published}
                                   onCheckedChange={(checked) =>
-                                    handlePostUpdate({ is_published: checked })
+                                    handlePostUpdate({ published: checked })
                                   }
                                 />
-                              </div>
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor="is_featured" className="text-sm">À la une</Label>
-                                <Switch
-                                  id="is_featured"
-                                  checked={post.is_featured}
-                                  onCheckedChange={(checked) =>
-                                    handlePostUpdate({ is_featured: checked })
-                                  }
-                                />
-                              </div>
-                              <div className="grid grid-cols-1 gap-2 text-xs">
-                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
-                                  <div className="font-semibold">{post.views_count || 0}</div>
-                                </div>
                               </div>
                             </div>
                           </DialogContent>
@@ -288,14 +266,10 @@ const AdminBlog = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="grid grid-cols-1 gap-2 text-xs">
                       <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
                         <div className="text-gray-500 dark:text-gray-400 mb-1">Publié le</div>
                         <div className="font-semibold">{formatDate(post.created_at)}</div>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
-                        <div className="font-semibold">{post.views_count || 0}</div>
                       </div>
                     </div>
                   </Card>
@@ -310,7 +284,6 @@ const AdminBlog = () => {
                       <TableHead>Article</TableHead>
                       <TableHead>Auteur</TableHead>
                       <TableHead>Statut</TableHead>
-                      <TableHead>Vues</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -320,38 +293,28 @@ const AdminBlog = () => {
                       <TableRow key={post.id}>
                         <TableCell>
                           <div className="flex items-center space-x-3">
-                            {post.featured_image && (
+                            {post.image_url && (
                               <img
-                                src={post.featured_image}
+                                src={post.image_url}
                                 alt={post.title}
                                 className="h-10 w-10 rounded object-cover"
                               />
                             )}
                             <div>
                               <div className="font-medium max-w-xs truncate">{post.title}</div>
-                              {post.blog_categories && (
-                                <div className="text-sm text-gray-500">{post.blog_categories.name}</div>
-                              )}
+                              <div className="text-sm text-gray-500 max-w-xs truncate">{post.summary}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">{post.profiles?.username}</span>
+                          <span className="text-sm">{post.author_id}</span>
                         </TableCell>
                         <TableCell>
-                          <div className="flex space-x-1">
-                            {post.is_published ? (
-                              <Badge className="bg-green-500 text-white text-xs">Publié</Badge>
-                            ) : (
-                              <Badge variant="secondary" className="text-xs">Brouillon</Badge>
-                            )}
-                            {post.is_featured && (
-                              <Badge variant="default" className="text-xs">À la une</Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="font-mono">{post.views_count || 0}</span>
+                          {post.published ? (
+                            <Badge className="bg-green-500 text-white text-xs">Publié</Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">Brouillon</Badge>
+                          )}
                         </TableCell>
                         <TableCell>
                           <span className="text-sm">{formatDate(post.created_at)}</span>
@@ -375,33 +338,13 @@ const AdminBlog = () => {
                                 <div className="space-y-4">
                                   <div className="flex items-center space-x-2">
                                     <Switch
-                                      id="is_published"
-                                      checked={post.is_published}
+                                      id="published"
+                                      checked={post.published}
                                       onCheckedChange={(checked) =>
-                                        handlePostUpdate({ is_published: checked })
+                                        handlePostUpdate({ published: checked })
                                       }
                                     />
-                                    <Label htmlFor="is_published">Publié</Label>
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <Switch
-                                      id="is_featured"
-                                      checked={post.is_featured}
-                                      onCheckedChange={(checked) =>
-                                        handlePostUpdate({ is_featured: checked })
-                                      }
-                                    />
-                                    <Label htmlFor="is_featured">À la une</Label>
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <Label className="text-sm">Vues</Label>
-                                      <p className="font-mono">{post.views_count || 0}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-sm">Auteur</Label>
-                                      <p>{post.profiles?.username}</p>
-                                    </div>
+                                    <Label htmlFor="published">Publié</Label>
                                   </div>
                                 </div>
                               </DialogContent>
