@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, ShoppingBag, DollarSign, TrendingUp, Eye } from "lucide-react";
@@ -77,8 +78,8 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-4 sm:space-y-6 p-2 sm:p-0">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
         {statCards.map((stat, index) => (
           <motion.div
             key={stat.title}
@@ -88,16 +89,16 @@ const AdminDashboard = () => {
           >
             <Card className="relative overflow-hidden dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-5`}></div>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-3 sm:p-6">
+                <CardTitle className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
                   {stat.title}
                 </CardTitle>
                 <div className={`p-2 rounded-lg bg-gradient-to-r ${stat.color}`}>
-                  <stat.icon className="h-4 w-4 text-white" />
+                  <stat.icon className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+              <CardContent className="p-3 sm:p-6 pt-0">
+                <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                   {stat.value.toLocaleString()}
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -109,52 +110,52 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-gradient-modern">Activité Récente</CardTitle>
-            <CardDescription className="dark:text-gray-300">
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="text-gradient-modern text-base sm:text-lg">Activité Récente</CardTitle>
+            <CardDescription className="dark:text-gray-300 text-sm">
               Vue d'ensemble des dernières activités
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Nouvelles inscriptions aujourd'hui</span>
-                <span className="font-semibold text-blue-600 dark:text-blue-400">+12</span>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Nouvelles inscriptions aujourd'hui</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400 text-sm">+12</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Missions soumises aujourd'hui</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">+34</span>
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Missions soumises aujourd'hui</span>
+                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">+34</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">BradCoins distribués</span>
-                <span className="font-semibold text-yellow-600 dark:text-yellow-400">+2,450</span>
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">BradCoins distribués</span>
+                <span className="font-semibold text-yellow-600 dark:text-yellow-400 text-sm">+2,450</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-gradient-modern">Performance Publicitaire</CardTitle>
-            <CardDescription className="dark:text-gray-300">
+          <CardHeader className="p-3 sm:p-6">
+            <CardTitle className="text-gradient-modern text-base sm:text-lg">Performance Publicitaire</CardTitle>
+            <CardDescription className="dark:text-gray-300 text-sm">
               Statistiques des publicités cette semaine
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Taux de clic moyen</span>
-                <span className="font-semibold text-slate-600 dark:text-slate-400">2.3%</span>
+          <CardContent className="p-3 sm:p-6 pt-0">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Taux de clic moyen</span>
+                <span className="font-semibold text-slate-600 dark:text-slate-400 text-sm">2.3%</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">CTR cette semaine</span>
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">+0.4%</span>
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">CTR cette semaine</span>
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400 text-sm">+0.4%</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-sm text-gray-600 dark:text-gray-300">Revenus estimés</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">€127.50</span>
+              <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Revenus estimés</span>
+                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">€127.50</span>
               </div>
             </div>
           </CardContent>

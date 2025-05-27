@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Search, Crown, Shield, Star } from "lucide-react";
+import { Search, Crown, Shield, Star, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -75,12 +75,12 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Gestion des Utilisateurs
-            <div className="relative w-64">
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
+            <span className="text-lg sm:text-xl">Gestion des Utilisateurs</span>
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Rechercher un utilisateur..."
@@ -91,73 +91,36 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0 sm:p-6">
           {isLoading ? (
-            <div className="text-center py-8">Chargement...</div>
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+              <p>Chargement...</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Utilisateur</TableHead>
-                  <TableHead>BradCoins</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Inscription</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <div className="overflow-x-auto">
+              {/* Mobile Cards View - Hidden on larger screens */}
+              <div className="block sm:hidden space-y-3 p-4">
                 {users?.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
+                  <Card key={user.id} className="p-4 dark:bg-slate-700/20">
+                    <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
                             alt={user.username}
-                            className="h-8 w-8 rounded-full"
+                            className="h-10 w-10 rounded-full"
                           />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                          <div className="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
                             {user.username[0]?.toUpperCase()}
                           </div>
                         )}
                         <div>
-                          <div className="font-medium">{user.username}</div>
-                          <div className="text-sm text-gray-500">{user.fortnite_username}</div>
+                          <div className="font-medium text-sm">{user.username}</div>
+                          <div className="text-xs text-gray-500">{user.fortnite_username}</div>
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-mono">
-                        {user.brad_coins?.[0]?.balance || 0}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-1">
-                        {user.is_owner && (
-                          <Badge variant="default" className="text-xs bg-yellow-500">
-                            <Star className="h-3 w-3 mr-1" />
-                            Propriétaire
-                          </Badge>
-                        )}
-                        {user.is_admin && (
-                          <Badge variant="destructive" className="text-xs">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Admin
-                          </Badge>
-                        )}
-                        {user.is_vip && (
-                          <Badge variant="secondary" className="text-xs">
-                            <Crown className="h-3 w-3 mr-1" />
-                            VIP
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
@@ -165,11 +128,12 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                             size="sm"
                             onClick={() => setSelectedUser(user)}
                             disabled={user.is_owner}
+                            className="h-8 w-8 p-0"
                           >
-                            Gérer
+                            <Settings className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent className="w-[95vw] max-w-md">
                           <DialogHeader>
                             <DialogTitle>Gérer {user.username}</DialogTitle>
                           </DialogHeader>
@@ -197,18 +161,168 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                               <Label htmlFor="is_vip">Statut VIP</Label>
                             </div>
                             {!isOwner && user.is_admin && (
-                              <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded">
+                              <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded">
                                 Seul le propriétaire peut modifier le statut administrateur.
                               </p>
                             )}
                           </div>
                         </DialogContent>
                       </Dialog>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-gray-500">BradCoins:</span>
+                        <span className="font-mono ml-1">{user.brad_coins?.[0]?.balance || 0}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Inscription:</span>
+                        <span className="ml-1">{new Date(user.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {user.is_owner && (
+                        <Badge variant="default" className="text-xs bg-yellow-500">
+                          <Star className="h-3 w-3 mr-1" />
+                          Propriétaire
+                        </Badge>
+                      )}
+                      {user.is_admin && (
+                        <Badge variant="destructive" className="text-xs">
+                          <Shield className="h-3 w-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
+                      {user.is_vip && (
+                        <Badge variant="secondary" className="text-xs">
+                          <Crown className="h-3 w-3 mr-1" />
+                          VIP
+                        </Badge>
+                      )}
+                    </div>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop Table View - Hidden on mobile */}
+              <div className="hidden sm:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Utilisateur</TableHead>
+                      <TableHead>BradCoins</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Inscription</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users?.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            {user.avatar_url ? (
+                              <img
+                                src={user.avatar_url}
+                                alt={user.username}
+                                className="h-8 w-8 rounded-full"
+                              />
+                            ) : (
+                              <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                                {user.username[0]?.toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-medium">{user.username}</div>
+                              <div className="text-sm text-gray-500">{user.fortnite_username}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-mono">
+                            {user.brad_coins?.[0]?.balance || 0}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-1">
+                            {user.is_owner && (
+                              <Badge variant="default" className="text-xs bg-yellow-500">
+                                <Star className="h-3 w-3 mr-1" />
+                                Propriétaire
+                              </Badge>
+                            )}
+                            {user.is_admin && (
+                              <Badge variant="destructive" className="text-xs">
+                                <Shield className="h-3 w-3 mr-1" />
+                                Admin
+                              </Badge>
+                            )}
+                            {user.is_vip && (
+                              <Badge variant="secondary" className="text-xs">
+                                <Crown className="h-3 w-3 mr-1" />
+                                VIP
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedUser(user)}
+                                disabled={user.is_owner}
+                              >
+                                Gérer
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Gérer {user.username}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                {isOwner && !user.is_owner && (
+                                  <div className="flex items-center space-x-2">
+                                    <Switch
+                                      id="is_admin"
+                                      checked={user.is_admin}
+                                      onCheckedChange={(checked) =>
+                                        handleUserUpdate({ is_admin: checked })
+                                      }
+                                    />
+                                    <Label htmlFor="is_admin">Administrateur</Label>
+                                  </div>
+                                )}
+                                <div className="flex items-center space-x-2">
+                                  <Switch
+                                    id="is_vip"
+                                    checked={user.is_vip}
+                                    onCheckedChange={(checked) =>
+                                      handleUserUpdate({ is_vip: checked })
+                                    }
+                                  />
+                                  <Label htmlFor="is_vip">Statut VIP</Label>
+                                </div>
+                                {!isOwner && user.is_admin && (
+                                  <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded">
+                                    Seul le propriétaire peut modifier le statut administrateur.
+                                  </p>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
