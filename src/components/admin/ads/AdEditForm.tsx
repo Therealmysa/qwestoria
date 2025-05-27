@@ -10,21 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-interface AdCreateFormProps {
+interface AdEditFormProps {
+  ad: any;
   onClose: () => void;
 }
 
-const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
+const AdEditForm = ({ ad, onClose }: AdEditFormProps) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    image_url: "",
-    link_url: "/",
-    position: "sidebar",
-    is_active: true,
-    start_date: "",
-    end_date: ""
+    title: ad.title || "",
+    description: ad.description || "",
+    image_url: ad.image_url || "",
+    link_url: ad.link_url || "/",
+    position: ad.position || "sidebar",
+    is_active: ad.is_active || false,
+    start_date: ad.start_date ? new Date(ad.start_date).toISOString().slice(0, 16) : "",
+    end_date: ad.end_date ? new Date(ad.end_date).toISOString().slice(0, 16) : ""
   });
 
   const sitePages = [
@@ -40,27 +41,28 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
     { value: "/profile", label: "Profil" }
   ];
 
-  const createAdMutation = useMutation({
+  const updateAdMutation = useMutation({
     mutationFn: async (adData: any) => {
       const { error } = await supabase
         .from('advertisements')
-        .insert([{
+        .update({
           ...adData,
           start_date: adData.start_date || null,
           end_date: adData.end_date || null
-        }]);
+        })
+        .eq('id', ad.id);
       
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-advertisements'] });
       queryClient.invalidateQueries({ queryKey: ['advertisements-stats'] });
-      toast.success("Publicité créée avec succès");
+      toast.success("Publicité mise à jour avec succès");
       onClose();
     },
     onError: (error) => {
-      console.error('Error creating advertisement:', error);
-      toast.error("Erreur lors de la création");
+      console.error('Error updating advertisement:', error);
+      toast.error("Erreur lors de la mise à jour");
     }
   });
 
@@ -70,7 +72,7 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
       toast.error("Titre et page de destination requis");
       return;
     }
-    createAdMutation.mutate(formData);
+    updateAdMutation.mutate(formData);
   };
 
   return (
@@ -156,18 +158,18 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
           checked={formData.is_active}
           onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
         />
-        <Label htmlFor="is_active">Activer immédiatement</Label>
+        <Label htmlFor="is_active">Publicité active</Label>
       </div>
       <div className="flex justify-end space-x-2">
         <Button type="button" variant="outline" onClick={onClose}>
           Annuler
         </Button>
-        <Button type="submit" disabled={createAdMutation.isPending}>
-          {createAdMutation.isPending ? "Création..." : "Créer la publicité"}
+        <Button type="submit" disabled={updateAdMutation.isPending}>
+          {updateAdMutation.isPending ? "Mise à jour..." : "Mettre à jour"}
         </Button>
       </div>
     </form>
   );
 };
 
-export default AdCreateForm;
+export default AdEditForm;

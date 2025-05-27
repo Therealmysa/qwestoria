@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,12 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Search, Plus, Edit, Trash2, Eye, MousePointer, TrendingUp } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Target, Eye, MousePointer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AdCreateForm from "./ads/AdCreateForm";
+import AdEditForm from "./ads/AdEditForm";
 
 const AdminAdvertisements = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,22 +41,22 @@ const AdminAdvertisements = () => {
   const { data: stats } = useQuery({
     queryKey: ['advertisements-stats'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: ads, error } = await supabase
         .from('advertisements')
-        .select('click_count, impression_count, is_active');
+        .select('is_active, impression_count, click_count');
 
       if (error) throw error;
 
-      const activeAds = data.filter(ad => ad.is_active).length;
-      const totalClicks = data.reduce((sum, ad) => sum + ad.click_count, 0);
-      const totalImpressions = data.reduce((sum, ad) => sum + ad.impression_count, 0);
-      const ctr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : 0;
+      const totalAds = ads.length;
+      const activeAds = ads.filter(ad => ad.is_active).length;
+      const totalImpressions = ads.reduce((sum, ad) => sum + (ad.impression_count || 0), 0);
+      const totalClicks = ads.reduce((sum, ad) => sum + (ad.click_count || 0), 0);
 
       return {
+        totalAds,
         activeAds,
-        totalClicks,
         totalImpressions,
-        ctr
+        totalClicks
       };
     }
   });
@@ -80,36 +80,24 @@ const AdminAdvertisements = () => {
     }
   });
 
-  const updateAdMutation = useMutation({
-    mutationFn: async ({ adId, updates }: { adId: string, updates: any }) => {
-      const { error } = await supabase
-        .from('advertisements')
-        .update(updates)
-        .eq('id', adId);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-advertisements'] });
-      queryClient.invalidateQueries({ queryKey: ['advertisements-stats'] });
-      toast.success("Publicité mise à jour avec succès");
-      setSelectedAd(null);
-      setShowEditDialog(false);
-    },
-    onError: () => {
-      toast.error("Erreur lors de la mise à jour");
-    }
-  });
-
-  const handleAdUpdate = (updates: any) => {
-    if (selectedAd) {
-      updateAdMutation.mutate({ adId: selectedAd.id, updates });
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
-  const getCTR = (clicks: number, impressions: number) => {
-    if (impressions === 0) return "0.00";
-    return ((clicks / impressions) * 100).toFixed(2);
+  const getPageLabel = (url: string) => {
+    const pageMap: { [key: string]: string } = {
+      "/": "Accueil",
+      "/missions": "Missions",
+      "/blog": "Blog",
+      "/shop": "Boutique",
+      "/teammates": "Coéquipiers",
+      "/messages": "Messagerie",
+      "/leaderboard": "Classement",
+      "/fortnite-shop": "Boutique Fortnite",
+      "/dashboard": "Dashboard",
+      "/profile": "Profil"
+    };
+    return pageMap[url] || url;
   };
 
   return (
@@ -119,10 +107,10 @@ const AdminAdvertisements = () => {
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-6 sm:h-8 w-6 sm:w-8 text-green-500" />
+              <Target className="h-6 sm:h-8 w-6 sm:w-8 text-blue-500" />
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Pubs actives</p>
-                <p className="text-lg sm:text-2xl font-bold">{stats?.activeAds || 0}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total publicités</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalAds || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -131,10 +119,10 @@ const AdminAdvertisements = () => {
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center space-x-2">
-              <MousePointer className="h-6 sm:h-8 w-6 sm:w-8 text-blue-500" />
+              <Target className="h-6 sm:h-8 w-6 sm:w-8 text-green-500" />
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total clics</p>
-                <p className="text-lg sm:text-2xl font-bold">{stats?.totalClicks?.toLocaleString() || 0}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Actives</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.activeAds || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -155,10 +143,10 @@ const AdminAdvertisements = () => {
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
           <CardContent className="p-3 sm:p-6">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-6 sm:h-8 w-6 sm:w-8 text-orange-500" />
+              <MousePointer className="h-6 sm:h-8 w-6 sm:w-8 text-orange-500" />
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">CTR moyen</p>
-                <p className="text-lg sm:text-2xl font-bold">{stats?.ctr}%</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Clics</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalClicks?.toLocaleString() || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -182,11 +170,11 @@ const AdminAdvertisements = () => {
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
                   <Button 
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                     size="sm"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Nouvelle Pub
+                    Nouvelle Publicité
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -221,17 +209,15 @@ const AdminAdvertisements = () => {
                           />
                         )}
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium text-sm mb-1 line-clamp-1">{ad.title}</div>
-                          <div className="text-xs text-gray-500 mb-2 line-clamp-2">{ad.description}</div>
+                          <div className="font-medium text-sm mb-1 line-clamp-2">{ad.title}</div>
+                          <div className="text-xs text-gray-500 mb-2">Vers: {getPageLabel(ad.link_url)}</div>
                           <div className="flex flex-wrap gap-1">
                             {ad.is_active ? (
-                              <Badge className="bg-green-500 text-white text-xs">Actif</Badge>
+                              <Badge className="bg-green-500 text-white text-xs">Active</Badge>
                             ) : (
-                              <Badge variant="secondary" className="text-xs">Inactif</Badge>
+                              <Badge variant="secondary" className="text-xs">Inactive</Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              CTR: {getCTR(ad.click_count, ad.impression_count)}%
-                            </Badge>
+                            <Badge variant="outline" className="text-xs">{ad.position}</Badge>
                           </div>
                         </div>
                       </div>
@@ -250,32 +236,11 @@ const AdminAdvertisements = () => {
                               <Edit className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="w-[95vw] max-w-md mx-auto">
+                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                              <DialogTitle className="text-lg">Gérer {ad.title}</DialogTitle>
+                              <DialogTitle>Modifier la publicité</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor="is_active" className="text-sm">Actif</Label>
-                                <Switch
-                                  id="is_active"
-                                  checked={ad.is_active}
-                                  onCheckedChange={(checked) =>
-                                    handleAdUpdate({ is_active: checked })
-                                  }
-                                />
-                              </div>
-                              <div className="grid grid-cols-2 gap-2 text-xs">
-                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Clics</div>
-                                  <div className="font-semibold">{ad.click_count}</div>
-                                </div>
-                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
-                                  <div className="font-semibold">{ad.impression_count}</div>
-                                </div>
-                              </div>
-                            </div>
+                            <AdEditForm ad={selectedAd} onClose={() => setShowEditDialog(false)} />
                           </DialogContent>
                         </Dialog>
                         <Button
@@ -289,18 +254,14 @@ const AdminAdvertisements = () => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-3 gap-2 text-xs">
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded text-center">
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Impressions</div>
+                        <div className="font-semibold">{ad.impression_count || 0}</div>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
                         <div className="text-gray-500 dark:text-gray-400 mb-1">Clics</div>
-                        <div className="font-semibold">{ad.click_count}</div>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded text-center">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
-                        <div className="font-semibold">{ad.impression_count}</div>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded text-center">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">CTR</div>
-                        <div className="font-semibold">{getCTR(ad.click_count, ad.impression_count)}%</div>
+                        <div className="font-semibold">{ad.click_count || 0}</div>
                       </div>
                     </div>
                   </Card>
@@ -313,9 +274,11 @@ const AdminAdvertisements = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Publicité</TableHead>
-                      <TableHead>Performances</TableHead>
-                      <TableHead>CTR</TableHead>
+                      <TableHead>Page</TableHead>
+                      <TableHead>Position</TableHead>
                       <TableHead>Statut</TableHead>
+                      <TableHead>Statistiques</TableHead>
+                      <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -332,34 +295,32 @@ const AdminAdvertisements = () => {
                               />
                             )}
                             <div>
-                              <div className="font-medium">{ad.title}</div>
+                              <div className="font-medium max-w-xs truncate">{ad.title}</div>
                               <div className="text-sm text-gray-500 max-w-xs truncate">{ad.description}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm">
-                            <div className="flex items-center gap-2">
-                              <MousePointer className="h-3 w-3" />
-                              <span>{ad.click_count} clics</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-gray-500">
-                              <Eye className="h-3 w-3" />
-                              <span>{ad.impression_count} vues</span>
-                            </div>
-                          </div>
+                          <span className="text-sm">{getPageLabel(ad.link_url)}</span>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="text-xs">
-                            {getCTR(ad.click_count, ad.impression_count)}%
-                          </Badge>
+                          <Badge variant="outline" className="text-xs">{ad.position}</Badge>
                         </TableCell>
                         <TableCell>
                           {ad.is_active ? (
-                            <Badge className="bg-green-500 text-white text-xs">Actif</Badge>
+                            <Badge className="bg-green-500 text-white text-xs">Active</Badge>
                           ) : (
-                            <Badge variant="secondary" className="text-xs">Inactif</Badge>
+                            <Badge variant="secondary" className="text-xs">Inactive</Badge>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm">
+                            <div>{ad.impression_count || 0} vues</div>
+                            <div>{ad.click_count || 0} clics</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">{formatDate(ad.created_at)}</span>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
@@ -376,32 +337,11 @@ const AdminAdvertisements = () => {
                                   <Edit className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent>
+                              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
-                                  <DialogTitle>Gérer {ad.title}</DialogTitle>
+                                  <DialogTitle>Modifier la publicité</DialogTitle>
                                 </DialogHeader>
-                                <div className="space-y-4">
-                                  <div className="flex items-center space-x-2">
-                                    <Switch
-                                      id="is_active"
-                                      checked={ad.is_active}
-                                      onCheckedChange={(checked) =>
-                                        handleAdUpdate({ is_active: checked })
-                                      }
-                                    />
-                                    <Label htmlFor="is_active">Actif</Label>
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <Label className="text-sm">Clics</Label>
-                                      <p className="font-mono">{ad.click_count}</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-sm">Impressions</Label>
-                                      <p className="font-mono">{ad.impression_count}</p>
-                                    </div>
-                                  </div>
-                                </div>
+                                <AdEditForm ad={selectedAd} onClose={() => setShowEditDialog(false)} />
                               </DialogContent>
                             </Dialog>
                             <Button
