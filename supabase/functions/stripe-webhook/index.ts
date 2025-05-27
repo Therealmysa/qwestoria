@@ -12,8 +12,14 @@ serve(async (req) => {
   try {
     logStep("Webhook received");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Use test key in development, live key in production
+    const isDevelopment = Deno.env.get("ENVIRONMENT") !== "production";
+    const stripeKey = isDevelopment 
+      ? Deno.env.get("STRIPE_TEST_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY")
+      : Deno.env.get("STRIPE_SECRET_KEY");
+    
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+    logStep("Stripe key verified", { mode: isDevelopment ? "test" : "live" });
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -25,19 +31,24 @@ serve(async (req) => {
     const signature = req.headers.get("stripe-signature");
     const body = await req.text();
 
+    // Use test webhook secret in development
+    const webhookSecret = isDevelopment 
+      ? Deno.env.get("STRIPE_TEST_WEBHOOK_SECRET") || Deno.env.get("STRIPE_WEBHOOK_SECRET")
+      : Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
     let event;
     try {
       event = stripe.webhooks.constructEvent(
         body,
         signature!,
-        Deno.env.get("STRIPE_WEBHOOK_SECRET") || ""
+        webhookSecret || ""
       );
     } catch (err) {
       logStep("Webhook signature verification failed", { error: err.message });
       return new Response(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    logStep("Event type", { type: event.type });
+    logStep("Event type", { type: event.type, mode: isDevelopment ? "test" : "live" });
 
     switch (event.type) {
       case 'checkout.session.completed': {

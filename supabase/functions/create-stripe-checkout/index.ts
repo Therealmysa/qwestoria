@@ -21,9 +21,14 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Use test key in development, live key in production
+    const isDevelopment = Deno.env.get("ENVIRONMENT") !== "production";
+    const stripeKey = isDevelopment 
+      ? Deno.env.get("STRIPE_TEST_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY")
+      : Deno.env.get("STRIPE_SECRET_KEY");
+    
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
+    logStep("Stripe key verified", { mode: isDevelopment ? "test" : "live" });
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -161,7 +166,7 @@ serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create(sessionData);
-    logStep("Checkout session created", { sessionId: session.id });
+    logStep("Checkout session created", { sessionId: session.id, mode: isDevelopment ? "test" : "live" });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
