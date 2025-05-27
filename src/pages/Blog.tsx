@@ -22,7 +22,7 @@ interface Post {
   profiles: {
     username: string;
     avatar_url: string;
-  };
+  } | null;
 }
 
 const Blog = () => {
@@ -42,7 +42,7 @@ const Blog = () => {
           author_id,
           category,
           image_url,
-          profiles!blog_posts_author_id_fkey (
+          profiles:author_id (
             username,
             avatar_url
           )
@@ -58,7 +58,10 @@ const Blog = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching posts:', error);
+        throw error;
+      }
       return data as Post[];
     }
   });
@@ -160,10 +163,10 @@ const Blog = () => {
                           <div className="flex items-center space-x-2">
                             <Avatar className="h-6 w-6">
                               <AvatarImage src={post.profiles?.avatar_url} />
-                              <AvatarFallback>{post.profiles?.username?.charAt(0).toUpperCase()}</AvatarFallback>
+                              <AvatarFallback>{post.profiles?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
                             </Avatar>
                             <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {post.profiles?.username} - {formatDate(post.created_at)}
+                              {post.profiles?.username || 'Utilisateur inconnu'} - {formatDate(post.created_at)}
                             </span>
                           </div>
                         </CardDescription>
