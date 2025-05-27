@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -136,7 +135,7 @@ const Messages = () => {
 
   if (!user || loading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40]">
+      <div className="h-screen flex justify-center items-center bg-gray-900">
         <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
       </div>
     );
@@ -234,7 +233,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-[#0a0a12] via-[#1a1625] to-[#2a1f40]">
+    <div className="h-screen flex flex-col bg-gray-900">
       {/* Background particles */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute w-40 h-40 bg-blue-500/10 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
