@@ -1,190 +1,101 @@
-
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Calendar, Clock, User, ArrowLeft } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import BlogSocialActions from "@/components/blog/BlogSocialActions";
-import BlogComments from "@/components/blog/BlogComments";
+import { Loader2 } from "lucide-react";
+
+interface BlogPostType {
+  id: string;
+  created_at: string;
+  title: string;
+  content: string;
+  author: string;
+  image_url: string | null;
+}
 
 const BlogPost = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const [post, setPost] = useState<BlogPostType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: post, isLoading, error } = useQuery({
-    queryKey: ['blog-post', id],
-    queryFn: async () => {
-      // Récupérer le post d'abord
-      const { data: postData, error: postError } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('id', id)
-        .eq('published', true)
-        .single();
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      setError(null);
 
-      if (postError) throw postError;
-
-      // Récupérer le profil de l'auteur séparément
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', postData.author_id)
-        .single();
-
-      if (profileError) {
-        console.warn('Profil de l\'auteur non trouvé:', profileError);
-      }
-
-      return {
-        ...postData,
-        profiles: profileData || {
-          username: 'Auteur inconnu',
-          avatar_url: undefined
+      try {
+        if (!id) {
+          throw new Error("Article non trouvé");
         }
-      };
-    },
-    enabled: !!id,
-  });
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .select("*")
+          .eq("id", id)
+          .single();
 
-  if (error || !post) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
-            Article non trouvé
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            L'article que vous recherchez n'existe pas ou a été supprimé.
-          </p>
-        </div>
-      </div>
-    );
-  }
+        if (error) {
+          throw error;
+        }
+
+        setPost(data as BlogPostType);
+      } catch (err: any) {
+        setError(err.message || "Impossible de charger l'article");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <article className="max-w-4xl mx-auto">
-        {/* Bouton de retour */}
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/blog')}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md hover:bg-white/95 dark:hover:bg-black/30 transition-all duration-300"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour aux articles
-          </Button>
-        </div>
-
-        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
-          <CardHeader className="space-y-6">
-            {/* Titre de l'article */}
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
-              {post.title}
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] mb-4">
+              Article de Blog
             </h1>
+          </div>
 
-            {/* Résumé si disponible */}
-            {post.summary && (
-              <p className="text-lg text-muted-foreground dark:text-gray-300 leading-relaxed">
-                {post.summary}
-              </p>
-            )}
-
-            {/* Image de l'article */}
-            {post.image_url && (
-              <div className="w-full h-64 md:h-80 overflow-hidden rounded-lg">
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Chargement de l'article...
+            </div>
+          ) : error ? (
+            <div className="text-red-500">{error}</div>
+          ) : post ? (
+            <>
+              {/* Post Image */}
+              {post.image_url && (
                 <img
                   src={post.image_url}
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className="w-full rounded-lg shadow-md mb-6"
                 />
-              </div>
-            )}
-
-            {/* Métadonnées de l'article */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground dark:text-gray-400">
-              {/* Auteur */}
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={post.profiles?.avatar_url} />
-                  <AvatarFallback>
-                    <User className="h-3 w-3" />
-                  </AvatarFallback>
-                </Avatar>
-                <span>Par {post.profiles?.username || 'Auteur inconnu'}</span>
-              </div>
-
-              {/* Date de publication */}
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {formatDistanceToNow(new Date(post.created_at), { 
-                    addSuffix: true, 
-                    locale: fr 
-                  })}
-                </span>
-              </div>
-
-              {/* Temps de lecture */}
-              {post.reading_time_minutes && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  <span>{post.reading_time_minutes} min de lecture</span>
-                </div>
               )}
-            </div>
 
-            {/* Actions sociales */}
-            <BlogSocialActions 
-              postId={post.id}
-              postTitle={post.title}
-              postSummary={post.summary}
-            />
-
-            <Separator className="dark:bg-white/15" />
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            {/* Contenu de l'article */}
-            <div 
-              className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-blockquote:text-foreground prose-li:text-foreground dark:prose-headings:text-white dark:prose-p:text-gray-300"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-
-            <Separator className="dark:bg-white/15" />
-
-            {/* Section des commentaires */}
-            <div id="comments-section">
-              <BlogComments postId={post.id} />
-            </div>
-          </CardContent>
-        </Card>
-      </article>
+              {/* Post Content */}
+              <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert">
+                <h2 className="text-2xl font-semibold mb-4">{post.title}</h2>
+                <div className="text-gray-500 mb-4">
+                  Publié le{" "}
+                  {format(new Date(post.created_at), "dd MMMM yyyy", {
+                    locale: fr,
+                  })} par {post.author}
+                </div>
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              </div>
+            </>
+          ) : (
+            <div>Article non trouvé</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

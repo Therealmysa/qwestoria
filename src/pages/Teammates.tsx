@@ -408,7 +408,7 @@ const Teammates = () => {
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-primary dark:text-[#9b87f5]">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
             Recherche de Coéquipiers
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
