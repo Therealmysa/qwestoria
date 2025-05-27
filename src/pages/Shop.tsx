@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,18 +52,29 @@ const Shop = () => {
     }
   });
 
+  // Get brad coins balance separately
+  const { data: bradCoinsBalance } = useQuery({
+    queryKey: ['brad-coins', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data, error } = await supabase
+        .from('brad_coins')
+        .select('balance')
+        .eq('user_id', user.id)
+        .single();
+      if (error) return 0;
+      return data?.balance || 0;
+    },
+    enabled: !!user?.id,
+  });
+
   const handlePurchase = async (itemId: string, price: number) => {
     if (!user) {
       toast.error("Vous devez être connecté pour acheter des articles.");
       return;
     }
 
-    if (!profile) {
-      toast.error("Votre profil n'a pas été trouvé.");
-      return;
-    }
-
-    if (profile.brad_coins < price) {
+    if (!bradCoinsBalance || bradCoinsBalance < price) {
       toast.error("Vous n'avez pas assez de BradCoins.");
       return;
     }
@@ -83,7 +95,6 @@ const Shop = () => {
       console.log("Achat réussi:", data);
       toast.success("Achat réussi !");
       // Revalider le profil utilisateur pour mettre à jour le solde de BradCoins
-      // queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
       window.location.reload();
     }
   };
@@ -133,7 +144,7 @@ const Shop = () => {
               <TabsList className="mb-4">
                 <TabsTrigger value="all" onClick={() => setSelectedCategory("all")}>Tous</TabsTrigger>
                 {categories?.map((category) => (
-                  <TabsTrigger key={category.id} value={category.slug} onClick={() => setSelectedCategory(category.slug)}>
+                  <TabsTrigger key={category.id} value={category.category} onClick={() => setSelectedCategory(category.category)}>
                     {category.name}
                   </TabsTrigger>
                 ))}
@@ -192,7 +203,7 @@ const Shop = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold flex items-center gap-1">
-                  {profile?.brad_coins || 0}
+                  {bradCoinsBalance || 0}
                   <Coins className="h-5 w-5 text-yellow-500" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">

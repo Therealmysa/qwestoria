@@ -194,7 +194,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_blog_posts_author"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brad_coins: {
         Row: {
@@ -524,6 +532,30 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_categories: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       shop_items: {
         Row: {
           available_until: string | null
@@ -840,12 +872,7 @@ export type Database = {
       }
     }
     Views: {
-      shop_categories: {
-        Row: {
-          category: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       get_blog_post_comment_count: {

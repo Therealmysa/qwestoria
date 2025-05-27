@@ -19,6 +19,10 @@ interface Post {
   author_id: string;
   category: string;
   image_url: string;
+  profiles: {
+    username: string;
+    avatar_url: string;
+  };
 }
 
 const Blog = () => {
@@ -38,7 +42,7 @@ const Blog = () => {
           author_id,
           category,
           image_url,
-          profiles (
+          profiles!blog_posts_author_id_fkey (
             username,
             avatar_url
           )
@@ -55,7 +59,7 @@ const Blog = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as Post[];
     }
   });
 
@@ -140,7 +144,7 @@ const Blog = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {posts?.map((post: Post & { profiles: { username: string, avatar_url: string } }) => (
+                {posts?.map((post) => (
                   <Card key={post.id} className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
                     <Link to={`/blog/${post.id}`}>
                       {post.image_url && (
