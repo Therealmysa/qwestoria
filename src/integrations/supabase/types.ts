@@ -557,6 +557,51 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_purchases: {
+        Row: {
+          id: string
+          item_id: string
+          price_paid: number
+          purchased_at: string
+          quantity: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          price_paid: number
+          purchased_at?: string
+          quantity?: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          price_paid?: number
+          purchased_at?: string
+          quantity?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_purchases_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_subscribers: {
         Row: {
           created_at: string
@@ -711,38 +756,6 @@ export type Database = {
           },
         ]
       }
-      user_purchases: {
-        Row: {
-          id: string
-          item_id: string
-          price_paid: number
-          purchased_at: string | null
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          item_id: string
-          price_paid: number
-          purchased_at?: string | null
-          user_id: string
-        }
-        Update: {
-          id?: string
-          item_id?: string
-          price_paid?: number
-          purchased_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_purchases_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "shop_items"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_subscriptions: {
         Row: {
           cancelled_at: string | null
@@ -828,6 +841,10 @@ export type Database = {
       }
       is_site_owner: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      process_shop_purchase: {
+        Args: { p_user_id: string; p_item_id: string; p_quantity?: number }
         Returns: boolean
       }
       user_has_liked_post: {

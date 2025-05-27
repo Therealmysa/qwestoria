@@ -4,8 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Package } from "lucide-react";
+import { Coins, Package, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useShopPurchase } from "@/hooks/useShopPurchase";
+import { useUserStatus } from "@/hooks/useUserStatus";
+import PremiumBadge from "@/components/vip/PremiumBadge";
 
 interface ShopItem {
   id: string;
@@ -20,6 +23,9 @@ interface ShopItem {
 }
 
 const ShopItems = () => {
+  const { purchaseItem, isPurchasing } = useShopPurchase();
+  const { isVip, isPremium } = useUserStatus();
+
   const { data: shopItems, isLoading } = useQuery<ShopItem[]>({
     queryKey: ['shop-items'],
     queryFn: async (): Promise<ShopItem[]> => {
@@ -53,9 +59,24 @@ const ShopItems = () => {
     }
   });
 
-  const handlePurchaseItem = async (item: ShopItem) => {
-    console.log('Achat article:', item);
-    // TODO: Implémenter la logique d'achat
+  const { data: userPurchases = [] } = useQuery({
+    queryKey: ['shop-purchases'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('shop_purchases')
+        .select('item_id')
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      return data?.map(p => p.item_id) || [];
+    }
+  });
+
+  const handlePurchaseItem = (item: ShopItem) => {
+    purchaseItem({ itemId: item.id });
   };
 
   const isAvailable = (item: ShopItem): boolean => {
@@ -63,6 +84,30 @@ const ShopItems = () => {
       return new Date(item.available_until) > new Date();
     }
     return true;
+  };
+
+  const canPurchase = (item: ShopItem): boolean => {
+    // Vérifier si l'article est disponible
+    if (!isAvailable(item)) return false;
+    
+    // Vérifier si l'utilisateur a déjà acheté cet article
+    if (userPurchases.includes(item.id)) return false;
+    
+    // Vérifier si l'article est VIP seulement et si l'utilisateur est VIP/Premium
+    if (item.is_vip_only && !isVip && !isPremium) return false;
+    
+    // Vérifier si l'utilisateur a assez de BradCoins
+    if (userCoins < item.price) return false;
+    
+    return true;
+  };
+
+  const getButtonText = (item: ShopItem): string => {
+    if (!isAvailable(item)) return "Indisponible";
+    if (userPurchases.includes(item.id)) return "Déjà acheté";
+    if (item.is_vip_only && !isVip && !isPremium) return "VIP requis";
+    if (userCoins < item.price) return "Solde insuffisant";
+    return "Acheter";
   };
 
   if (isLoading) {
@@ -139,12 +184,15 @@ const ShopItems = () => {
                 </Badge>
                 
                 {item.is_vip_only && (
-                  <Badge 
-                    variant="outline" 
-                    className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-amber-500/90 hover:bg-amber-500/90 text-black border-0 text-xs"
-                  >
-                    VIP
-                  </Badge>
+                  <div className="absolute top-2 sm:top-4 right-2 sm:right-4">
+                    <PremiumBadge isPremium={true} variant="vip" size="sm" />
+                  </div>
+                )}
+
+                {userPurchases.includes(item.id) && (
+                  <div className="absolute bottom-2 right-2">
+                    <CheckCircle className="h-6 w-6 text-green-500 bg-white rounded-full" />
+                  </div>
                 )}
               </div>
               
@@ -170,14 +218,9 @@ const ShopItems = () => {
                 <Button 
                   className="w-full bg-slate-700 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500 text-sm"
                   onClick={() => handlePurchaseItem(item)}
-                  disabled={!isAvailable(item) || userCoins < item.price}
+                  disabled={!canPurchase(item) || isPurchasing}
                 >
-                  {!isAvailable(item) 
-                    ? "Indisponible" 
-                    : userCoins < item.price 
-                      ? "Solde insuffisant" 
-                      : "Acheter"
-                  }
+                  {isPurchasing ? "Achat en cours..." : getButtonText(item)}
                 </Button>
               </CardFooter>
             </Card>

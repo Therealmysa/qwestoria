@@ -3,12 +3,15 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import VipUpgrade from "@/components/vip/VipUpgrade";
+import VipFeatures from "@/components/vip/VipFeatures";
 import BradCoinsShop from "@/components/shop/BradCoinsShop";
 import ShopItems from "@/components/shop/ShopItems";
-import { Coins, Crown, ShoppingBag } from "lucide-react";
+import { useUserStatus } from "@/hooks/useUserStatus";
+import { Coins, Crown, ShoppingBag, Star } from "lucide-react";
 
 const Shop = () => {
   const [activeTab, setActiveTab] = useState("premium");
+  const { isPremium, isVip } = useUserStatus();
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 p-3 sm:p-6">
@@ -38,7 +41,7 @@ const Shop = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <div className="flex justify-center px-2">
-            <TabsList className="grid w-full max-w-md grid-cols-3 bg-white/90 dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 h-auto">
+            <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-white/90 dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 h-auto">
               <TabsTrigger 
                 value="premium" 
                 className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white font-semibold text-xs sm:text-sm py-2 sm:py-1.5"
@@ -46,6 +49,14 @@ const Shop = () => {
                 <Crown className="h-3 sm:h-4 w-3 sm:w-4" />
                 <span className="hidden sm:inline">Premium</span>
                 <span className="sm:hidden text-xs">VIP</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="features" 
+                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white text-xs sm:text-sm py-2 sm:py-1.5"
+              >
+                <Star className="h-3 sm:h-4 w-3 sm:w-4" />
+                <span className="hidden sm:inline">Fonctions</span>
+                <span className="sm:hidden text-xs">Plus</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="items" 
@@ -68,6 +79,10 @@ const Shop = () => {
 
           <TabsContent value="premium" className="space-y-4 sm:space-y-6">
             <VipUpgrade />
+          </TabsContent>
+
+          <TabsContent value="features" className="space-y-4 sm:space-y-6">
+            <VipFeatures isPremium={isPremium} isVip={isVip} />
           </TabsContent>
 
           <TabsContent value="items" className="space-y-4 sm:space-y-6">
