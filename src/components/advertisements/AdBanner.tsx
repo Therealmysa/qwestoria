@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,49 +18,108 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
   const { data: ads } = useQuery({
     queryKey: ['advertisements', position],
     queryFn: async () => {
-      const { data, error } = await supabase
+      console.log('Fetching ads for position:', position);
+      
+      const now = new Date().toISOString();
+      let query = supabase
         .from('advertisements')
         .select('*')
         .eq('position', position)
         .eq('is_active', true)
+        .or(`start_date.is.null,start_date.lte.${now}`)
+        .or(`end_date.is.null,end_date.gte.${now}`)
         .limit(maxAds);
+
+      const { data, error } = await query;
+      if (error) {
+        console.error('Error fetching ads:', error);
+        throw error;
+      }
       
-      if (error) throw error;
-      return data?.filter(ad => !dismissedAds.includes(ad.id)) || [];
+      console.log('Fetched ads:', data);
+      const filteredAds = data?.filter(ad => !dismissedAds.includes(ad.id)) || [];
+      console.log('Filtered ads (after dismissal):', filteredAds);
+      return filteredAds;
     }
   });
 
   const incrementImpressionMutation = useMutation({
     mutationFn: async (adId: string) => {
-      await supabase.rpc('increment_ad_impressions', { ad_id: adId });
+      console.log('Incrementing impression for ad:', adId);
+      const { data, error } = await supabase
+        .from('advertisements')
+        .select('impression_count')
+        .eq('id', adId)
+        .single();
+      
+      if (error) {
+        console.error('Error getting current impression count:', error);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('advertisements')
+        .update({ impression_count: (data.impression_count || 0) + 1 })
+        .eq('id', adId);
+      
+      if (updateError) console.error('Error incrementing impression:', updateError);
     }
   });
 
   const incrementClickMutation = useMutation({
     mutationFn: async (adId: string) => {
-      await supabase.rpc('increment_ad_clicks', { ad_id: adId });
+      console.log('Incrementing click for ad:', adId);
+      const { data, error } = await supabase
+        .from('advertisements')
+        .select('click_count')
+        .eq('id', adId)
+        .single();
+      
+      if (error) {
+        console.error('Error getting current click count:', error);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('advertisements')
+        .update({ click_count: (data.click_count || 0) + 1 })
+        .eq('id', adId);
+      
+      if (updateError) console.error('Error incrementing click:', updateError);
     }
   });
 
   const handleAdClick = (ad: any) => {
+    console.log('Ad clicked:', ad);
     incrementClickMutation.mutate(ad.id);
-    window.open(ad.link_url, '_blank');
+    
+    // Handle internal navigation vs external links
+    if (ad.link_url.startsWith('http')) {
+      window.open(ad.link_url, '_blank');
+    } else {
+      window.location.href = ad.link_url;
+    }
   };
 
   const handleDismiss = (adId: string) => {
+    console.log('Dismissing ad:', adId);
     setDismissedAds(prev => [...prev, adId]);
   };
 
   // Track impressions when ads are shown
-  React.useEffect(() => {
-    if (ads) {
+  useEffect(() => {
+    if (ads && ads.length > 0) {
+      console.log('Tracking impressions for ads:', ads);
       ads.forEach(ad => {
         incrementImpressionMutation.mutate(ad.id);
       });
     }
   }, [ads]);
 
-  if (!ads || ads.length === 0) return null;
+  if (!ads || ads.length === 0) {
+    console.log('No ads to display for position:', position);
+    return null;
+  }
 
   const getPositionStyles = () => {
     switch (position) {
@@ -74,6 +133,8 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
         return '';
     }
   };
+
+  console.log('Rendering ads:', ads);
 
   return (
     <AnimatePresence>

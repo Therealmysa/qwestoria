@@ -1,99 +1,211 @@
-
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import VipUpgrade from "@/components/vip/VipUpgrade";
-import VipFeatures from "@/components/vip/VipFeatures";
-import BradCoinsShop from "@/components/shop/BradCoinsShop";
-import ShopItems from "@/components/shop/ShopItems";
-import { useUserStatus } from "@/hooks/useUserStatus";
-import { Coins, Crown, ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag, Search, Filter, Coins } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+import AdBanner from "@/components/advertisements/AdBanner";
 
 const Shop = () => {
-  const [activeTab, setActiveTab] = useState("premium");
-  const { isPremium, isVip } = useUserStatus();
-  
+  const { user, profile } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const { data: shopItems, isLoading } = useQuery({
+    queryKey: ['shop-items', searchTerm, selectedCategory],
+    queryFn: async () => {
+      let query = supabase
+        .from('shop_items')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (searchTerm) {
+        query = query.ilike('name', `%${searchTerm}%`);
+      }
+
+      if (selectedCategory !== "all") {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['shop-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('shop_categories')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const handlePurchase = async (itemId: string, price: number) => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour acheter des articles.");
+      return;
+    }
+
+    if (!profile) {
+      toast.error("Votre profil n'a pas été trouvé.");
+      return;
+    }
+
+    if (profile.brad_coins < price) {
+      toast.error("Vous n'avez pas assez de BradCoins.");
+      return;
+    }
+
+    // Déclencher une fonction Edge pour effectuer l'achat
+    const { data, error } = await supabase.functions.invoke('purchase-item', {
+      body: {
+        user_id: user.id,
+        item_id: itemId,
+        price: price
+      }
+    });
+
+    if (error) {
+      console.error("Erreur lors de l'achat:", error);
+      toast.error("Erreur lors de l'achat. Veuillez réessayer.");
+    } else {
+      console.log("Achat réussi:", data);
+      toast.success("Achat réussi !");
+      // Revalider le profil utilisateur pour mettre à jour le solde de BradCoins
+      // queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
+      window.location.reload();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 p-3 sm:p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8 sm:mb-12 text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] mb-6 tracking-tight px-2">
-            Boutique Qwestoria
-          </h1>
-          
-          <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-200 mb-6 px-2">
-            Services Premium et Articles Exclusifs
-          </p>
-        </div>
-
-        {/* Séparation décorative */}
-        <div className="relative mb-6 sm:mb-8">
-          <Separator className="bg-gradient-to-r from-transparent via-slate-300/40 to-transparent dark:via-slate-500/40" />
-          <div className="absolute inset-0 flex justify-center items-center">
-            <div className="bg-gray-50 dark:bg-slate-900 px-4 sm:px-6 py-2 rounded-full border border-slate-200 dark:border-slate-700/50">
-              <div className="flex items-center gap-2">
-                <ShoppingBag className="h-4 sm:h-5 w-4 sm:w-5 text-slate-600 dark:text-slate-400" />
-                <span className="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">Boutique Qwestoria</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <div className="flex justify-center px-2">
-            <TabsList className="grid w-full max-w-2xl grid-cols-4 bg-white/90 dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 h-auto">
-              <TabsTrigger 
-                value="premium" 
-                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white font-semibold text-xs sm:text-sm py-2 sm:py-1.5"
-              >
-                <Crown className="h-3 sm:h-4 w-3 sm:w-4" />
-                <span className="hidden sm:inline">Premium</span>
-                <span className="sm:hidden text-xs">VIP</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="features" 
-                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white text-xs sm:text-sm py-2 sm:py-1.5"
-              >
-                <Star className="h-3 sm:h-4 w-3 sm:w-4" />
-                <span className="hidden sm:inline">Fonctions</span>
-                <span className="sm:hidden text-xs">Plus</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="items" 
-                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white text-xs sm:text-sm py-2 sm:py-1.5"
-              >
-                <ShoppingBag className="h-3 sm:h-4 w-3 sm:w-4" />
-                <span className="hidden sm:inline">Articles</span>
-                <span className="sm:hidden text-xs">Shop</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="bradcoins" 
-                className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white text-xs sm:text-sm py-2 sm:py-1.5"
-              >
-                <Coins className="h-3 sm:h-4 w-3 sm:w-4" />
-                <span className="hidden sm:inline">BradCoins</span>
-                <span className="sm:hidden text-xs">Coins</span>
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="premium" className="space-y-4 sm:space-y-6">
-            <VipUpgrade />
-          </TabsContent>
-
-          <TabsContent value="features" className="space-y-4 sm:space-y-6">
-            <VipFeatures isPremium={isPremium} isVip={isVip} />
-          </TabsContent>
-
-          <TabsContent value="items" className="space-y-4 sm:space-y-6">
-            <ShopItems />
-          </TabsContent>
-
-          <TabsContent value="bradcoins" className="space-y-4 sm:space-y-6">
-            <BradCoinsShop />
-          </TabsContent>
-        </Tabs>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+      {/* Banner Ad */}
+      <div className="container mx-auto px-4 pt-6">
+        <AdBanner position="banner" maxAds={1} />
       </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <Card className="mb-8 dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader className="flex flex-col space-y-3">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
+                  <ShoppingBag className="h-5 w-5" />
+                  Boutique
+                </CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Découvrez nos articles exclusifs et améliorez votre expérience.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="search"
+                      placeholder="Rechercher un article..."
+                      className="pl-10"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Filter className="h-4 w-4" />
+                    Filtrer
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="all" onClick={() => setSelectedCategory("all")}>Tous</TabsTrigger>
+                {categories?.map((category) => (
+                  <TabsTrigger key={category.id} value={category.slug} onClick={() => setSelectedCategory(category.slug)}>
+                    {category.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {isLoading ? (
+                  <div className="col-span-full text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+                    <p className="text-sm">Chargement des articles...</p>
+                  </div>
+                ) : (
+                  shopItems?.map((item) => (
+                    <Card key={item.id} className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+                      <CardHeader>
+                        <CardTitle>{item.name}</CardTitle>
+                        <CardDescription>{item.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex flex-col space-y-4">
+                        {item.image_url && (
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="w-full h-32 object-cover rounded-md"
+                          />
+                        )}
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-semibold flex items-center gap-1">
+                            <Coins className="h-4 w-4 text-yellow-500" />
+                            {item.price}
+                          </span>
+                          <Button onClick={() => handlePurchase(item.id, item.price)}>Acheter</Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </Tabs>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Sidebar Ads */}
+            <AdBanner position="sidebar" maxAds={2} />
+            
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="h-5 w-5 text-yellow-500" />
+                  BradCoins
+                </CardTitle>
+                <CardDescription className="text-gray-500 dark:text-gray-400">
+                  Votre solde actuel
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold flex items-center gap-1">
+                  {profile?.brad_coins || 0}
+                  <Coins className="h-5 w-5 text-yellow-500" />
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Utilisez vos BradCoins pour acheter des articles exclusifs dans la boutique.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Popup Ads */}
+      <AdBanner position="popup" maxAds={1} />
     </div>
   );
 };

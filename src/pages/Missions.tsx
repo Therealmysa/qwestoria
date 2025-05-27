@@ -1,440 +1,329 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileUpload } from "@/components/ui/file-upload";
-import { useToast } from "@/components/ui/use-toast";
-import { ExternalLink, Clock, Coins, CheckCircle } from "lucide-react";
-
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  reward_coins: number;
-  is_vip_only: boolean;
-  external_link: string | null;
-  starts_at: string;
-  ends_at: string | null;
-}
-
-interface UserSubmission {
-  mission_id: string;
-  status: string;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Sparkles, ShieldCheck, Flame, Search, User2, Briefcase, GraduationCap, Gem, BrainCircuit } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import AdBanner from "@/components/advertisements/AdBanner";
 
 const Missions = () => {
-  const { user, profile, loading } = useAuth();
-  const [missions, setMissions] = useState<Mission[]>([]);
-  const [userSubmissions, setUserSubmissions] = useState<UserSubmission[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [submissionData, setSubmissionData] = useState({
-    fortniteUsername: profile?.fortnite_username || "",
-    screenshotUrl: "",
-    missionId: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("all");
+  const [availableMissions, setAvailableMissions] = useState<any[]>([]);
+  const [completedMissions, setCompletedMissions] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    } else {
-      fetchMissions();
-      fetchUserSubmissions();
-    }
-  }, [user, loading, navigate]);
+  const categories = [
+    { value: "all", label: "Toutes" },
+    { value: "daily", label: "Quotidiennes", icon: Flame },
+    { value: "weekly", label: "Hebdomadaires", icon: ShieldCheck },
+    { value: "special", label: "Spéciales", icon: Sparkles },
+    { value: "community", label: "Communauté", icon: User2 },
+    { value: "career", label: "Carrière", icon: Briefcase },
+    { value: "education", label: "Éducation", icon: GraduationCap },
+    { value: "luxury", label: "Luxe", icon: Gem },
+    { value: "innovation", label: "Innovation", icon: BrainCircuit }
+  ];
 
-  const fetchMissions = async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from("missions")
-        .select("*")
-        .order("created_at", { ascending: false });
+  const difficulties = [
+    { value: "all", label: "Toutes" },
+    { value: "easy", label: "Facile" },
+    { value: "medium", label: "Moyenne" },
+    { value: "hard", label: "Difficile" },
+    { value: "expert", label: "Expert" }
+  ];
 
-      if (error) throw error;
+  const { data: missions, isLoading: isLoadingMissions } = useQuery({
+    queryKey: ['missions', searchTerm, selectedCategory, selectedDifficulty],
+    queryFn: async () => {
+      let query = supabase
+        .from('missions')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-      setMissions(data as Mission[]);
-    } catch (error: any) {
-      console.error("Error fetching missions:", error.message);
-      toast({
-        title: "Error",
-        description: "Failed to load missions. Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchUserSubmissions = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("mission_submissions")
-        .select("mission_id, status")
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      setUserSubmissions(data as UserSubmission[]);
-    } catch (error: any) {
-      console.error("Error fetching user submissions:", error.message);
-    }
-  };
-
-  const getUserSubmissionForMission = (missionId: string) => {
-    return userSubmissions.find(submission => submission.mission_id === missionId);
-  };
-
-  // Corriger la logique: on peut soumettre une mission si on n'a pas encore de soumission validée pour cette mission spécifique
-  const canSubmitMission = (missionId: string) => {
-    const submission = getUserSubmissionForMission(missionId);
-    // On peut soumettre si :
-    // 1. Aucune soumission pour cette mission
-    // 2. La soumission a été rejetée
-    // On ne peut PAS soumettre si la mission est déjà validée ou en attente
-    return !submission || submission.status === 'rejected';
-  };
-
-  const getMissionButtonText = (missionId: string) => {
-    const submission = getUserSubmissionForMission(missionId);
-    if (!submission) return "Submit";
-    
-    switch (submission.status) {
-      case 'verified':
-        return "Completed";
-      case 'pending':
-        return "Pending";
-      case 'rejected':
-        return "Resubmit";
-      default:
-        return "Submit";
-    }
-  };
-
-  const getMissionButtonVariant = (missionId: string) => {
-    const submission = getUserSubmissionForMission(missionId);
-    if (!submission) return "default";
-    
-    switch (submission.status) {
-      case 'verified':
-        return "outline";
-      case 'pending':
-        return "outline";
-      case 'rejected':
-        return "destructive";
-      default:
-        return "default";
-    }
-  };
-
-  const handleSubmissionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSubmissionData({
-      ...submissionData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleFileUpload = (url: string) => {
-    setSubmissionData({
-      ...submissionData,
-      screenshotUrl: url,
-    });
-  };
-
-  const uploadToSupabaseStorage = async (file: File): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user!.id}/${Date.now()}.${fileExt}`;
-    
-    const { data, error } = await supabase.storage
-      .from('temp')
-      .upload(fileName, file);
-
-    if (error) throw error;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('temp')
-      .getPublicUrl(fileName);
-
-    return publicUrl;
-  };
-
-  const handleSubmit = async (missionId: string) => {
-    if (!submissionData.fortniteUsername) {
-      toast({
-        title: "Error",
-        description: "Fortnite username is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
-      // Vérifier si l'utilisateur a déjà une soumission en attente pour cette mission spécifique
-      const { data: existingSubmission } = await supabase
-        .from('mission_submissions')
-        .select('id, status')
-        .eq('mission_id', missionId)
-        .eq('user_id', user!.id)
-        .single();
-
-      // Empêcher la soumission si il y a déjà une soumission validée ou en attente
-      if (existingSubmission && (existingSubmission.status === 'pending' || existingSubmission.status === 'verified')) {
-        toast({
-          title: "Error",
-          description: existingSubmission.status === 'verified' 
-            ? "You have already completed this mission."
-            : "You already have a pending submission for this mission.",
-          variant: "destructive",
-        });
-        return;
+      if (searchTerm) {
+        query = query.ilike('title', `%${searchTerm}%`);
       }
 
+      if (selectedCategory !== "all") {
+        query = query.eq('category', selectedCategory);
+      }
+
+      if (selectedDifficulty !== "all") {
+        query = query.eq('difficulty', selectedDifficulty);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: userMissions, isLoading: isLoadingUserMissions } = useQuery({
+    queryKey: ['user-missions', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
       const { data, error } = await supabase
-        .from('mission_submissions')
-        .insert([
-          { 
-            mission_id: missionId,
-            user_id: user!.id,
-            fortnite_username: submissionData.fortniteUsername,
-            screenshot_url: submissionData.screenshotUrl || null,
-            status: 'pending'
-          }
-        ])
-        .select();
+        .from('user_missions')
+        .select('*')
+        .eq('user_id', user.id);
 
       if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
 
-      toast({
-        title: "Success!",
-        description: "Your mission submission has been received and is pending validation.",
-      });
-
-      // Reset submission data
-      setSubmissionData({
-        fortniteUsername: profile?.fortnite_username || "",
-        screenshotUrl: "",
-        missionId: "",
-      });
-      setShowDialog(false);
-      
-      // Refresh user submissions
-      fetchUserSubmissions();
-    } catch (error: any) {
-      console.error('Error submitting mission:', error.message);
-      toast({
-        title: "Submission failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    if (missions && userMissions) {
+      const completedMissionIds = userMissions.map(um => um.mission_id);
+      setAvailableMissions(missions.filter(mission => !completedMissionIds.includes(mission.id)));
+      setCompletedMissions(missions.filter(mission => completedMissionIds.includes(mission.id)));
     }
+  }, [missions, userMissions]);
+
+  const completeMissionMutation = useMutation({
+    mutationFn: async (missionId: string) => {
+      const { data, error } = await supabase
+        .from('user_missions')
+        .insert([{ user_id: user?.id, mission_id: missionId }]);
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Mission accomplie !");
+      // Invalidate queries to refetch missions data
+      // queryClient.invalidateQueries({ queryKey: ['missions'] });
+      // queryClient.invalidateQueries({ queryKey: ['user-missions'] });
+    },
+    onError: (error) => {
+      toast.error("Erreur lors de la validation de la mission.");
+      console.error("Error completing mission:", error);
+    }
+  });
+
+  const handleCompleteMission = async (missionId: string) => {
+    completeMissionMutation.mutate(missionId);
   };
 
-  const isActive = (mission: Mission) => {
-    const now = new Date();
-    const startDate = new Date(mission.starts_at);
-    const endDate = mission.ends_at ? new Date(mission.ends_at) : null;
-    
-    return startDate <= now && (!endDate || endDate > now);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR');
-  };
-
-  const openSubmissionDialog = (missionId: string) => {
-    setSubmissionData({
-      ...submissionData,
-      missionId: missionId,
-    });
-    setShowDialog(true);
-  };
+  const isLoading = isLoadingMissions || isLoadingUserMissions;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] flex flex-col">
-      <div className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="mb-6 text-3xl font-bold text-gradient-modern">Missions</h1>
-        
-        {isLoading ? (
-          <div className="flex justify-center p-12">
-            <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-[#9b87f5] rounded-full"></div>
-          </div>
-        ) : missions.length === 0 ? (
-          <p className="text-center text-lg text-gray-400 dark:text-gray-400">No missions available at the moment.</p>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {missions.map((mission) => {
-              const userSubmission = getUserSubmissionForMission(mission.id);
-              const isCompleted = userSubmission?.status === 'verified';
-              
-              return (
-                <Card key={mission.id} className={`border-${isActive(mission) ? '[#9b87f5]' : 'gray'}/50 dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 text-gray-900 dark:text-white overflow-hidden ${isCompleted ? 'ring-2 ring-green-500/50' : ''}`}>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-center">
-                      <CardTitle className="text-xl font-semibold text-gradient-modern truncate flex items-center gap-2">
-                        {mission.title}
-                        {isCompleted && <CheckCircle className="h-5 w-5 text-green-500" />}
-                      </CardTitle>
-                      <div className="flex gap-2">
-                        {mission.is_vip_only && (
-                          <Badge className="bg-amber-500/80 text-black">VIP</Badge>
-                        )}
-                        {isCompleted && (
-                          <Badge className="bg-green-500/80 text-white">Completed</Badge>
-                        )}
-                      </div>
-                    </div>
-                    <CardDescription className="dark:text-gray-400">
-                      {mission.starts_at && (
-                        <div className="flex items-center gap-1 mt-1">
-                          <Clock className="h-3 w-3" />
-                          <span>
-                            {formatDate(mission.starts_at)} 
-                            {mission.ends_at && ` - ${formatDate(mission.ends_at)}`}
-                          </span>
-                        </div>
-                      )}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm dark:text-gray-300">{mission.description}</p>
-                    <div className="flex items-center mt-4">
-                      <Coins className="h-5 w-5 text-amber-400 mr-1" />
-                      <span className="font-bold text-amber-400">{mission.reward_coins} BradCoins</span>
-                      {isCompleted && <span className="ml-2 text-green-500 text-sm">(Earned)</span>}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between pt-2">
-                    {mission.external_link && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => window.open(mission.external_link!, '_blank')}
-                        className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                      >
-                        <ExternalLink className="h-4 w-4 mr-1" /> View
-                      </Button>
-                    )}
-                    
-                    {isActive(mission) && (!mission.is_vip_only || profile?.is_vip) ? (
-                      <Button 
-                        size="sm" 
-                        onClick={() => openSubmissionDialog(mission.id)}
-                        className={`${getMissionButtonVariant(mission.id) === 'default' ? 'bg-[#9b87f5] hover:bg-[#8976e4]' : ''}`}
-                        variant={getMissionButtonVariant(mission.id) as any}
-                        disabled={!canSubmitMission(mission.id)}
-                      >
-                        {getMissionButtonText(mission.id)}
-                      </Button>
-                    ) : mission.is_vip_only && !profile?.is_vip ? (
-                      <Button 
-                        size="sm" 
-                        disabled
-                        className="bg-gray-700 text-gray-400 cursor-not-allowed"
-                      >
-                        VIP Only
-                      </Button>
-                    ) : !isActive(mission) ? (
-                      <Button 
-                        size="sm" 
-                        disabled
-                        className="bg-gray-700 text-gray-400 cursor-not-allowed"
-                      >
-                        Inactive
-                      </Button>
-                    ) : null}
-                  </CardFooter>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-
-        <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogContent className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">
-            <DialogHeader>
-              <DialogTitle>Submit Mission</DialogTitle>
-              <DialogDescription className="dark:text-gray-400">
-                Fill out the details to submit your completed mission.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="fortniteUsername" className="text-right">
-                  Fortnite Username
-                </Label>
-                <Input
-                  id="fortniteUsername"
-                  name="fortniteUsername"
-                  value={submissionData.fortniteUsername}
-                  onChange={handleSubmissionChange}
-                  className="col-span-3 dark:bg-black/20 dark:border-white/15 bg-white/90"
-                  required
-                />
-              </div>
-              
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label className="text-right mt-2">
-                  Screenshot
-                </Label>
-                <div className="col-span-3">
-                  <FileUpload
-                    onUploadComplete={handleFileUpload}
-                    accept="image/*,video/*,.pdf,.doc,.docx"
-                    maxSizeMB={10}
-                    buttonText="Upload proof"
-                    secureUpload={false}
-                  />
-                  {submissionData.screenshotUrl && (
-                    <p className="text-sm text-green-600 mt-2">File uploaded successfully!</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            <DialogFooter>
-              <Button 
-                type="submit"
-                className="bg-[#9b87f5] hover:bg-[#8976e4] text-white"
-                disabled={isSubmitting || !submissionData.fortniteUsername}
-                onClick={() => handleSubmit(submissionData.missionId)}
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit Mission'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+      {/* Banner Ad */}
+      <div className="container mx-auto px-4 pt-6">
+        <AdBanner position="banner" maxAds={1} />
       </div>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <ShieldCheck className="h-5 w-5 text-blue-500" />
+                  <span>Missions</span>
+                </CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Explorez les missions disponibles et accomplissez-les pour gagner des récompenses.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 flex items-center space-x-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="search"
+                      placeholder="Rechercher une mission..."
+                      className="pl-10"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Catégorie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Difficulté" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {difficulties.map((difficulty) => (
+                        <SelectItem key={difficulty.value} value={difficulty.value}>
+                          {difficulty.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {isLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+                    <p className="text-sm">Chargement des missions...</p>
+                  </div>
+                ) : (
+                  <>
+                    {availableMissions.length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {availableMissions.map((mission) => (
+                          <Card key={mission.id} className="bg-white dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
+                            <CardHeader>
+                              <CardTitle className="text-lg font-semibold">{mission.title}</CardTitle>
+                              <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                                {mission.description}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex items-center space-x-2 mb-2">
+                                <Badge variant="secondary">{mission.difficulty}</Badge>
+                                <Badge variant="outline">{
+                                  categories.find(cat => cat.value === mission.category)?.label
+                                }</Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                Récompense: {mission.reward}
+                              </p>
+                              <Button onClick={() => handleCompleteMission(mission.id)}>
+                                Accomplir la mission
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Aucune mission disponible pour le moment.
+                        </p>
+                      </div>
+                    )}
+
+                    {completedMissions.length > 0 && (
+                      <>
+                        <h3 className="text-lg font-semibold mt-8 mb-4">Missions Accomplies</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {completedMissions.map((mission) => (
+                            <Card key={mission.id} className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700">
+                              <CardHeader>
+                                <CardTitle className="text-lg font-semibold">{mission.title}</CardTitle>
+                                <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                                  {mission.description}
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <Badge variant="secondary">{mission.difficulty}</Badge>
+                                  <Badge variant="outline">{
+                                    categories.find(cat => cat.value === mission.category)?.label
+                                  }</Badge>
+                                </div>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                                  Récompense: {mission.reward}
+                                </p>
+                                <Badge className="bg-green-500 text-white">Mission Accomplie</Badge>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Sidebar Ads */}
+            <AdBanner position="sidebar" maxAds={2} />
+            
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader>
+                <CardTitle>Filtres</CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Filtrer les missions par catégorie et difficulté.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="block text-sm font-medium mb-2">Catégories</Label>
+                    <ScrollArea className="h-[200px] w-full rounded-md border">
+                      <div className="p-3">
+                        {categories.map((category) => (
+                          <div key={category.value} className="flex items-center space-x-2 py-1">
+                            <Checkbox
+                              id={`category-${category.value}`}
+                              checked={selectedCategory === category.value}
+                              onCheckedChange={(checked) => {
+                                setSelectedCategory(checked ? category.value : "all");
+                              }}
+                            />
+                            <Label htmlFor={`category-${category.value}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                              {category.icon && <category.icon className="inline-block h-4 w-4 mr-1" />}
+                              {category.label}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+
+                  <div>
+                    <Label className="block text-sm font-medium mb-2">Difficultés</Label>
+                    <ScrollArea className="h-[150px] w-full rounded-md border">
+                      <div className="p-3">
+                        {difficulties.map((difficulty) => (
+                          <div key={difficulty.value} className="flex items-center space-x-2 py-1">
+                            <Checkbox
+                              id={`difficulty-${difficulty.value}`}
+                              checked={selectedDifficulty === difficulty.value}
+                              onCheckedChange={(checked) => {
+                                setSelectedDifficulty(checked ? difficulty.value : "all");
+                              }}
+                            />
+                            <Label htmlFor={`difficulty-${difficulty.value}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                              {difficulty.label}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Popup Ads */}
+      <AdBanner position="popup" maxAds={1} />
     </div>
   );
 };

@@ -1,358 +1,249 @@
-
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Transactions from "@/components/Transactions";
-import { Coins, CheckCircle2, XCircle, Clock3, Trophy, BadgeCheck, ShoppingBag, Shield } from "lucide-react";
-import { getRankByPoints } from "@/utils/rankUtils";
-import RankBadge from "@/components/rank/RankBadge";
-import useProfileCompletion from "@/hooks/useProfileCompletion";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
-interface BradCoin {
-  balance: number;
-}
-
-interface MissionSubmission {
-  id: string;
-  mission: {
-    title: string;
-    reward_coins: number;
-  };
-  status: string;
-  created_at: string;
-}
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import AdBanner from "@/components/advertisements/AdBanner";
 
 const Dashboard = () => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [coins, setCoins] = useState<number>(0);
-  const [submissions, setSubmissions] = useState<MissionSubmission[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isProfileComplete, missingFields } = useProfileCompletion();
-  
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    } else if (user) {
-      // Check if profile is complete
-      if (!isProfileComplete && !loading) {
-        navigate("/profile?complete=1");
-      } else {
-        fetchUserData();
-      }
-    }
-  }, [user, loading, navigate, isProfileComplete]);
+  const [selectedMission, setSelectedMission] = useState<any>(null);
 
-  const fetchUserData = async () => {
-    setIsLoading(true);
-    try {
-      // Fetch user's BradCoins
-      const { data: coinsData, error: coinsError } = await supabase
-        .from("brad_coins")
-        .select("balance")
-        .eq("user_id", user?.id)
-        .single();
+  const { data: userMissions, isLoading: isLoadingMissions } = useQuery({
+    queryKey: ['user-missions', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const { data, error } = await supabase
+        .from('user_missions')
+        .select('*, mission:missions(*)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
-      if (coinsError) throw coinsError;
-      setCoins((coinsData as BradCoin).balance);
-
-      // Fetch user's mission submissions
-      const { data: submissionsData, error: submissionsError } = await supabase
-        .from("mission_submissions")
-        .select(
-          `
-          id,
-          mission:mission_id (
-            title,
-            reward_coins
-          ),
-          status,
-          created_at
-        `
-        )
-        .eq("user_id", user?.id)
-        .order("created_at", { ascending: false })
+  const { data: leaderboard, isLoading: isLoadingLeaderboard } = useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, brad_coins')
+        .order('brad_coins', { ascending: false })
         .limit(5);
+      if (error) throw error;
+      return data;
+    },
+  });
 
-      if (submissionsError) throw submissionsError;
-      setSubmissions(submissionsData as MissionSubmission[]);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    } finally {
-      setIsLoading(false);
+  const { data: recentMissions, isLoading: isLoadingRecentMissions } = useQuery({
+    queryKey: ['recent-missions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('missions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const completeMission = async (missionId: string) => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour compléter une mission.");
+      return;
     }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Clock3 className="h-4 w-4 text-yellow-300" />;
-      case "verified":
-        return <CheckCircle2 className="h-4 w-4 text-green-300" />;
-      case "rejected":
-        return <XCircle className="h-4 w-4 text-red-300" />;
-      default:
-        return null;
+    setSelectedMission(missionId);
+
+    const { data: missionData, error: missionError } = await supabase
+      .from('missions')
+      .select('reward_amount')
+      .eq('id', missionId)
+      .single();
+
+    if (missionError) {
+      console.error("Erreur lors de la récupération des détails de la mission:", missionError);
+      toast.error("Erreur lors de la récupération des détails de la mission.");
+      setSelectedMission(null);
+      return;
     }
-  };
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-500/20 text-yellow-600 dark:text-yellow-300";
-      case "verified":
-        return "bg-green-500/20 text-green-600 dark:text-green-300";
-      case "rejected":
-        return "bg-red-500/20 text-red-600 dark:text-red-300";
-      default:
-        return "bg-gray-500/20 text-gray-700 dark:text-gray-300";
+    const { reward_amount } = missionData;
+
+    const { error } = await supabase
+      .from('user_missions')
+      .insert([{ user_id: user.id, mission_id: missionId }]);
+
+    if (error) {
+      console.error("Erreur lors de l'insertion de la mission utilisateur:", error);
+      toast.error("Erreur lors de la complétion de la mission.");
+      setSelectedMission(null);
+      return;
     }
-  };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("fr-FR");
-  };
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({ brad_coins: (profile?.brad_coins || 0) + reward_amount })
+      .eq('id', user.id);
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "En attente";
-      case "verified":
-        return "Validée";
-      case "rejected":
-        return "Refusée";
-      default:
-        return status;
+    if (profileError) {
+      console.error("Erreur lors de la mise à jour du profil:", profileError);
+      toast.error("Erreur lors de la mise à jour de votre solde.");
+      setSelectedMission(null);
+      return;
     }
-  };
 
-  const currentRank = getRankByPoints(coins);
-  
-  const calculateNextRankProgress = () => {
-    return Math.min(100, (coins / (coins + 200)) * 100);
-  };
-
-  const getNextRankName = () => {
-    return currentRank;
+    toast.success(`Mission complétée ! Vous avez gagné ${reward_amount} BradCoins.`);
+    setSelectedMission(null);
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-slate-300">
-          Tableau de bord
-        </h1>
-        
-        <div className="flex items-center gap-3">
-          <RankBadge rankTier={currentRank} />
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+      {/* Banner Ad */}
+      <div className="container mx-auto px-4 pt-6">
+        <AdBanner position="banner" maxAds={1} />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* User Profile Summary Card */}
-        <Card className="dark:bg-slate-800/40 dark:backdrop-blur-xl dark:border dark:border-slate-600/30 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-900/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-slate-600/30">
-            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-slate-300">
-              Profil Joueur
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-4 mb-4">
-              <Avatar className="h-16 w-16 border-2 border-gray-300 dark:border-slate-500/40">
-                {profile?.avatar_url ? (
-                  <AvatarImage src={profile.avatar_url} alt={profile?.username || "Utilisateur"} />
-                ) : (
-                  <AvatarFallback className="bg-gray-100 dark:bg-slate-600/30 text-gray-700 dark:text-slate-300 text-lg font-semibold">
-                    {profile?.username ? profile.username.substring(0, 2).toUpperCase() : "U"}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <div>
-                <h3 className="font-semibold text-lg text-gray-800 dark:text-slate-300">
-                  {profile?.username || user?.email?.split("@")[0] || "Utilisateur"}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-slate-400">
-                  Membre depuis {profile?.created_at ? new Date(profile.created_at).toLocaleDateString("fr-FR") : "récemment"}
-                </p>
-              </div>
-            </div>
-            
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-600/30">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <Trophy className="h-5 w-5 text-gray-600 dark:text-slate-400 mr-2" />
-                  <span className="text-gray-700 dark:text-slate-300 font-medium">Rang actuel:</span>
-                </div>
-                <RankBadge rankTier={currentRank} />
-              </div>
-              
-              <button 
-                onClick={() => navigate("/missions")} 
-                className="mt-4 w-full py-2 px-4 rounded-md bg-gray-100 hover:bg-gray-200 
-                          dark:bg-slate-600/20 dark:hover:bg-slate-600/30 
-                          text-gray-700 dark:text-slate-300 
-                          transition-colors font-medium flex items-center justify-center gap-2"
-              >
-                <BadgeCheck className="h-4 w-4" />
-                Voir les missions disponibles
-              </button>
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content - 3 columns */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Welcome Section */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Bienvenue, {profile?.username} !</CardTitle>
+                <CardDescription>Voici un aperçu de votre progression et des dernières activités.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>Continuez à explorer et à accomplir des missions pour gagner des récompenses !</p>
+              </CardContent>
+            </Card>
 
-              {(profile?.is_admin || profile?.is_owner) && (
-                <button 
-                  onClick={() => navigate("/admin")} 
-                  className="mt-2 w-full py-2 px-4 rounded-md bg-red-500/10 hover:bg-red-500/20 
-                            dark:bg-red-500/10 dark:hover:bg-red-500/20 
-                            text-red-600 dark:text-red-400 
-                            transition-colors font-medium flex items-center justify-center gap-2"
-                >
-                  <Shield className="h-4 w-4" />
-                  Panneau d'Administration
-                </button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* BradCoins Card */}
-        <Card className="dark:bg-slate-800/40 dark:backdrop-blur-xl dark:border dark:border-slate-600/30 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-900/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-slate-600/30">
-            <CardTitle className="text-xl font-semibold text-gray-800 dark:text-slate-300">
-              Solde BradCoins
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="flex items-center mb-4">
-              <span className="mr-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 dark:bg-slate-600/30">
-                <Coins className="h-7 w-7 text-gray-600 dark:text-slate-400" />
-              </span>
-              <div>
-                <span className="text-3xl font-bold text-gray-800 dark:text-white">
-                  {isLoading ? "..." : coins}
-                </span>
-                <p className="text-sm text-gray-500 dark:text-gray-400">BradCoins</p>
-              </div>
-            </div>
-            
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-600/30">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
-                Progression vers le prochain rang
-              </h4>
-              <div className="flex items-center gap-2 mb-1">
-                <RankBadge rankTier={currentRank} showText={false} size="sm" />
-                <div className="flex-1">
-                  <div className="h-3 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-gray-600 to-slate-600 dark:from-slate-400 dark:to-slate-500 rounded-full" 
-                      style={{ width: `${calculateNextRankProgress()}%` }}
-                    ></div>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+                <CardContent className="p-3">
+                  <div className="flex items-center space-x-2">
+                    <Coins className="h-6 w-6 text-yellow-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">BradCoins</p>
+                      <p className="text-xl font-bold">{profile?.brad_coins || 0}</p>
+                    </div>
                   </div>
-                </div>
-                {currentRank !== 'unreal' && (
-                  <RankBadge 
-                    rankTier={getNextRankName()}
-                    showText={false}
-                    size="sm"
-                  />
-                )}
-              </div>
-              
-              <button 
-                onClick={() => navigate("/shop")} 
-                className="mt-4 w-full py-2 px-4 rounded-md bg-gray-100 hover:bg-gray-200 
-                          dark:bg-slate-600/20 dark:hover:bg-slate-600/30 
-                          text-gray-700 dark:text-slate-300 
-                          transition-colors font-medium flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                Visiter la boutique
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
 
-        {/* Transactions Card */}
-        <div className="lg:col-span-1">
-          <Transactions />
+              <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+                <CardContent className="p-3">
+                  <div className="flex items-center space-x-2">
+                    <Trophy className="h-6 w-6 text-purple-500" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Missions Complétées</p>
+                      <p className="text-xl font-bold">{userMissions?.length || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Missions */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Dernières Missions</CardTitle>
+                <CardDescription>Voici les dernières missions disponibles.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoadingRecentMissions ? (
+                  <p>Chargement des missions...</p>
+                ) : (
+                  recentMissions?.map((mission) => (
+                    <div key={mission.id} className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-medium">{mission.title}</h3>
+                        <p className="text-xs text-gray-500">{mission.description}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => completeMission(mission.id)}
+                        disabled={selectedMission === mission.id}
+                      >
+                        {selectedMission === mission.id ? "En cours..." : "Compléter"}
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Leaderboard */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Classement</CardTitle>
+                <CardDescription>Les meilleurs joueurs de Qwestoria.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoadingLeaderboard ? (
+                  <p>Chargement du classement...</p>
+                ) : (
+                  <div className="space-y-2">
+                    {leaderboard?.map((player, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium">{index + 1}.</span>
+                          <span>{player.username}</span>
+                        </div>
+                        <Badge variant="secondary">{player.brad_coins} BC</Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar - 1 column */}
+          <div className="space-y-6">
+            {/* Sidebar Ads */}
+            <AdBanner position="sidebar" maxAds={2} />
+            
+            {/* Quick Actions */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Actions Rapides</CardTitle>
+                <CardDescription>Accès rapide aux fonctionnalités clés.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                <Button variant="secondary" onClick={() => navigate("/missions")}>
+                  <Target className="h-4 w-4 mr-2" />
+                  Voir les Missions
+                </Button>
+                <Button variant="secondary" onClick={() => navigate("/shop")}>
+                  <ShoppingBag className="h-4 w-4 mr-2" />
+                  Visiter la Boutique
+                </Button>
+                <Button variant="secondary" onClick={() => navigate("/leaderboard")}>
+                  <Star className="h-4 w-4 mr-2" />
+                  Consulter le Classement
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 
-      {/* Recent Submissions */}
-      <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-slate-300 flex items-center gap-2">
-        <BadgeCheck className="h-5 w-5 text-gray-600 dark:text-slate-400" />
-        Missions récentes
-      </h2>
-      <Card className="dark:bg-slate-800/40 dark:backdrop-blur-xl dark:border dark:border-slate-600/30 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-900/20 transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-        {isLoading ? (
-          <div className="p-6 text-center text-gray-500 dark:text-slate-400 animate-pulse">
-            <div className="mx-auto h-8 w-8 rounded-full bg-gray-200 dark:bg-slate-700 mb-4"></div>
-            Chargement...
-          </div>
-        ) : submissions.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto">
-              <thead>
-                <tr className="border-b border-gray-100 dark:border-slate-600/30 text-left text-sm text-gray-500 dark:text-slate-400">
-                  <th className="px-6 py-3 font-medium">Mission</th>
-                  <th className="px-6 py-3 font-medium">Récompense</th>
-                  <th className="px-6 py-3 font-medium">Date</th>
-                  <th className="px-6 py-3 font-medium">Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((submission) => (
-                  <tr
-                    key={submission.id}
-                    className="border-b border-gray-100 dark:border-slate-600/30 text-gray-800 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700/30"
-                  >
-                    <td className="px-6 py-4">{submission.mission.title}</td>
-                    <td className="px-6 py-4 flex items-center gap-1">
-                      <span>{submission.mission.reward_coins}</span>
-                      <Coins className="h-4 w-4 text-gray-600 dark:text-slate-400" />
-                    </td>
-                    <td className="px-6 py-4">
-                      {formatDate(submission.created_at)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs ${getStatusBadgeClass(
-                          submission.status
-                        )}`}
-                      >
-                        {getStatusIcon(submission.status)}
-                        {getStatusText(submission.status)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="p-8 text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="rounded-full bg-gray-100 dark:bg-slate-600/30 p-3">
-                <BadgeCheck className="h-6 w-6 text-gray-600 dark:text-slate-400" />
-              </div>
-            </div>
-            <h3 className="text-lg font-medium text-gray-700 dark:text-slate-300 mb-1">
-              Pas encore de missions
-            </h3>
-            <p className="text-gray-500 dark:text-slate-400 mb-4">
-              Vous n'avez pas encore soumis de missions.
-            </p>
-            <button 
-              onClick={() => navigate("/missions")} 
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 dark:bg-slate-600 dark:hover:bg-slate-500 text-white rounded-md transition-colors"
-            >
-              Découvrir les missions
-            </button>
-          </div>
-        )}
-      </Card>
+      {/* Popup Ads */}
+      <AdBanner position="popup" maxAds={1} />
     </div>
   );
 };
