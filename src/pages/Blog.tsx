@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +10,6 @@ import { Separator } from "@/components/ui/separator";
 import { BookOpen, Calendar, User, Eye, Clock, Search, Filter, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 interface BlogPost {
   id: string;
   title: string;
@@ -24,7 +22,6 @@ interface BlogPost {
   author_id: string;
   reading_time_minutes: number | null;
 }
-
 const Blog = () => {
   const {
     user
@@ -34,11 +31,9 @@ const Blog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-
   useEffect(() => {
     fetchBlogPosts();
   }, []);
-
   const fetchBlogPosts = async () => {
     try {
       setIsLoading(true);
@@ -57,7 +52,6 @@ const Blog = () => {
       setIsLoading(false);
     }
   };
-
   const getFilteredAndSortedPosts = () => {
     let filteredPosts = posts.filter(post => post.title.toLowerCase().includes(searchQuery.toLowerCase()) || post.summary && post.summary.toLowerCase().includes(searchQuery.toLowerCase()));
     switch (sortBy) {
@@ -70,7 +64,6 @@ const Blog = () => {
         return filteredPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
   };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", {
@@ -79,17 +72,14 @@ const Blog = () => {
       day: "numeric"
     });
   };
-
   const truncateContent = (content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + "...";
   };
-
   const handleReadArticle = (postId: string) => {
     navigate(`/blog/${postId}`);
   };
-
-  return <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 dark:from-blue-400 dark:via-blue-500 dark:to-cyan-400 mb-4">
@@ -183,5 +173,4 @@ const Blog = () => {
       </div>
     </div>;
 };
-
 export default Blog;
