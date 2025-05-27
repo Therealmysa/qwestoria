@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,8 +136,8 @@ const Messages = () => {
 
   if (!user || loading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-gray-900">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+      <div className="h-screen flex justify-center items-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -233,14 +234,14 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900">
+    <div className="h-screen flex flex-col bg-background">
       {/* Background particles */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute w-40 h-40 bg-blue-500/10 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
-        <div className="absolute w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
-        <div className="absolute w-48 h-48 bg-indigo-500/8 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
-        <div className="absolute w-24 h-24 bg-blue-600/12 rounded-full blur-2xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
-        <div className="absolute w-36 h-36 bg-cyan-600/8 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
+        <div className="absolute w-40 h-40 bg-blue-500/10 dark:bg-blue-500/10 bg-blue-400/5 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
+        <div className="absolute w-32 h-32 bg-cyan-500/10 dark:bg-cyan-500/10 bg-cyan-400/5 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
+        <div className="absolute w-48 h-48 bg-indigo-500/8 dark:bg-indigo-500/8 bg-indigo-400/4 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
+        <div className="absolute w-24 h-24 bg-blue-600/12 dark:bg-blue-600/12 bg-blue-500/6 rounded-full blur-2xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
+        <div className="absolute w-36 h-36 bg-cyan-600/8 dark:bg-cyan-600/8 bg-cyan-500/4 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
       {/* Header fixe */}
@@ -251,7 +252,7 @@ const Messages = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           {/* Navigation des tabs - hauteur fixe */}
           <div className="flex-shrink-0 p-4">
-            <div className="bg-black/20 backdrop-blur-2xl border border-white/15 rounded-2xl p-4 shadow-2xl hover:shadow-blue-500/20 transition-all duration-300">
+            <div className="bg-card backdrop-blur-2xl border border-border rounded-2xl p-4 shadow-2xl hover:shadow-primary/20 transition-all duration-300">
               <TabsList className="grid w-full grid-cols-4 bg-transparent">
                 <TabsTrigger 
                   value="messages" 

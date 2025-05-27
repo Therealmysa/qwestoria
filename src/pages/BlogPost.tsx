@@ -63,7 +63,7 @@ const BlogPost = () => {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] mb-4">
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 dark:from-blue-400 dark:via-blue-500 dark:to-cyan-400 mb-4">
               Article de Blog
             </h1>
           </div>
@@ -88,7 +88,7 @@ const BlogPost = () => {
               {/* Post Content */}
               <div className="prose prose-sm sm:prose-base lg:prose-lg dark:prose-invert">
                 <h2 className="text-2xl font-semibold mb-4">{post.title}</h2>
-                <div className="text-gray-500 mb-4">
+                <div className="text-muted-foreground mb-4">
                   Publié le{" "}
                   {format(new Date(post.created_at), "dd MMMM yyyy", {
                     locale: fr,
