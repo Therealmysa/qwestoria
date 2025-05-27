@@ -21,26 +21,43 @@ const AdminSubscriptions = () => {
   const { data: subscriptions, isLoading } = useQuery({
     queryKey: ['admin-subscriptions', searchTerm],
     queryFn: async () => {
-      let query = supabase
+      // First get subscriptions with plans
+      const { data: subscriptionsData, error: subscriptionsError } = await supabase
         .from('user_subscriptions')
         .select(`
           *,
-          profiles(username, avatar_url),
           subscription_plans(name, price_monthly)
         `)
         .order('created_at', { ascending: false });
 
-      const { data, error } = await query;
-      if (error) throw error;
+      if (subscriptionsError) throw subscriptionsError;
 
-      let filteredData = data;
+      // Then get user profiles separately
+      const userIds = subscriptionsData?.map(sub => sub.user_id) || [];
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const combinedData = subscriptionsData?.map(subscription => {
+        const profile = profilesData?.find(p => p.id === subscription.user_id);
+        return {
+          ...subscription,
+          profiles: profile
+        };
+      }) || [];
+
+      // Filter by search term if provided
       if (searchTerm) {
-        filteredData = data.filter((item) => 
+        return combinedData.filter((item) => 
           item.profiles?.username?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
-      return filteredData;
+      return combinedData;
     }
   });
 
