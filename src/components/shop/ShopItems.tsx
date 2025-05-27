@@ -78,12 +78,12 @@ const ShopItems = () => {
 
   if (!shopItems || shopItems.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Package className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
+      <div className="text-center py-12 px-4">
+        <Package className="h-12 sm:h-16 w-12 sm:w-16 mx-auto text-gray-400 mb-4" />
+        <h3 className="text-base sm:text-lg font-semibold text-gray-600 dark:text-gray-300 mb-2">
           Aucun article disponible
         </h3>
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
           Les articles de la boutique arrivent bientôt !
         </p>
       </div>
@@ -91,23 +91,23 @@ const ShopItems = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="text-center mb-6 sm:mb-8 px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Articles de la Boutique
         </h2>
-        <p className="text-gray-600 dark:text-gray-300">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
           Découvrez nos articles exclusifs et personnalisations
         </p>
-        <div className="mt-4 inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-full">
-          <Coins className="h-5 w-5 text-amber-500" />
-          <span className="font-semibold text-amber-600 dark:text-amber-400">
+        <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 px-3 sm:px-4 py-2 rounded-full">
+          <Coins className="h-4 sm:h-5 w-4 sm:w-5 text-amber-500" />
+          <span className="font-semibold text-amber-600 dark:text-amber-400 text-sm sm:text-base">
             {userCoins.toLocaleString()} BradCoins
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-2 sm:px-0">
         {shopItems.map((item, index) => (
           <motion.div
             key={item.id}
@@ -115,10 +115,10 @@ const ShopItems = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <Card className="overflow-hidden hover:scale-105 transition-transform border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800/50 dark:to-blue-900/20">
+            <Card className="overflow-hidden hover:scale-105 transition-transform border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800/50 dark:to-blue-900/20 h-full flex flex-col">
               <div className="relative">
                 {item.image_url ? (
-                  <div className="w-full h-48 overflow-hidden">
+                  <div className="w-full h-40 sm:h-48 overflow-hidden">
                     <img 
                       src={item.image_url} 
                       alt={item.name}
@@ -126,14 +126,14 @@ const ShopItems = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-48 bg-slate-100 dark:bg-slate-800/30 flex items-center justify-center">
-                    <Package className="h-16 w-16 text-slate-600 dark:text-slate-400" />
+                  <div className="w-full h-40 sm:h-48 bg-slate-100 dark:bg-slate-800/30 flex items-center justify-center">
+                    <Package className="h-12 sm:h-16 w-12 sm:w-16 text-slate-600 dark:text-slate-400" />
                   </div>
                 )}
                 
                 <Badge 
                   variant="outline" 
-                  className="absolute top-4 left-4 bg-slate-600/90 hover:bg-slate-600/90 text-white border-0"
+                  className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-slate-600/90 hover:bg-slate-600/90 text-white border-0 text-xs"
                 >
                   {item.category}
                 </Badge>
@@ -141,34 +141,34 @@ const ShopItems = () => {
                 {item.is_vip_only && (
                   <Badge 
                     variant="outline" 
-                    className="absolute top-4 right-4 bg-amber-500/90 hover:bg-amber-500/90 text-black border-0"
+                    className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-amber-500/90 hover:bg-amber-500/90 text-black border-0 text-xs"
                   >
                     VIP
                   </Badge>
                 )}
               </div>
               
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">{item.name}</h3>
-                <p className="text-muted-foreground text-sm mb-4">{item.description}</p>
+              <CardContent className="p-4 sm:p-6 flex-1 flex flex-col">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">{item.name}</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4 flex-1">{item.description}</p>
                 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mt-auto">
                   <div className="flex items-center">
-                    <Coins className="h-5 w-5 text-amber-400 mr-1" />
-                    <span className="font-bold text-amber-500 dark:text-amber-400 text-lg">
+                    <Coins className="h-4 sm:h-5 w-4 sm:w-5 text-amber-400 mr-1" />
+                    <span className="font-bold text-amber-500 dark:text-amber-400 text-base sm:text-lg">
                       {item.price}
                     </span>
                   </div>
                   
                   {!isAvailable(item) && (
-                    <Badge variant="destructive">Expiré</Badge>
+                    <Badge variant="destructive" className="text-xs">Expiré</Badge>
                   )}
                 </div>
               </CardContent>
               
-              <CardFooter className="px-6 pb-6">
+              <CardFooter className="px-4 sm:px-6 pb-4 sm:pb-6">
                 <Button 
-                  className="w-full bg-slate-700 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500"
+                  className="w-full bg-slate-700 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500 text-sm"
                   onClick={() => handlePurchaseItem(item)}
                   disabled={!isAvailable(item) || userCoins < item.price}
                 >
