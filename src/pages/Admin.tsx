@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +14,17 @@ import AdminSubscriptions from "@/components/admin/AdminSubscriptions";
 import AdminAdvertisements from "@/components/admin/AdminAdvertisements";
 import AdminBlog from "@/components/admin/AdminBlog";
 import AdminBradCoins from "@/components/admin/AdminBradCoins";
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarTrigger,
+  SidebarInset,
+} from "@/components/ui/sidebar";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -104,60 +114,74 @@ const Admin = () => {
     }
   ];
 
+  const activeTabData = tabs.find(tab => tab.id === activeTab);
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-gradient-modern mb-2">
-            Administration Qwestoria
-            {profile?.is_owner && (
-              <span className="ml-3 text-sm bg-yellow-500 text-black px-3 py-1 rounded-full">
-                Propriétaire
-              </span>
-            )}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Panneau de contrôle pour la gestion de la plateforme
-          </p>
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl dark:shadow-slate-500/20">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1 bg-transparent p-1">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+        <Sidebar className="border-r border-gray-200 dark:border-slate-700">
+          <SidebarHeader className="border-b border-gray-200 dark:border-slate-700 p-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Administration
+              </h2>
+              {profile?.is_owner && (
+                <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded-full">
+                  Propriétaire
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              Panneau de contrôle Qwestoria
+            </p>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu className="p-2">
               {tabs.map((tab) => (
-                <TabsTrigger 
-                  key={tab.id} 
-                  value={tab.id}
-                  className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-2 text-xs lg:text-sm py-2 px-2 lg:px-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-500 data-[state=active]:to-gray-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 min-h-[60px] lg:min-h-[40px]"
-                >
-                  <tab.icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="text-center break-words leading-tight">{tab.label}</span>
-                </TabsTrigger>
+                <SidebarMenuItem key={tab.id}>
+                  <SidebarMenuButton
+                    onClick={() => setActiveTab(tab.id)}
+                    isActive={activeTab === tab.id}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    <span className="text-sm">{tab.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               ))}
-            </TabsList>
-          </div>
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
 
-          {tabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id}>
-              <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gradient-modern">
-                    <tab.icon className="h-5 w-5" />
-                    {tab.label}
-                  </CardTitle>
-                  <CardDescription className="dark:text-gray-300">
-                    Gestion et administration {tab.label.toLowerCase()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <tab.component />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          ))}
-        </Tabs>
+        <SidebarInset className="flex-1">
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <div className="ml-auto">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {activeTabData?.label}
+              </h1>
+            </div>
+          </header>
+
+          <main className="flex-1 p-6">
+            <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gradient-modern">
+                  {activeTabData && <activeTabData.icon className="h-5 w-5" />}
+                  {activeTabData?.label}
+                </CardTitle>
+                <CardDescription className="dark:text-gray-300">
+                  Gestion et administration {activeTabData?.label.toLowerCase()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activeTabData && <activeTabData.component />}
+              </CardContent>
+            </Card>
+          </main>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
