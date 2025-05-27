@@ -59,7 +59,7 @@ const MessageArea = ({
   };
 
   return (
-    <Card className="h-full bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-[1.02] flex flex-col">
+    <Card className="h-full bg-black/15 backdrop-blur-2xl border border-white/15 shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 transform hover:scale-[1.02] flex flex-col">
       {selectedConversation && selectedUser ? (
         <>
           {/* Header de conversation - hauteur fixe */}
@@ -69,7 +69,7 @@ const MessageArea = ({
                 {selectedUser.avatar_url ? (
                   <AvatarImage src={selectedUser.avatar_url} alt={selectedUser.username} />
                 ) : (
-                  <AvatarFallback className="bg-purple-600/20 text-purple-300">
+                  <AvatarFallback className="bg-blue-600/20 text-blue-300">
                     {selectedUser.username.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 )}
@@ -85,7 +85,7 @@ const MessageArea = ({
             <div className="flex-1 overflow-y-auto p-4">
               {messagesLoading ? (
                 <div className="flex justify-center items-center h-full">
-                  <Loader2 className="h-6 w-6 animate-spin text-[#9b87f5]" />
+                  <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -102,14 +102,14 @@ const MessageArea = ({
                           <div
                             className={`px-3 py-2 rounded-lg relative backdrop-blur-xl ${
                               isMyMessage
-                                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-sm shadow-lg'
+                                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-br-sm shadow-lg'
                                 : 'bg-black/20 border border-white/15 text-white rounded-bl-sm'
                             }`}
                           >
                             <p className={`text-xs font-semibold mb-1 ${
                               isMyMessage 
-                                ? 'text-blue-200' 
-                                : 'text-blue-300'
+                                ? 'text-cyan-200' 
+                                : 'text-cyan-300'
                             }`}>
                               {senderProfile?.username || 'Chargement...'}
                             </p>
@@ -129,7 +129,7 @@ const MessageArea = ({
                             {senderProfile?.avatar_url ? (
                               <AvatarImage src={senderProfile.avatar_url} alt={senderProfile.username} />
                             ) : (
-                              <AvatarFallback className="bg-purple-600/20 text-purple-300 text-xs">
+                              <AvatarFallback className="bg-blue-600/20 text-blue-300 text-xs">
                                 {senderProfile?.username?.substring(0, 2).toUpperCase() || '??'}
                               </AvatarFallback>
                             )}
@@ -156,13 +156,13 @@ const MessageArea = ({
                       handleSendMessage();
                     }
                   }}
-                  className="flex-grow resize-none bg-black/20 border border-white/15 backdrop-blur-xl text-white placeholder-white/50 focus:border-purple-500/50 min-h-[40px] max-h-[40px]"
+                  className="flex-grow resize-none bg-black/20 border border-white/15 backdrop-blur-xl text-white placeholder-white/50 focus:border-blue-500/50 min-h-[40px] max-h-[40px]"
                   rows={1}
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || isSending}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white h-[40px] px-4"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white h-[40px] px-4"
                 >
                   {isSending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
