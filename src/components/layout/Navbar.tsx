@@ -72,7 +72,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-white dark:bg-slate-900/80 dark:backdrop-blur-xl dark:border-b dark:border-slate-700/30 px-4 py-3 shadow-md border-b border-gray-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-primary dark:text-blue-400">
+          <span className="text-2xl font-bold text-primary dark:text-slate-400">
             Qwestoria
           </span>
         </Link>
@@ -83,8 +83,8 @@ const Navbar = () => {
             to="/"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Accueil
@@ -93,8 +93,8 @@ const Navbar = () => {
             to="/missions"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/missions")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Missions
@@ -104,8 +104,8 @@ const Navbar = () => {
             to="/teammates"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/teammates")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Coéquipiers
@@ -114,8 +114,8 @@ const Navbar = () => {
             to="/messages"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/messages")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Messagerie
@@ -124,8 +124,8 @@ const Navbar = () => {
             to="/shop"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/shop")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Boutique
@@ -134,8 +134,8 @@ const Navbar = () => {
             to="/blog"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/blog")
-                ? "text-primary font-medium dark:text-blue-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-blue-400"
+                ? "text-primary font-medium dark:text-slate-400"
+                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
             }`}
           >
             Blog
@@ -149,7 +149,7 @@ const Navbar = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary dark:hover:border-blue-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary dark:hover:border-slate-500 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
@@ -161,57 +161,57 @@ const Navbar = () => {
               sideOffset={8}
             >
               <DropdownMenuLabel className="flex items-center">
-                <span className="font-bold text-primary dark:text-blue-400">
+                <span className="font-bold text-primary dark:text-slate-400">
                   Navigation
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
               <DropdownMenuItem
                 onClick={() => navigate("/")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Accueil
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/missions")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Missions
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Blog
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/teammates")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Coéquipiers
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/messages")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Messagerie
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 Boutique
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/leaderboard")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 <Trophy className="h-4 w-4 mr-2" /> Classement
               </DropdownMenuItem>
@@ -223,21 +223,21 @@ const Navbar = () => {
               </DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => setTheme("light")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 <Sun className="h-4 w-4 mr-2 text-amber-500" />
                 Clair
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setTheme("dark")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 <Moon className="h-4 w-4 mr-2 text-slate-400" />
                 Sombre
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setTheme("system")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
               >
                 <Monitor className="h-4 w-4 mr-2 text-gray-500" />
                 Système
@@ -266,7 +266,7 @@ const Navbar = () => {
                 <Button 
                   variant="outline" 
                   size="icon" 
-                  className="rounded-full border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-blue-500 transition-all duration-200"
+                  className="rounded-full border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-slate-500 transition-all duration-200"
                 >
                   {getThemeIcon()}
                   <span className="sr-only">Toggle theme</span>
@@ -278,21 +278,21 @@ const Navbar = () => {
               >
                 <DropdownMenuItem 
                   onClick={() => setTheme("light")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
                 >
                   <Sun className="mr-2 h-4 w-4 text-amber-500" />
                   <span>Clair</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setTheme("dark")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
                 >
                   <Moon className="mr-2 h-4 w-4 text-slate-400" />
                   <span>Sombre</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => setTheme("system")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
                 >
                   <Monitor className="mr-2 h-4 w-4 text-gray-500" />
                   <span>Système</span>
@@ -308,16 +308,16 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-primary dark:text-blue-400 hover:bg-primary/10 dark:hover:bg-blue-500/20 flex items-center rounded-full gap-2 p-2 pr-3"
+                    className="text-primary dark:text-slate-400 hover:bg-primary/10 dark:hover:bg-slate-500/20 flex items-center rounded-full gap-2 p-2 pr-3"
                   >
-                    <Avatar className="h-8 w-8 border border-primary/20 dark:border-blue-500/30">
+                    <Avatar className="h-8 w-8 border border-primary/20 dark:border-slate-500/30">
                       {profile?.avatar_url ? (
                         <AvatarImage
                           src={profile.avatar_url}
                           alt={profile?.username || "User"}
                         />
                       ) : (
-                        <AvatarFallback className="bg-primary/10 dark:bg-blue-500/20 text-primary dark:text-blue-400">
+                        <AvatarFallback className="bg-primary/10 dark:bg-slate-500/20 text-primary dark:text-slate-400">
                           {profile?.username
                             ? profile.username.substring(0, 2).toUpperCase()
                             : "U"}
@@ -350,28 +350,28 @@ const Navbar = () => {
                   <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
                   <DropdownMenuItem
                     onClick={() => navigate("/profile")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/missions")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/friends")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-blue-500/20 dark:focus:text-blue-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Amis
@@ -388,7 +388,7 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-primary hover:bg-primary/90 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-full">
+                <Button className="bg-primary hover:bg-primary/90 dark:bg-slate-500 dark:hover:bg-slate-600 text-white rounded-full">
                   Connexion
                 </Button>
               </Link>
