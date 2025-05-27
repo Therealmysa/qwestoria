@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -142,7 +143,7 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary dark:text-[#9b87f5] text-gradient-modern">
+        <h1 className="text-3xl font-bold text-primary dark:text-blue-400 text-gradient-modern">
           Tableau de bord
         </h1>
         
@@ -153,25 +154,25 @@ const Dashboard = () => {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* User Profile Summary Card */}
-        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-white/15">
-            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5] text-gradient-modern">
+        <Card className="dark:bg-slate-900/20 dark:backdrop-blur-xl dark:border dark:border-slate-700/30 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-blue-500/10 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-slate-700/30">
+            <CardTitle className="text-xl font-semibold text-primary dark:text-blue-400 text-gradient-modern">
               Profil Joueur
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="flex items-center gap-4 mb-4">
-              <Avatar className="h-16 w-16 border-2 border-primary/20 dark:border-[#9b87f5]/50">
+              <Avatar className="h-16 w-16 border-2 border-primary/20 dark:border-blue-500/30">
                 {profile?.avatar_url ? (
                   <AvatarImage src={profile.avatar_url} alt={profile?.username || "Utilisateur"} />
                 ) : (
-                  <AvatarFallback className="bg-primary/10 dark:bg-[#9b87f5]/20 text-primary dark:text-[#9b87f5] text-lg font-semibold">
+                  <AvatarFallback className="bg-primary/10 dark:bg-blue-500/20 text-primary dark:text-blue-400 text-lg font-semibold">
                     {profile?.username ? profile.username.substring(0, 2).toUpperCase() : "U"}
                   </AvatarFallback>
                 )}
               </Avatar>
               <div>
-                <h3 className="font-semibold text-lg text-primary dark:text-[#9b87f5] text-gradient-modern">
+                <h3 className="font-semibold text-lg text-primary dark:text-blue-400 text-gradient-modern">
                   {profile?.username || user?.email?.split("@")[0] || "Utilisateur"}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -180,10 +181,10 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/15">
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700/30">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <Trophy className="h-5 w-5 text-primary dark:text-[#9b87f5] mr-2" />
+                  <Trophy className="h-5 w-5 text-primary dark:text-blue-400 mr-2" />
                   <span className="text-gray-700 dark:text-gray-200 font-medium">Rang actuel:</span>
                 </div>
                 <RankBadge rankTier={currentRank} />
@@ -192,8 +193,8 @@ const Dashboard = () => {
               <button 
                 onClick={() => navigate("/missions")} 
                 className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
-                          dark:bg-[#9b87f5]/10 dark:hover:bg-[#9b87f5]/20 
-                          text-primary dark:text-[#9b87f5] 
+                          dark:bg-blue-500/10 dark:hover:bg-blue-500/20 
+                          text-primary dark:text-blue-400 
                           transition-colors font-medium flex items-center justify-center gap-2"
               >
                 <BadgeCheck className="h-4 w-4" />
@@ -217,16 +218,16 @@ const Dashboard = () => {
         </Card>
 
         {/* BradCoins Card */}
-        <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
-          <CardHeader className="pb-2 border-b border-gray-100 dark:border-white/15">
-            <CardTitle className="text-xl font-semibold text-primary dark:text-[#9b87f5] text-gradient-modern">
+        <Card className="dark:bg-slate-900/20 dark:backdrop-blur-xl dark:border dark:border-slate-700/30 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-blue-500/10 transform hover:scale-[1.02] transition-all duration-300 hover:shadow-xl">
+          <CardHeader className="pb-2 border-b border-gray-100 dark:border-slate-700/30">
+            <CardTitle className="text-xl font-semibold text-primary dark:text-blue-400 text-gradient-modern">
               Solde BradCoins
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="flex items-center mb-4">
-              <span className="mr-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 dark:bg-[#9b87f5]/20">
-                <Coins className="h-7 w-7 text-primary dark:text-[#9b87f5]" />
+              <span className="mr-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 dark:bg-blue-500/20">
+                <Coins className="h-7 w-7 text-primary dark:text-blue-400" />
               </span>
               <div>
                 <span className="text-3xl font-bold text-gray-800 dark:text-white">
@@ -236,7 +237,7 @@ const Dashboard = () => {
               </div>
             </div>
             
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-white/15">
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-700/30">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Progression vers le prochain rang
               </h4>
@@ -245,7 +246,7 @@ const Dashboard = () => {
                 <div className="flex-1">
                   <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary to-primary/80 dark:from-[#9b87f5] dark:to-[#7654d3] rounded-full" 
+                      className="h-full bg-gradient-to-r from-primary to-primary/80 dark:from-blue-500 dark:to-indigo-500 rounded-full" 
                       style={{ width: `${calculateNextRankProgress()}%` }}
                     ></div>
                   </div>
@@ -262,8 +263,8 @@ const Dashboard = () => {
               <button 
                 onClick={() => navigate("/shop")} 
                 className="mt-4 w-full py-2 px-4 rounded-md bg-primary/10 hover:bg-primary/20 
-                          dark:bg-[#9b87f5]/10 dark:hover:bg-[#9b87f5]/20 
-                          text-primary dark:text-[#9b87f5] 
+                          dark:bg-blue-500/10 dark:hover:bg-blue-500/20 
+                          text-primary dark:text-blue-400 
                           transition-colors font-medium flex items-center justify-center gap-2"
               >
                 <ShoppingBag className="h-4 w-4" />
@@ -281,10 +282,10 @@ const Dashboard = () => {
 
       {/* Recent Submissions */}
       <h2 className="mb-4 mt-8 text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2 text-gradient-modern">
-        <BadgeCheck className="h-5 w-5 text-primary dark:text-[#9b87f5]" />
+        <BadgeCheck className="h-5 w-5 text-primary dark:text-blue-400" />
         Missions récentes
       </h2>
-      <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+      <Card className="dark:bg-slate-900/20 dark:backdrop-blur-xl dark:border dark:border-slate-700/30 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-blue-500/10 transform hover:scale-[1.02] transition-all duration-300 overflow-hidden">
         {isLoading ? (
           <div className="p-6 text-center text-gray-500 dark:text-gray-400 animate-pulse">
             <div className="mx-auto h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
@@ -294,7 +295,7 @@ const Dashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-white/15 text-left text-sm text-gray-500 dark:text-gray-400">
+                <tr className="border-b border-gray-100 dark:border-slate-700/30 text-left text-sm text-gray-500 dark:text-gray-400">
                   <th className="px-6 py-3 font-medium">Mission</th>
                   <th className="px-6 py-3 font-medium">Récompense</th>
                   <th className="px-6 py-3 font-medium">Date</th>
@@ -305,12 +306,12 @@ const Dashboard = () => {
                 {submissions.map((submission) => (
                   <tr
                     key={submission.id}
-                    className="border-b border-gray-100 dark:border-white/15 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5"
+                    className="border-b border-gray-100 dark:border-slate-700/30 text-gray-800 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800/30"
                   >
                     <td className="px-6 py-4">{submission.mission.title}</td>
                     <td className="px-6 py-4 flex items-center gap-1">
                       <span>{submission.mission.reward_coins}</span>
-                      <Coins className="h-4 w-4 text-primary dark:text-[#9b87f5]" />
+                      <Coins className="h-4 w-4 text-primary dark:text-blue-400" />
                     </td>
                     <td className="px-6 py-4">
                       {formatDate(submission.created_at)}
@@ -333,8 +334,8 @@ const Dashboard = () => {
         ) : (
           <div className="p-8 text-center">
             <div className="mb-4 flex justify-center">
-              <div className="rounded-full bg-primary/10 dark:bg-[#9b87f5]/20 p-3">
-                <BadgeCheck className="h-6 w-6 text-primary dark:text-[#9b87f5]" />
+              <div className="rounded-full bg-primary/10 dark:bg-blue-500/20 p-3">
+                <BadgeCheck className="h-6 w-6 text-primary dark:text-blue-400" />
               </div>
             </div>
             <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -345,7 +346,7 @@ const Dashboard = () => {
             </p>
             <button 
               onClick={() => navigate("/missions")} 
-              className="px-4 py-2 bg-primary hover:bg-primary/90 dark:bg-[#9b87f5] dark:hover:bg-[#8976e4] text-white rounded-md transition-colors"
+              className="px-4 py-2 bg-primary hover:bg-primary/90 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-md transition-colors"
             >
               Découvrir les missions
             </button>
