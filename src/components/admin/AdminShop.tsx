@@ -9,14 +9,36 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Search, Plus, Edit, Trash2, ShoppingBag, Coins, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface ShopItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image_url?: string;
+  is_vip_only: boolean;
+  available_until?: string;
+}
+
 const AdminShop = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    category: "",
+    image_url: "",
+    is_vip_only: false,
+    available_until: ""
+  });
   const queryClient = useQueryClient();
 
   const { data: shopItems, isLoading } = useQuery({
@@ -37,6 +59,54 @@ const AdminShop = () => {
     }
   });
 
+  const createItemMutation = useMutation({
+    mutationFn: async (itemData: any) => {
+      const { error } = await supabase
+        .from('shop_items')
+        .insert([{
+          ...itemData,
+          available_until: itemData.available_until || null
+        }]);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
+      toast.success("Article créé avec succès");
+      setShowCreateDialog(false);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error creating item:', error);
+      toast.error("Erreur lors de la création");
+    }
+  });
+
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ id, ...itemData }: any) => {
+      const { error } = await supabase
+        .from('shop_items')
+        .update({
+          ...itemData,
+          available_until: itemData.available_until || null
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
+      toast.success("Article mis à jour avec succès");
+      setShowEditDialog(false);
+      setSelectedItem(null);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error updating item:', error);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  });
+
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: string) => {
       const { error } = await supabase
@@ -50,10 +120,127 @@ const AdminShop = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
       toast.success("Article supprimé avec succès");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error deleting item:', error);
       toast.error("Erreur lors de la suppression");
     }
   });
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      description: "",
+      price: 0,
+      category: "",
+      image_url: "",
+      is_vip_only: false,
+      available_until: ""
+    });
+  };
+
+  const handleEdit = (item: ShopItem) => {
+    setSelectedItem(item);
+    setFormData({
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: item.category,
+      image_url: item.image_url || "",
+      is_vip_only: item.is_vip_only,
+      available_until: item.available_until ? new Date(item.available_until).toISOString().slice(0, 16) : ""
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleSubmit = () => {
+    if (selectedItem) {
+      updateItemMutation.mutate({ id: selectedItem.id, ...formData });
+    } else {
+      createItemMutation.mutate(formData);
+    }
+  };
+
+  const ShopItemForm = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="name">Nom</Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="Nom de l'article"
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Description de l'article"
+          rows={3}
+        />
+      </div>
+      <div>
+        <Label htmlFor="price">Prix (BradCoins)</Label>
+        <Input
+          id="price"
+          type="number"
+          value={formData.price}
+          onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
+          placeholder="Prix en BradCoins"
+        />
+      </div>
+      <div>
+        <Label htmlFor="category">Catégorie</Label>
+        <Input
+          id="category"
+          value={formData.category}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          placeholder="Catégorie"
+        />
+      </div>
+      <div>
+        <Label htmlFor="image_url">URL de l'image</Label>
+        <Input
+          id="image_url"
+          value={formData.image_url}
+          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+          placeholder="https://..."
+        />
+      </div>
+      <div>
+        <Label htmlFor="available_until">Disponible jusqu'à (optionnel)</Label>
+        <Input
+          id="available_until"
+          type="datetime-local"
+          value={formData.available_until}
+          onChange={(e) => setFormData({ ...formData, available_until: e.target.value })}
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_vip_only"
+          checked={formData.is_vip_only}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_vip_only: checked })}
+        />
+        <Label htmlFor="is_vip_only">Réservé aux VIP</Label>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={() => {
+          setShowCreateDialog(false);
+          setShowEditDialog(false);
+          resetForm();
+          setSelectedItem(null);
+        }}>
+          Annuler
+        </Button>
+        <Button onClick={handleSubmit}>
+          {selectedItem ? 'Mettre à jour' : 'Créer'}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-3 sm:space-y-6">
@@ -71,14 +258,27 @@ const AdminShop = () => {
                   className="pl-10 text-sm"
                 />
               </div>
-              <Button 
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-green-600 hover:bg-green-700 text-white"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvel Article
-              </Button>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    onClick={() => {
+                      resetForm();
+                      setShowCreateDialog(true);
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouvel Article
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Créer un nouvel article</DialogTitle>
+                  </DialogHeader>
+                  <ShopItemForm />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardTitle>
         </CardHeader>
@@ -124,31 +324,14 @@ const AdminShop = () => {
                         </div>
                       </div>
                       <div className="flex gap-1 flex-shrink-0 ml-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedItem(item)}
-                              className="h-8 w-8 p-0"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="w-[95vw] max-w-md mx-auto">
-                            <DialogHeader>
-                              <DialogTitle className="text-lg">Gérer {item.name}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4 py-4">
-                              <div className="grid grid-cols-1 gap-2 text-xs">
-                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Prix</div>
-                                  <div className="font-semibold">{item.price} BradCoins</div>
-                                </div>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(item)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="destructive"
                           size="sm"
@@ -157,23 +340,6 @@ const AdminShop = () => {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Catégorie</div>
-                        <div className="font-semibold">{item.category}</div>
-                      </div>
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Type</div>
-                        <div className="font-semibold">
-                          {item.is_vip_only ? (
-                            <span className="text-purple-600">VIP</span>
-                          ) : (
-                            <span className="text-green-600">Public</span>
-                          )}
-                        </div>
                       </div>
                     </div>
                   </Card>
@@ -228,34 +394,13 @@ const AdminShop = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setSelectedItem(item)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Gérer {item.name}</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <Label className="text-sm">Prix</Label>
-                                      <p className="font-mono">{item.price} BradCoins</p>
-                                    </div>
-                                    <div>
-                                      <Label className="text-sm">Catégorie</Label>
-                                      <p>{item.category}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(item)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="destructive"
                               size="sm"
@@ -270,6 +415,15 @@ const AdminShop = () => {
                   </TableBody>
                 </Table>
               </div>
+
+              <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Modifier l'article</DialogTitle>
+                  </DialogHeader>
+                  <ShopItemForm />
+                </DialogContent>
+              </Dialog>
             </>
           )}
         </CardContent>

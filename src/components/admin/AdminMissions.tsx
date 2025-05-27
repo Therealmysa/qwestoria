@@ -14,10 +14,31 @@ import { Search, Plus, Edit, Trash2, Eye, Users, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface Mission {
+  id: string;
+  title: string;
+  description: string;
+  reward_coins: number;
+  is_vip_only: boolean;
+  starts_at: string;
+  ends_at?: string;
+  external_link?: string;
+}
+
 const AdminMissions = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMission, setSelectedMission] = useState<any>(null);
+  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    reward_coins: 0,
+    is_vip_only: false,
+    starts_at: "",
+    ends_at: "",
+    external_link: ""
+  });
   const queryClient = useQueryClient();
 
   const { data: missions, isLoading } = useQuery({
@@ -38,6 +59,56 @@ const AdminMissions = () => {
     }
   });
 
+  const createMissionMutation = useMutation({
+    mutationFn: async (missionData: any) => {
+      const { error } = await supabase
+        .from('missions')
+        .insert([{
+          ...missionData,
+          starts_at: missionData.starts_at || new Date().toISOString(),
+          ends_at: missionData.ends_at || null
+        }]);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
+      toast.success("Mission créée avec succès");
+      setShowCreateDialog(false);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error creating mission:', error);
+      toast.error("Erreur lors de la création");
+    }
+  });
+
+  const updateMissionMutation = useMutation({
+    mutationFn: async ({ id, ...missionData }: any) => {
+      const { error } = await supabase
+        .from('missions')
+        .update({
+          ...missionData,
+          ends_at: missionData.ends_at || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
+      toast.success("Mission mise à jour avec succès");
+      setShowEditDialog(false);
+      setSelectedMission(null);
+      resetForm();
+    },
+    onError: (error) => {
+      console.error('Error updating mission:', error);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  });
+
   const deleteMissionMutation = useMutation({
     mutationFn: async (missionId: string) => {
       const { error } = await supabase
@@ -51,14 +122,131 @@ const AdminMissions = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
       toast.success("Mission supprimée avec succès");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error deleting mission:', error);
       toast.error("Erreur lors de la suppression");
     }
   });
 
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      reward_coins: 0,
+      is_vip_only: false,
+      starts_at: "",
+      ends_at: "",
+      external_link: ""
+    });
+  };
+
+  const handleEdit = (mission: Mission) => {
+    setSelectedMission(mission);
+    setFormData({
+      title: mission.title,
+      description: mission.description,
+      reward_coins: mission.reward_coins,
+      is_vip_only: mission.is_vip_only,
+      starts_at: mission.starts_at ? new Date(mission.starts_at).toISOString().slice(0, 16) : "",
+      ends_at: mission.ends_at ? new Date(mission.ends_at).toISOString().slice(0, 16) : "",
+      external_link: mission.external_link || ""
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleSubmit = () => {
+    if (selectedMission) {
+      updateMissionMutation.mutate({ id: selectedMission.id, ...formData });
+    } else {
+      createMissionMutation.mutate(formData);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
+
+  const MissionForm = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="title">Titre</Label>
+        <Input
+          id="title"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          placeholder="Titre de la mission"
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Description de la mission"
+          rows={3}
+        />
+      </div>
+      <div>
+        <Label htmlFor="reward_coins">Récompense (BradCoins)</Label>
+        <Input
+          id="reward_coins"
+          type="number"
+          value={formData.reward_coins}
+          onChange={(e) => setFormData({ ...formData, reward_coins: parseInt(e.target.value) || 0 })}
+          placeholder="Nombre de BradCoins"
+        />
+      </div>
+      <div>
+        <Label htmlFor="external_link">Lien externe (optionnel)</Label>
+        <Input
+          id="external_link"
+          value={formData.external_link}
+          onChange={(e) => setFormData({ ...formData, external_link: e.target.value })}
+          placeholder="https://..."
+        />
+      </div>
+      <div>
+        <Label htmlFor="starts_at">Date de début</Label>
+        <Input
+          id="starts_at"
+          type="datetime-local"
+          value={formData.starts_at}
+          onChange={(e) => setFormData({ ...formData, starts_at: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label htmlFor="ends_at">Date de fin (optionnel)</Label>
+        <Input
+          id="ends_at"
+          type="datetime-local"
+          value={formData.ends_at}
+          onChange={(e) => setFormData({ ...formData, ends_at: e.target.value })}
+        />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_vip_only"
+          checked={formData.is_vip_only}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_vip_only: checked })}
+        />
+        <Label htmlFor="is_vip_only">Réservé aux VIP</Label>
+      </div>
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={() => {
+          setShowCreateDialog(false);
+          setShowEditDialog(false);
+          resetForm();
+          setSelectedMission(null);
+        }}>
+          Annuler
+        </Button>
+        <Button onClick={handleSubmit}>
+          {selectedMission ? 'Mettre à jour' : 'Créer'}
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-3 sm:space-y-6">
@@ -76,14 +264,27 @@ const AdminMissions = () => {
                   className="pl-10 text-sm"
                 />
               </div>
-              <Button 
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvelle Mission
-              </Button>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    onClick={() => {
+                      resetForm();
+                      setShowCreateDialog(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouvelle Mission
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Créer une nouvelle mission</DialogTitle>
+                  </DialogHeader>
+                  <MissionForm />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardTitle>
         </CardHeader>
@@ -120,7 +321,7 @@ const AdminMissions = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedMission(mission)}
+                          onClick={() => handleEdit(mission)}
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
@@ -133,16 +334,6 @@ const AdminMissions = () => {
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 gap-2 text-xs">
-                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                        <div className="text-gray-500 dark:text-gray-400 mb-1">Période</div>
-                        <div className="font-semibold">
-                          {formatDate(mission.starts_at)}
-                          {mission.ends_at && ` - ${formatDate(mission.ends_at)}`}
-                        </div>
                       </div>
                     </div>
                   </Card>
@@ -198,7 +389,7 @@ const AdminMissions = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setSelectedMission(mission)}
+                              onClick={() => handleEdit(mission)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -216,6 +407,15 @@ const AdminMissions = () => {
                   </TableBody>
                 </Table>
               </div>
+
+              <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Modifier la mission</DialogTitle>
+                  </DialogHeader>
+                  <MissionForm />
+                </DialogContent>
+              </Dialog>
             </>
           )}
         </CardContent>

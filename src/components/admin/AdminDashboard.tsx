@@ -9,17 +9,25 @@ const AdminDashboard = () => {
   const { data: stats } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const [usersResult, missionsResult, submissionsResult, coinsResult, adsResult] = await Promise.all([
+      // Get all stats in parallel
+      const [usersResult, missionsResult, submissionsResult, coinsResult, adsResult, recentUsers, recentSubmissions, totalRevenue] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('missions').select('id', { count: 'exact' }),
         supabase.from('mission_submissions').select('id', { count: 'exact' }),
-        supabase.from('brad_coins').select('balance').gte('balance', 0),
-        supabase.from('advertisements').select('click_count, impression_count')
+        supabase.from('brad_coins').select('balance'),
+        supabase.from('advertisements').select('click_count, impression_count'),
+        // Recent users (today)
+        supabase.from('profiles').select('id', { count: 'exact' }).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+        // Recent submissions (today)
+        supabase.from('mission_submissions').select('id', { count: 'exact' }).gte('created_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
+        // Total revenue from BradCoins purchases
+        supabase.from('bradcoins_purchases').select('price_paid_cents').eq('status', 'completed')
       ]);
 
       const totalCoins = coinsResult.data?.reduce((sum, coin) => sum + coin.balance, 0) || 0;
       const totalClicks = adsResult.data?.reduce((sum, ad) => sum + ad.click_count, 0) || 0;
       const totalImpressions = adsResult.data?.reduce((sum, ad) => sum + ad.impression_count, 0) || 0;
+      const revenue = totalRevenue.data?.reduce((sum, purchase) => sum + purchase.price_paid_cents, 0) || 0;
 
       return {
         totalUsers: usersResult.count || 0,
@@ -27,7 +35,11 @@ const AdminDashboard = () => {
         totalSubmissions: submissionsResult.count || 0,
         totalCoins,
         totalClicks,
-        totalImpressions
+        totalImpressions,
+        recentUsers: recentUsers.count || 0,
+        recentSubmissions: recentSubmissions.count || 0,
+        totalRevenue: revenue / 100, // Convert cents to euros
+        ctr: totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(1) : 0
       };
     }
   });
@@ -122,15 +134,15 @@ const AdminDashboard = () => {
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Nouvelles inscriptions aujourd'hui</span>
-                <span className="font-semibold text-blue-600 dark:text-blue-400 text-sm">+12</span>
+                <span className="font-semibold text-blue-600 dark:text-blue-400 text-sm">+{stats?.recentUsers || 0}</span>
               </div>
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Missions soumises aujourd'hui</span>
-                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">+34</span>
+                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">+{stats?.recentSubmissions || 0}</span>
               </div>
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">BradCoins distribués</span>
-                <span className="font-semibold text-yellow-600 dark:text-yellow-400 text-sm">+2,450</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Revenus totaux</span>
+                <span className="font-semibold text-yellow-600 dark:text-yellow-400 text-sm">€{stats?.totalRevenue?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
           </CardContent>
@@ -140,22 +152,22 @@ const AdminDashboard = () => {
           <CardHeader className="p-3 sm:p-6">
             <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] text-base sm:text-lg">Performance Publicitaire</CardTitle>
             <CardDescription className="dark:text-gray-300 text-sm">
-              Statistiques des publicités cette semaine
+              Statistiques des publicités en temps réel
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-6 pt-0">
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Taux de clic moyen</span>
-                <span className="font-semibold text-slate-600 dark:text-slate-400 text-sm">2.3%</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Taux de clic (CTR)</span>
+                <span className="font-semibold text-slate-600 dark:text-slate-400 text-sm">{stats?.ctr || 0}%</span>
               </div>
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">CTR cette semaine</span>
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400 text-sm">+0.4%</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Total clics</span>
+                <span className="font-semibold text-indigo-600 dark:text-indigo-400 text-sm">{stats?.totalClicks || 0}</span>
               </div>
               <div className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Revenus estimés</span>
-                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">€127.50</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Total impressions</span>
+                <span className="font-semibold text-green-600 dark:text-green-400 text-sm">{stats?.totalImpressions || 0}</span>
               </div>
             </div>
           </CardContent>
