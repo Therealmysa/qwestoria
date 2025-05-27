@@ -57,7 +57,7 @@ const VipFeatures = ({ isPremium, isVip }: VipFeaturesProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] mb-2">
           Fonctionnalités Premium
         </h2>
         <p className="text-gray-600 dark:text-gray-300">

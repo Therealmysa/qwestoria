@@ -17,7 +17,7 @@ const Shop = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 p-3 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 sm:mb-12 text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-800 via-blue-700 to-slate-700 dark:from-slate-300 dark:via-blue-400 dark:to-slate-400 mb-6 tracking-tight px-2">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] mb-6 tracking-tight px-2">
             Boutique Qwestoria
           </h1>
           
