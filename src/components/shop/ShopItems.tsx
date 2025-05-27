@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -114,7 +115,7 @@ const ShopItems = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <Card className="overflow-hidden hover:scale-105 transition-transform border-[#9b87f5]/20 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+            <Card className="overflow-hidden hover:scale-105 transition-transform border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800/50 dark:to-blue-900/20">
               <div className="relative">
                 {item.image_url ? (
                   <div className="w-full h-48 overflow-hidden">
@@ -125,14 +126,14 @@ const ShopItems = () => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-48 bg-[#9b87f5]/10 flex items-center justify-center">
-                    <Package className="h-16 w-16 text-[#9b87f5]" />
+                  <div className="w-full h-48 bg-slate-100 dark:bg-slate-800/30 flex items-center justify-center">
+                    <Package className="h-16 w-16 text-slate-600 dark:text-slate-400" />
                   </div>
                 )}
                 
                 <Badge 
                   variant="outline" 
-                  className="absolute top-4 left-4 bg-[#9b87f5]/90 hover:bg-[#9b87f5]/90 text-white border-0"
+                  className="absolute top-4 left-4 bg-slate-600/90 hover:bg-slate-600/90 text-white border-0"
                 >
                   {item.category}
                 </Badge>
@@ -148,7 +149,7 @@ const ShopItems = () => {
               </div>
               
               <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-[#9b87f5] mb-2">{item.name}</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">{item.name}</h3>
                 <p className="text-muted-foreground text-sm mb-4">{item.description}</p>
                 
                 <div className="flex items-center justify-between">
@@ -167,7 +168,7 @@ const ShopItems = () => {
               
               <CardFooter className="px-6 pb-6">
                 <Button 
-                  className="w-full bg-[#9b87f5] hover:bg-[#8976e4]"
+                  className="w-full bg-slate-700 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500"
                   onClick={() => handlePurchaseItem(item)}
                   disabled={!isAvailable(item) || userCoins < item.price}
                 >

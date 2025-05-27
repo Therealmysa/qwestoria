@@ -30,7 +30,7 @@ const PackDisplay: React.FC<PackDisplayProps> = ({
   onSelectItem 
 }) => {
   return (
-    <Card key={pack.id} className="card-enhanced card-hover col-span-1 md:col-span-2 lg:col-span-4">
+    <Card key={pack.id} className="card-enhanced card-hover col-span-1 md:col-span-2 lg:col-span-4 border-slate-200 dark:border-slate-700">
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/3 relative">
           {pack.image_url ? (
@@ -42,13 +42,13 @@ const PackDisplay: React.FC<PackDisplayProps> = ({
               />
             </div>
           ) : (
-            <div className="w-full h-64 md:h-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center">
-              <Package className="h-20 w-20 text-[#9b87f5]" />
+            <div className="w-full h-64 md:h-full bg-slate-100 dark:bg-slate-800/30 flex items-center justify-center">
+              <Package className="h-20 w-20 text-slate-600 dark:text-slate-400" />
             </div>
           )}
           <Badge 
             variant="outline" 
-            className="absolute top-4 left-4 bg-[#9b87f5]/90 hover:bg-[#9b87f5]/90 text-white border-0"
+            className="absolute top-4 left-4 bg-slate-600/90 hover:bg-slate-600/90 text-white border-0"
           >
             <Package className="h-3 w-3 mr-1" />
             Pack
@@ -66,7 +66,7 @@ const PackDisplay: React.FC<PackDisplayProps> = ({
         <div className="flex-1 p-6 flex flex-col">
           <div className="flex flex-col md:flex-row md:items-start justify-between mb-4">
             <div>
-              <h3 className="text-2xl font-bold text-[#9b87f5] mb-1">{pack.name}</h3>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">{pack.name}</h3>
               <p className="text-muted-foreground text-sm mb-4">{pack.description}</p>
             </div>
             <div className="flex items-center mt-2 md:mt-0">
@@ -88,7 +88,7 @@ const PackDisplay: React.FC<PackDisplayProps> = ({
                   key={idx} 
                   className="bg-secondary/30 rounded-md p-2 h-16 flex items-center justify-center"
                 >
-                  <BadgeCheck className="h-5 w-5 text-[#9b87f5]/70" />
+                  <BadgeCheck className="h-5 w-5 text-slate-600 dark:text-slate-400 opacity-70" />
                 </div>
               ))}
             </div>
@@ -96,7 +96,7 @@ const PackDisplay: React.FC<PackDisplayProps> = ({
           
           <CardFooter className="flex justify-end items-center p-0 pt-4 mt-auto">
             <Button 
-              className="bg-[#9b87f5] hover:bg-[#8976e4]"
+              className="bg-slate-700 hover:bg-slate-600 dark:bg-slate-600 dark:hover:bg-slate-500"
               onClick={() => onSelectItem(pack)}
               disabled={!isAvailable(pack) || userCoins < pack.price}
             >
