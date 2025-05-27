@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -6,12 +5,9 @@ import VipUpgrade from "@/components/vip/VipUpgrade";
 import BradCoinsShop from "@/components/shop/BradCoinsShop";
 import ShopItems from "@/components/shop/ShopItems";
 import { Coins, Crown, ShoppingBag } from "lucide-react";
-
 const Shop = () => {
   const [activeTab, setActiveTab] = useState("premium");
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 p-6">
+  return <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-gray-900 dark:to-slate-800 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 text-center relative">
           {/* Effet de particules décoratif */}
@@ -61,7 +57,7 @@ const Shop = () => {
             <div className="bg-gray-50 dark:bg-slate-900 px-6 py-2 rounded-full border border-slate-200 dark:border-slate-700/50">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Boutique Professionnelle</span>
+                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Boutique Qwestoria</span>
               </div>
             </div>
           </div>
@@ -70,24 +66,15 @@ const Shop = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex justify-center">
             <TabsList className="grid w-full max-w-md grid-cols-3 bg-white/90 dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700">
-              <TabsTrigger 
-                value="premium" 
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white font-semibold"
-              >
+              <TabsTrigger value="premium" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500 data-[state=active]:to-orange-500 data-[state=active]:text-white font-semibold">
                 <Crown className="h-4 w-4" />
                 Premium
               </TabsTrigger>
-              <TabsTrigger 
-                value="items"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
-              >
+              <TabsTrigger value="items" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
                 <ShoppingBag className="h-4 w-4" />
                 Articles
               </TabsTrigger>
-              <TabsTrigger 
-                value="bradcoins"
-                className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
-              >
+              <TabsTrigger value="bradcoins" className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
                 <Coins className="h-4 w-4" />
                 BradCoins
               </TabsTrigger>
@@ -107,8 +94,6 @@ const Shop = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Shop;
