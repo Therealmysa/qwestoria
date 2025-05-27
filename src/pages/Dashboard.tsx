@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
@@ -15,7 +14,6 @@ import AdBanner from "@/components/advertisements/AdBanner";
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [selectedMission, setSelectedMission] = useState<any>(null);
 
   const { data: userMissions, isLoading: isLoadingMissions } = useQuery({
     queryKey: ['user-missions', user?.id],
@@ -45,14 +43,14 @@ const Dashboard = () => {
     },
   });
 
-  const { data: recentMissions, isLoading: isLoadingRecentMissions } = useQuery({
-    queryKey: ['recent-missions'],
+  const { data: availableMissions, isLoading: isLoadingAvailableMissions } = useQuery({
+    queryKey: ['available-missions'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('missions')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(3);
+        .limit(5);
       if (error) throw error;
       return data;
     },
@@ -73,56 +71,32 @@ const Dashboard = () => {
     enabled: !!user?.id,
   });
 
-  const completeMission = async (missionId: string) => {
+  const startMission = async (missionId: string) => {
     if (!user) {
-      toast.error("Vous devez être connecté pour compléter une mission.");
+      toast.error("Vous devez être connecté pour commencer une mission.");
       return;
     }
 
-    setSelectedMission(missionId);
-
-    const { data: missionData, error: missionError } = await supabase
-      .from('missions')
-      .select('reward_coins')
-      .eq('id', missionId)
-      .single();
-
-    if (missionError) {
-      console.error("Erreur lors de la récupération des détails de la mission:", missionError);
-      toast.error("Erreur lors de la récupération des détails de la mission.");
-      setSelectedMission(null);
+    // Vérifier si l'utilisateur a déjà cette mission
+    const existingMission = userMissions?.find(um => um.mission_id === missionId);
+    if (existingMission) {
+      toast.error("Vous avez déjà cette mission.");
       return;
     }
-
-    const { reward_coins } = missionData;
 
     const { error } = await supabase
       .from('user_missions')
       .insert([{ user_id: user.id, mission_id: missionId }]);
 
     if (error) {
-      console.error("Erreur lors de l'insertion de la mission utilisateur:", error);
-      toast.error("Erreur lors de la complétion de la mission.");
-      setSelectedMission(null);
+      console.error("Erreur lors du démarrage de la mission:", error);
+      toast.error("Erreur lors du démarrage de la mission.");
       return;
     }
 
-    const { error: coinsError } = await supabase
-      .from('brad_coins')
-      .upsert({ 
-        user_id: user.id, 
-        balance: (bradCoinsBalance || 0) + reward_coins 
-      });
-
-    if (coinsError) {
-      console.error("Erreur lors de la mise à jour des BradCoins:", coinsError);
-      toast.error("Erreur lors de la mise à jour de votre solde.");
-      setSelectedMission(null);
-      return;
-    }
-
-    toast.success(`Mission complétée ! Vous avez gagné ${reward_coins} BradCoins.`);
-    setSelectedMission(null);
+    toast.success("Mission ajoutée à votre liste !");
+    // Recharger les missions utilisateur
+    window.location.reload();
   };
 
   return (
@@ -174,33 +148,50 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            {/* Recent Missions */}
+            {/* Available Missions */}
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Dernières Missions</CardTitle>
-                <CardDescription>Voici les dernières missions disponibles.</CardDescription>
+                <CardTitle className="text-lg font-semibold">Missions Disponibles</CardTitle>
+                <CardDescription>Découvrez les nouvelles missions et commencez à les accomplir.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isLoadingRecentMissions ? (
+                {isLoadingAvailableMissions ? (
                   <p>Chargement des missions...</p>
                 ) : (
-                  recentMissions?.map((mission) => (
-                    <div key={mission.id} className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-medium">{mission.title}</h3>
-                        <p className="text-xs text-gray-500">{mission.description}</p>
+                  availableMissions?.slice(0, 3).map((mission) => {
+                    const isAlreadyStarted = userMissions?.some(um => um.mission_id === mission.id);
+                    return (
+                      <div key={mission.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/10 rounded-lg">
+                        <div>
+                          <h3 className="text-sm font-medium">{mission.title}</h3>
+                          <p className="text-xs text-gray-500">{mission.description}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-yellow-600 flex items-center gap-1">
+                              <Coins className="h-3 w-3" />
+                              {mission.reward_coins} BradCoins
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isAlreadyStarted ? (
+                            <Badge variant="secondary">En cours</Badge>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => startMission(mission.id)}
+                            >
+                              Commencer
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => completeMission(mission.id)}
-                        disabled={selectedMission === mission.id}
-                      >
-                        {selectedMission === mission.id ? "En cours..." : "Compléter"}
-                      </Button>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
+                <Button variant="ghost" onClick={() => navigate("/missions")} className="w-full">
+                  Voir toutes les missions
+                </Button>
               </CardContent>
             </Card>
 

@@ -14,6 +14,7 @@ interface AdBannerProps {
 
 const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
   const [dismissedAds, setDismissedAds] = useState<string[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
 
   const { data: ads } = useQuery({
     queryKey: ['advertisements', position],
@@ -104,6 +105,9 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
   const handleDismiss = (adId: string) => {
     console.log('Dismissing ad:', adId);
     setDismissedAds(prev => [...prev, adId]);
+    if (position === 'popup') {
+      setShowPopup(false);
+    }
   };
 
   // Track impressions when ads are shown
@@ -113,6 +117,14 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
       ads.forEach(ad => {
         incrementImpressionMutation.mutate(ad.id);
       });
+      
+      // Show popup after a delay for popup ads
+      if (position === 'popup') {
+        const timer = setTimeout(() => {
+          setShowPopup(true);
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
     }
   }, [ads]);
 
@@ -128,7 +140,7 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
       case 'sidebar':
         return 'w-full max-w-sm';
       case 'popup':
-        return 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 max-w-md';
+        return 'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm';
       default:
         return '';
     }
@@ -136,38 +148,47 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
 
   console.log('Rendering ads:', ads);
 
+  if (position === 'popup' && !showPopup) {
+    return null;
+  }
+
   return (
     <AnimatePresence>
       <div className={getPositionStyles()}>
         {ads.map((ad, index) => (
           <motion.div
             key={ad.id}
-            initial={{ opacity: 0, y: position === 'popup' ? -20 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: position === 'popup' ? -20 : 20 }}
+            initial={{ opacity: 0, y: position === 'popup' ? -20 : 20, scale: position === 'popup' ? 0.9 : 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: position === 'popup' ? -20 : 20, scale: position === 'popup' ? 0.9 : 1 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
             className={position === 'banner' ? 'mb-4' : ''}
           >
             <Card className={`relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg ${
-              position === 'popup' ? 'bg-white shadow-2xl' : 'bg-gradient-to-r from-purple-50 to-blue-50'
+              position === 'popup' 
+                ? 'bg-white shadow-2xl max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto' 
+                : 'bg-gradient-to-r from-purple-50 to-blue-50'
             }`}>
-              {position === 'popup' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 z-10"
-                  onClick={() => handleDismiss(ad.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 z-20 hover:bg-gray-100"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDismiss(ad.id);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
               
               <div 
                 onClick={() => handleAdClick(ad)}
-                className="p-4"
+                className={position === 'popup' ? 'p-6' : 'p-4'}
               >
                 {ad.image_url && (
-                  <div className={`mb-3 ${position === 'banner' ? 'h-20' : 'h-32'} overflow-hidden rounded-lg`}>
+                  <div className={`mb-3 ${
+                    position === 'popup' ? 'h-48' : position === 'banner' ? 'h-20' : 'h-32'
+                  } overflow-hidden rounded-lg`}>
                     <img
                       src={ad.image_url}
                       alt={ad.title}
@@ -177,18 +198,20 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
                 )}
                 
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-1">
+                  <h4 className={`font-semibold text-gray-900 mb-1 ${position === 'popup' ? 'text-xl' : ''}`}>
                     {ad.title}
                   </h4>
                   {ad.description && (
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className={`text-gray-600 mb-3 ${position === 'popup' ? 'text-base' : 'text-sm'}`}>
                       {ad.description}
                     </p>
                   )}
                   
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">Sponsorisé</span>
-                    <div className="text-xs text-purple-600 hover:text-purple-700 font-medium">
+                    <div className={`text-purple-600 hover:text-purple-700 font-medium ${
+                      position === 'popup' ? 'text-sm' : 'text-xs'
+                    }`}>
                       En savoir plus →
                     </div>
                   </div>
