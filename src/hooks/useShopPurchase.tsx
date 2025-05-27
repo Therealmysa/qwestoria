@@ -29,9 +29,8 @@ export const useShopPurchase = () => {
       return data;
     },
     onSuccess: () => {
-      // Invalider les requêtes pour mettre à jour les données
-      queryClient.invalidateQueries({ queryKey: ['brad-coins'] });
-      queryClient.invalidateQueries({ queryKey: ['user-coins'] });
+      // Invalider toutes les requêtes liées aux BradCoins
+      queryClient.invalidateQueries({ queryKey: ['brad-coins-balance'] });
       queryClient.invalidateQueries({ queryKey: ['shop-purchases'] });
       queryClient.invalidateQueries({ queryKey: ['shop-items'] });
       toast.success("Achat effectué avec succès !");

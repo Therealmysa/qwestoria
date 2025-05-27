@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -8,6 +7,7 @@ import { Coins, Package, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useShopPurchase } from "@/hooks/useShopPurchase";
 import { useUserStatus } from "@/hooks/useUserStatus";
+import { useBradCoins } from "@/hooks/useBradCoins";
 import PremiumBadge from "@/components/vip/PremiumBadge";
 
 interface ShopItem {
@@ -25,6 +25,7 @@ interface ShopItem {
 const ShopItems = () => {
   const { purchaseItem, isPurchasing } = useShopPurchase();
   const { isVip, isPremium } = useUserStatus();
+  const { balance: userCoins } = useBradCoins();
 
   const { data: shopItems, isLoading } = useQuery<ShopItem[]>({
     queryKey: ['shop-items'],
@@ -36,26 +37,6 @@ const ShopItems = () => {
       
       if (error) throw error;
       return data || [];
-    }
-  });
-
-  const { data: userCoins = 0 } = useQuery<number>({
-    queryKey: ['brad-coins'],
-    queryFn: async (): Promise<number> => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return 0;
-
-      const { data, error } = await supabase
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching user coins:', error);
-        return 0;
-      }
-      return data?.balance || 0;
     }
   });
 

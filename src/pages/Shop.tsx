@@ -1,45 +1,19 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingBag, Search, Filter, Coins, Crown } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ShoppingBag, Coins, Crown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
 import AdBanner from "@/components/advertisements/AdBanner";
 import BradCoinsShop from "@/components/shop/BradCoinsShop";
 import VipUpgrade from "@/components/vip/VipUpgrade";
 import ShopItems from "@/components/shop/ShopItems";
+import { useBradCoins } from "@/hooks/useBradCoins";
 
 const Shop = () => {
   const { user, profile } = useAuth();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-
-  const { data: bradCoinsBalance, refetch: refetchBalance } = useQuery({
-    queryKey: ['brad-coins', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return 0;
-      console.log('Fetching BradCoins balance for user:', user.id);
-      const { data, error } = await supabase
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching BradCoins:', error);
-        return 0;
-      }
-      console.log('BradCoins balance:', data?.balance || 0);
-      return data?.balance || 0;
-    },
-    enabled: !!user?.id,
-  });
+  const { balance: bradCoinsBalance, refetch: refetchBalance } = useBradCoins();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
@@ -107,7 +81,7 @@ const Shop = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold flex items-center gap-1">
-                  {bradCoinsBalance || 0}
+                  {bradCoinsBalance}
                   <Coins className="h-5 w-5 text-yellow-500" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">

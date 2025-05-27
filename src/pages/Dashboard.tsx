@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,10 +9,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AdBanner from "@/components/advertisements/AdBanner";
+import { useBradCoins } from "@/hooks/useBradCoins";
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { balance: bradCoinsBalance } = useBradCoins();
 
   const { data: completedMissions, isLoading: isLoadingMissions } = useQuery({
     queryKey: ['completed-missions', user?.id],
@@ -78,27 +79,6 @@ const Dashboard = () => {
     enabled: !!user?.id,
   });
 
-  const { data: bradCoinsBalance } = useQuery({
-    queryKey: ['brad-coins', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return 0;
-      console.log('Fetching BradCoins balance for user:', user.id);
-      const { data, error } = await supabase
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', user.id)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching BradCoins:', error);
-        return 0;
-      }
-      console.log('BradCoins balance:', data?.balance || 0);
-      return data?.balance || 0;
-    },
-    enabled: !!user?.id,
-  });
-
   const startMission = async (missionId: string) => {
     if (!user) {
       toast.error("Vous devez être connecté pour commencer une mission.");
@@ -134,7 +114,7 @@ const Dashboard = () => {
                     <Coins className="h-6 w-6 text-yellow-500" />
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">BradCoins</p>
-                      <p className="text-xl font-bold">{bradCoinsBalance || 0}</p>
+                      <p className="text-xl font-bold">{bradCoinsBalance}</p>
                     </div>
                   </div>
                 </CardContent>
