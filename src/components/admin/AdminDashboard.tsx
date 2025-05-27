@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, ShoppingBag, DollarSign, TrendingUp, Eye } from "lucide-react";
@@ -51,7 +50,7 @@ const AdminDashboard = () => {
       title: "Soumissions Total",
       value: stats?.totalSubmissions || 0,
       icon: TrendingUp,
-      color: "from-purple-500 to-purple-600",
+      color: "from-slate-500 to-slate-600",
       description: "Missions soumises"
     },
     {
@@ -87,7 +86,7 @@ const AdminDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <Card className="relative overflow-hidden dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="relative overflow-hidden dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-5`}></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -111,7 +110,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-gradient-modern">Activité Récente</CardTitle>
             <CardDescription className="dark:text-gray-300">
@@ -120,15 +119,15 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">Nouvelles inscriptions aujourd'hui</span>
                 <span className="font-semibold text-blue-600 dark:text-blue-400">+12</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">Missions soumises aujourd'hui</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">+34</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">BradCoins distribués</span>
                 <span className="font-semibold text-yellow-600 dark:text-yellow-400">+2,450</span>
               </div>
@@ -136,7 +135,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-gradient-modern">Performance Publicitaire</CardTitle>
             <CardDescription className="dark:text-gray-300">
@@ -145,15 +144,15 @@ const AdminDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">Taux de clic moyen</span>
-                <span className="font-semibold text-purple-600 dark:text-purple-400">2.3%</span>
+                <span className="font-semibold text-slate-600 dark:text-slate-400">2.3%</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">CTR cette semaine</span>
                 <span className="font-semibold text-indigo-600 dark:text-indigo-400">+0.4%</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/5 rounded-lg">
                 <span className="text-sm text-gray-600 dark:text-gray-300">Revenus estimés</span>
                 <span className="font-semibold text-green-600 dark:text-green-400">€127.50</span>
               </div>

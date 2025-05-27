@@ -42,7 +42,7 @@ const Admin = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Vérification des permissions...</p>
         </div>
       </div>
@@ -105,7 +105,7 @@ const Admin = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-[#0a0a12] dark:via-[#1a1625] dark:to-[#2a1f40] p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-gradient-modern mb-2">
@@ -122,13 +122,13 @@ const Admin = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="dark:bg-black/20 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl dark:shadow-purple-500/20">
+          <div className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-2xl dark:shadow-slate-500/20">
             <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-1 bg-transparent p-1">
               {tabs.map((tab) => (
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id}
-                  className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-2 text-xs lg:text-sm py-2 px-2 lg:px-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#9b87f5] data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 min-h-[60px] lg:min-h-[40px]"
+                  className="flex flex-col lg:flex-row items-center justify-center gap-1 lg:gap-2 text-xs lg:text-sm py-2 px-2 lg:px-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-slate-500 data-[state=active]:to-gray-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 min-h-[60px] lg:min-h-[40px]"
                 >
                   <tab.icon className="h-4 w-4 flex-shrink-0" />
                   <span className="text-center break-words leading-tight">{tab.label}</span>
@@ -139,7 +139,7 @@ const Admin = () => {
 
           {tabs.map((tab) => (
             <TabsContent key={tab.id} value={tab.id}>
-              <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
+              <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-gradient-modern">
                     <tab.icon className="h-5 w-5" />
