@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +11,13 @@ interface BlogPostType {
   created_at: string;
   title: string;
   content: string;
-  author: string;
+  author_id: string;
   image_url: string | null;
+  published: boolean;
+  reading_time_minutes: number | null;
+  slug: string | null;
+  summary: string | null;
+  updated_at: string;
 }
 
 const BlogPost = () => {
@@ -86,7 +92,7 @@ const BlogPost = () => {
                   Publié le{" "}
                   {format(new Date(post.created_at), "dd MMMM yyyy", {
                     locale: fr,
-                  })} par {post.author}
+                  })} par {post.author_id}
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: post.content }} />
               </div>
