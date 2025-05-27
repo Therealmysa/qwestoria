@@ -30,6 +30,7 @@ export const useShopPurchase = () => {
     },
     onSuccess: () => {
       // Invalider les requêtes pour mettre à jour les données
+      queryClient.invalidateQueries({ queryKey: ['brad-coins'] });
       queryClient.invalidateQueries({ queryKey: ['user-coins'] });
       queryClient.invalidateQueries({ queryKey: ['shop-purchases'] });
       queryClient.invalidateQueries({ queryKey: ['shop-items'] });

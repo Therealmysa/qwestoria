@@ -40,7 +40,7 @@ const ShopItems = () => {
   });
 
   const { data: userCoins = 0 } = useQuery<number>({
-    queryKey: ['user-coins'],
+    queryKey: ['brad-coins'],
     queryFn: async (): Promise<number> => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return 0;

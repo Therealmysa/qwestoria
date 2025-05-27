@@ -82,12 +82,18 @@ const Dashboard = () => {
     queryKey: ['brad-coins', user?.id],
     queryFn: async () => {
       if (!user?.id) return 0;
+      console.log('Fetching BradCoins balance for user:', user.id);
       const { data, error } = await supabase
         .from('brad_coins')
         .select('balance')
         .eq('user_id', user.id)
         .single();
-      if (error) return 0;
+      
+      if (error) {
+        console.error('Error fetching BradCoins:', error);
+        return 0;
+      }
+      console.log('BradCoins balance:', data?.balance || 0);
       return data?.balance || 0;
     },
     enabled: !!user?.id,
