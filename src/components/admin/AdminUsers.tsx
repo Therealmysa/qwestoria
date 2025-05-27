@@ -75,50 +75,50 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
-        <CardHeader className="pb-3 sm:pb-6">
-          <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
-            <span className="text-lg sm:text-xl">Gestion des Utilisateurs</span>
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-base sm:text-xl">Gestion des Utilisateurs</span>
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Rechercher un utilisateur..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-0 sm:p-6">
+        <CardContent className="p-3 sm:p-6">
           {isLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
-              <p>Chargement...</p>
+              <p className="text-sm">Chargement...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              {/* Mobile Cards View - Hidden on larger screens */}
-              <div className="block sm:hidden space-y-3 p-4">
+            <>
+              {/* Mobile Cards View */}
+              <div className="block lg:hidden space-y-3">
                 {users?.map((user) => (
-                  <Card key={user.id} className="p-4 dark:bg-slate-700/20">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-3">
+                  <Card key={user.id} className="p-3 dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
                         {user.avatar_url ? (
                           <img
                             src={user.avatar_url}
                             alt={user.username}
-                            className="h-10 w-10 rounded-full"
+                            className="h-10 w-10 rounded-full flex-shrink-0"
                           />
                         ) : (
-                          <div className="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                          <div className="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                             {user.username[0]?.toUpperCase()}
                           </div>
                         )}
-                        <div>
-                          <div className="font-medium text-sm">{user.username}</div>
-                          <div className="text-xs text-gray-500">{user.fortnite_username}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm truncate">{user.username}</div>
+                          <div className="text-xs text-gray-500 truncate">{user.fortnite_username}</div>
                         </div>
                       </div>
                       <Dialog>
@@ -128,18 +128,19 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                             size="sm"
                             onClick={() => setSelectedUser(user)}
                             disabled={user.is_owner}
-                            className="h-8 w-8 p-0"
+                            className="h-8 w-8 p-0 flex-shrink-0"
                           >
                             <Settings className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="w-[95vw] max-w-md">
+                        <DialogContent className="w-[95vw] max-w-md mx-auto">
                           <DialogHeader>
-                            <DialogTitle>Gérer {user.username}</DialogTitle>
+                            <DialogTitle className="text-lg">Gérer {user.username}</DialogTitle>
                           </DialogHeader>
-                          <div className="space-y-4">
+                          <div className="space-y-4 py-4">
                             {isOwner && !user.is_owner && (
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="is_admin" className="text-sm">Administrateur</Label>
                                 <Switch
                                   id="is_admin"
                                   checked={user.is_admin}
@@ -147,10 +148,10 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                                     handleUserUpdate({ is_admin: checked })
                                   }
                                 />
-                                <Label htmlFor="is_admin">Administrateur</Label>
                               </div>
                             )}
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="is_vip" className="text-sm">Statut VIP</Label>
                               <Switch
                                 id="is_vip"
                                 checked={user.is_vip}
@@ -158,10 +159,9 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                                   handleUserUpdate({ is_vip: checked })
                                 }
                               />
-                              <Label htmlFor="is_vip">Statut VIP</Label>
                             </div>
                             {!isOwner && user.is_admin && (
-                              <p className="text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded">
+                              <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded">
                                 Seul le propriétaire peut modifier le statut administrateur.
                               </p>
                             )}
@@ -170,20 +170,20 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                       </Dialog>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-gray-500">BradCoins:</span>
-                        <span className="font-mono ml-1">{user.brad_coins?.[0]?.balance || 0}</span>
+                    <div className="grid grid-cols-2 gap-3 text-xs mb-3">
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">BradCoins</div>
+                        <div className="font-mono font-semibold">{user.brad_coins?.[0]?.balance || 0}</div>
                       </div>
-                      <div>
-                        <span className="text-gray-500">Inscription:</span>
-                        <span className="ml-1">{new Date(user.created_at).toLocaleDateString()}</span>
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Inscription</div>
+                        <div className="font-semibold">{new Date(user.created_at).toLocaleDateString()}</div>
                       </div>
                     </div>
                     
-                    <div className="flex flex-wrap gap-1 mt-3">
+                    <div className="flex flex-wrap gap-1">
                       {user.is_owner && (
-                        <Badge variant="default" className="text-xs bg-yellow-500">
+                        <Badge variant="default" className="text-xs bg-yellow-500 text-black">
                           <Star className="h-3 w-3 mr-1" />
                           Propriétaire
                         </Badge>
@@ -205,8 +205,8 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                 ))}
               </div>
 
-              {/* Desktop Table View - Hidden on mobile */}
-              <div className="hidden sm:block">
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -322,7 +322,7 @@ const AdminUsers = ({ isOwner }: AdminUsersProps) => {
                   </TableBody>
                 </Table>
               </div>
-            </div>
+            </>
           )}
         </CardContent>
       </Card>

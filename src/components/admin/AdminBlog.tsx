@@ -1,180 +1,72 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Calendar,
-  FileText,
-  Loader2,
-  Save,
-  BookOpen,
-  Tag,
-  Folder,
-  Clock
-} from "lucide-react";
-import RichTextEditor from "./blog/RichTextEditor";
-import CategoryManager from "./blog/CategoryManager";
-import TagManager from "./blog/TagManager";
-
-interface BlogPost {
-  id: string;
-  title: string;
-  summary: string | null;
-  content: string;
-  image_url: string | null;
-  published: boolean;
-  created_at: string;
-  updated_at: string;
-  author_id: string;
-  slug: string | null;
-  reading_time_minutes: number | null;
-}
-
-const blogFormSchema = z.object({
-  title: z.string().min(1, "Le titre est requis"),
-  summary: z.string().optional(),
-  content: z.string().min(1, "Le contenu est requis"),
-  image_url: z.string().url("URL invalide").optional().or(z.literal("")),
-  published: z.boolean(),
-  featured: z.boolean().optional(),
-  meta_description: z.string().optional(),
-  categories: z.array(z.string()).optional(),
-  tags: z.array(z.string()).optional(),
-  reading_time_minutes: z.number().min(1, "Le temps de lecture doit être d'au moins 1 minute").max(120, "Le temps de lecture ne peut pas dépasser 120 minutes"),
-});
-
-type BlogFormData = z.infer<typeof blogFormSchema>;
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Edit, Trash2, BookOpen, MessageSquare, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const AdminBlog = () => {
-  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const queryClient = useQueryClient();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const form = useForm<BlogFormData>({
-    resolver: zodResolver(blogFormSchema),
-    defaultValues: {
-      title: "",
-      summary: "",
-      content: "",
-      image_url: "",
-      published: false,
-      featured: false,
-      meta_description: "",
-      reading_time_minutes: 5,
-    },
-  });
-
-  // Récupérer tous les articles de blog
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['admin-blog-posts'],
+  const { data: blogPosts, isLoading } = useQuery({
+    queryKey: ['admin-blog-posts', searchTerm],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('blog_posts')
-        .select('*')
+        .select('*, profiles(username), blog_categories(name)')
         .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data as BlogPost[];
-    },
-  });
 
-  // Mutation pour créer/modifier un article
-  const saveMutation = useMutation({
-    mutationFn: async (data: BlogFormData) => {
-      const slug = data.title.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '');
-
-      if (editingPost) {
-        // Modifier l'article existant
-        const { error } = await supabase
-          .from('blog_posts')
-          .update({
-            title: data.title,
-            content: data.content,
-            summary: data.summary || null,
-            image_url: data.image_url || null,
-            published: data.published,
-            slug: slug,
-            reading_time_minutes: data.reading_time_minutes,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', editingPost.id);
-        
-        if (error) throw error;
-      } else {
-        // Créer un nouvel article
-        const { error } = await supabase
-          .from('blog_posts')
-          .insert({
-            title: data.title,
-            content: data.content,
-            summary: data.summary || null,
-            image_url: data.image_url || null,
-            published: data.published,
-            slug: slug,
-            reading_time_minutes: data.reading_time_minutes,
-            author_id: user!.id,
-          });
-        
-        if (error) throw error;
+      if (searchTerm) {
+        query = query.ilike('title', `%${searchTerm}%`);
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
-      setDialogOpen(false);
-      setEditingPost(null);
-      setSelectedCategories([]);
-      setSelectedTags([]);
-      form.reset();
-      toast.success(editingPost ? "Article modifié avec succès" : "Article créé avec succès");
-    },
-    onError: (error) => {
-      console.error('Erreur lors de la sauvegarde:', error);
-      toast.error("Erreur lors de la sauvegarde de l'article");
-    },
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    }
   });
 
-  // Mutation pour supprimer un article
-  const deleteMutation = useMutation({
+  const { data: stats } = useQuery({
+    queryKey: ['blog-stats'],
+    queryFn: async () => {
+      const { data: posts, error: postsError } = await supabase
+        .from('blog_posts')
+        .select('is_published, views_count');
+
+      if (postsError) throw postsError;
+
+      const { data: comments, error: commentsError } = await supabase
+        .from('blog_comments')
+        .select('id');
+
+      if (commentsError) throw commentsError;
+
+      const totalPosts = posts.length;
+      const publishedPosts = posts.filter(post => post.is_published).length;
+      const totalViews = posts.reduce((sum, post) => sum + (post.views_count || 0), 0);
+      const totalComments = comments.length;
+
+      return {
+        totalPosts,
+        publishedPosts,
+        totalViews,
+        totalComments
+      };
+    }
+  });
+
+  const deletePostMutation = useMutation({
     mutationFn: async (postId: string) => {
       const { error } = await supabase
         .from('blog_posts')
@@ -185,433 +77,353 @@ const AdminBlog = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-stats'] });
       toast.success("Article supprimé avec succès");
     },
-    onError: (error) => {
-      console.error('Erreur lors de la suppression:', error);
-      toast.error("Erreur lors de la suppression de l'article");
-    },
+    onError: () => {
+      toast.error("Erreur lors de la suppression");
+    }
   });
 
-  const handleEdit = (post: BlogPost) => {
-    setEditingPost(post);
-    form.reset({
-      title: post.title,
-      summary: post.summary || "",
-      content: post.content,
-      image_url: post.image_url || "",
-      published: post.published,
-      reading_time_minutes: post.reading_time_minutes || 5,
-    });
-    setDialogOpen(true);
-  };
+  const updatePostMutation = useMutation({
+    mutationFn: async ({ postId, updates }: { postId: string, updates: any }) => {
+      const { error } = await supabase
+        .from('blog_posts')
+        .update(updates)
+        .eq('id', postId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['blog-stats'] });
+      toast.success("Article mis à jour avec succès");
+      setSelectedPost(null);
+    },
+    onError: () => {
+      toast.error("Erreur lors de la mise à jour");
+    }
+  });
 
-  const handleDelete = (postId: string) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cet article ?")) {
-      deleteMutation.mutate(postId);
+  const handlePostUpdate = (updates: any) => {
+    if (selectedPost) {
+      updatePostMutation.mutate({ postId: selectedPost.id, updates });
     }
   };
 
-  const onSubmit = (data: BlogFormData) => {
-    saveMutation.mutate(data);
-  };
-
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return new Date(dateString).toLocaleDateString('fr-FR');
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-        <span className="ml-2 text-gray-600 dark:text-gray-300">Chargement des articles...</span>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
-            <BookOpen className="h-7 w-7 text-purple-500" />
-            Gestion du Blog CMS
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">Créez et gérez les articles de blog avec un éditeur avancé</p>
-        </div>
+    <div className="space-y-3 sm:space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <BookOpen className="h-6 sm:h-8 w-6 sm:w-8 text-blue-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total articles</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalPosts || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              onClick={() => {
-                setEditingPost(null);
-                setSelectedCategories([]);
-                setSelectedTags([]);
-                form.reset();
-              }}
-              className="button-primary"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Nouvel Article
-            </Button>
-          </DialogTrigger>
-          
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto dark:bg-black/80 dark:backdrop-blur-2xl dark:border-white/15">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                <FileText className="h-5 w-5" />
-                {editingPost ? "Modifier l'article" : "Créer un nouvel article"}
-              </DialogTitle>
-            </DialogHeader>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Colonne principale - Contenu */}
-                  <div className="lg:col-span-2 space-y-6">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 dark:text-gray-300">Titre de l'article</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="Entrez un titre accrocheur..." 
-                              {...field}
-                              className="text-lg font-medium input-enhanced"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <Eye className="h-6 sm:h-8 w-6 sm:w-8 text-green-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Publiés</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.publishedPosts || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <Eye className="h-6 sm:h-8 w-6 sm:w-8 text-purple-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Vues totales</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalViews?.toLocaleString() || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="h-6 sm:h-8 w-6 sm:w-8 text-orange-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Commentaires</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalComments || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-                    <FormField
-                      control={form.control}
-                      name="summary"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 dark:text-gray-300">Résumé de l'article</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="Résumé court qui apparaîtra dans les listes..." 
-                              {...field} 
-                              className="input-enhanced"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="content"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-700 dark:text-gray-300">Contenu de l'article</FormLabel>
-                          <FormControl>
-                            <RichTextEditor
-                              content={field.value}
-                              onChange={field.onChange}
-                              placeholder="Rédigez votre article ici..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Colonne latérale - Paramètres */}
-                  <div className="space-y-6">
-                    {/* Statut de publication */}
-                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
-                      <h3 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
-                        <Eye className="h-4 w-4" />
-                        Publication
-                      </h3>
-                      
-                      <FormField
-                        control={form.control}
-                        name="published"
-                        render={({ field }) => (
-                          <FormItem className="flex items-center justify-between">
-                            <FormLabel className="text-gray-700 dark:text-gray-300">Publier l'article</FormLabel>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Temps de lecture */}
-                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
-                      <h3 className="font-medium mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
-                        <Clock className="h-4 w-4" />
-                        Temps de lecture
-                      </h3>
-                      <FormField
-                        control={form.control}
-                        name="reading_time_minutes"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-700 dark:text-gray-300">Minutes de lecture estimées</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                min="1" 
-                                max="120" 
-                                placeholder="5" 
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 5)}
-                                className="input-enhanced"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    {/* Image à la une */}
-                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
-                      <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Image à la une</h3>
-                      <FormField
-                        control={form.control}
-                        name="image_url"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Input placeholder="URL de l'image..." {...field} className="input-enhanced" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {form.watch('image_url') && (
-                        <div className="mt-2">
-                          <img 
-                            src={form.watch('image_url')} 
-                            alt="Aperçu" 
-                            className="w-full h-32 object-cover rounded border border-white/10"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
+      <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-base sm:text-xl">Gestion du Blog</span>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+              <div className="relative flex-1 sm:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher un article..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 text-sm"
+                />
+              </div>
+              <Button 
+                onClick={() => setShowCreateDialog(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvel Article
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-3 sm:p-6">
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+              <p className="text-sm">Chargement...</p>
+            </div>
+          ) : (
+            <>
+              {/* Mobile Cards View */}
+              <div className="block lg:hidden space-y-3">
+                {blogPosts?.map((post) => (
+                  <Card key={post.id} className="p-3 dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-start space-x-3 flex-1 min-w-0">
+                        {post.featured_image && (
+                          <img
+                            src={post.featured_image}
+                            alt={post.title}
+                            className="h-12 w-12 rounded object-cover flex-shrink-0"
                           />
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm mb-1 line-clamp-2">{post.title}</div>
+                          <div className="text-xs text-gray-500 mb-2">Par {post.profiles?.username}</div>
+                          <div className="flex flex-wrap gap-1">
+                            {post.is_published ? (
+                              <Badge className="bg-green-500 text-white text-xs">Publié</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs">Brouillon</Badge>
+                            )}
+                            {post.blog_categories && (
+                              <Badge variant="outline" className="text-xs">
+                                {post.blog_categories.name}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
-
-                    {/* Catégories */}
-                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
-                      <CategoryManager
-                        selectedCategories={selectedCategories}
-                        onCategoriesChange={setSelectedCategories}
-                      />
-                    </div>
-
-                    {/* Tags */}
-                    <div className="bg-gray-50 dark:bg-black/20 dark:border dark:border-white/10 p-4 rounded-lg backdrop-blur-xl">
-                      <TagManager
-                        selectedTags={selectedTags}
-                        onTagsChange={setSelectedTags}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-2 pt-6 border-t border-gray-200 dark:border-white/10">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
-                    className="dark:bg-black/20 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
-                  >
-                    Annuler
-                  </Button>
-                  <Button type="submit" disabled={saveMutation.isPending} className="button-primary">
-                    {saveMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    {editingPost ? "Mettre à jour" : "Publier l'article"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Statistiques améliorées */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="card-enhanced">
-          <div className="flex items-center p-4">
-            <FileText className="h-8 w-8 text-blue-500" />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Articles</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{posts?.length || 0}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-enhanced">
-          <div className="flex items-center p-4">
-            <Eye className="h-8 w-8 text-green-500" />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Publiés</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {posts?.filter(p => p.published).length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-enhanced">
-          <div className="flex items-center p-4">
-            <Calendar className="h-8 w-8 text-orange-500" />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Brouillons</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {posts?.filter(p => !p.published).length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="card-enhanced">
-          <div className="flex items-center p-4">
-            <Folder className="h-8 w-8 text-purple-500" />
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Cette semaine</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {posts?.filter(p => {
-                  const weekAgo = new Date();
-                  weekAgo.setDate(weekAgo.getDate() - 7);
-                  return new Date(p.created_at) > weekAgo;
-                }).length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Liste des articles améliorée */}
-      <div className="card-enhanced">
-        <div className="p-4 border-b border-gray-200 dark:border-white/10">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Articles récents</h3>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
-                <TableHead className="text-gray-700 dark:text-gray-300">Article</TableHead>
-                <TableHead className="text-gray-700 dark:text-gray-300">Statut</TableHead>
-                <TableHead className="text-gray-700 dark:text-gray-300">Auteur</TableHead>
-                <TableHead className="text-gray-700 dark:text-gray-300">Créé le</TableHead>
-                <TableHead className="text-gray-700 dark:text-gray-300">Modifié le</TableHead>
-                <TableHead className="text-right text-gray-700 dark:text-gray-300">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {posts?.map((post) => (
-                <TableRow key={post.id} className="border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
-                  <TableCell>
-                    <div className="flex items-start space-x-3">
-                      {post.image_url && (
-                        <img 
-                          src={post.image_url} 
-                          alt="" 
-                          className="w-12 h-12 object-cover rounded border border-white/10"
-                        />
-                      )}
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{post.title}</p>
-                        {post.summary && (
-                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
-                            {post.summary}
-                          </p>
-                        )}
-                        {post.slug && (
-                          <p className="text-xs text-blue-500 dark:text-blue-400">/{post.slug}</p>
-                        )}
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0 ml-2">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedPost(post)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="w-[95vw] max-w-md mx-auto">
+                            <DialogHeader>
+                              <DialogTitle className="text-lg">Gérer {post.title}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="is_published" className="text-sm">Publié</Label>
+                                <Switch
+                                  id="is_published"
+                                  checked={post.is_published}
+                                  onCheckedChange={(checked) =>
+                                    handlePostUpdate({ is_published: checked })
+                                  }
+                                />
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <Label htmlFor="is_featured" className="text-sm">À la une</Label>
+                                <Switch
+                                  id="is_featured"
+                                  checked={post.is_featured}
+                                  onCheckedChange={(checked) =>
+                                    handlePostUpdate({ is_featured: checked })
+                                  }
+                                />
+                              </div>
+                              <div className="grid grid-cols-1 gap-2 text-xs">
+                                <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
+                                  <div className="font-semibold">{post.views_count || 0}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deletePostMutation.mutate(post.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={post.published ? "default" : "secondary"}
-                      className={
-                        post.published 
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-700'
-                          : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-600'
-                      }
-                    >
-                      {post.published ? "Publié" : "Brouillon"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Vous</span>
-                  </TableCell>
-                  <TableCell className="text-gray-700 dark:text-gray-300">{formatDate(post.created_at)}</TableCell>
-                  <TableCell className="text-gray-700 dark:text-gray-300">{formatDate(post.updated_at)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(post)}
-                        className="dark:hover:bg-white/10 dark:text-gray-300"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(post.id)}
-                        disabled={deleteMutation.isPending}
-                        className="dark:hover:bg-white/10 dark:text-gray-300 hover:text-red-500"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Publié le</div>
+                        <div className="font-semibold">{formatDate(post.created_at)}</div>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Vues</div>
+                        <div className="font-semibold">{post.views_count || 0}</div>
+                      </div>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  </Card>
+                ))}
+              </div>
 
-        {posts?.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Aucun article
-            </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Commencez par créer votre premier article avec l'éditeur avancé.
-            </p>
-            <Button onClick={() => setDialogOpen(true)} className="button-primary">
-              <Plus className="h-4 w-4 mr-2" />
-              Créer le premier article
-            </Button>
-          </div>
-        )}
-      </div>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Article</TableHead>
+                      <TableHead>Auteur</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Vues</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {blogPosts?.map((post) => (
+                      <TableRow key={post.id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            {post.featured_image && (
+                              <img
+                                src={post.featured_image}
+                                alt={post.title}
+                                className="h-10 w-10 rounded object-cover"
+                              />
+                            )}
+                            <div>
+                              <div className="font-medium max-w-xs truncate">{post.title}</div>
+                              {post.blog_categories && (
+                                <div className="text-sm text-gray-500">{post.blog_categories.name}</div>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">{post.profiles?.username}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-1">
+                            {post.is_published ? (
+                              <Badge className="bg-green-500 text-white text-xs">Publié</Badge>
+                            ) : (
+                              <Badge variant="secondary" className="text-xs">Brouillon</Badge>
+                            )}
+                            {post.is_featured && (
+                              <Badge variant="default" className="text-xs">À la une</Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className="font-mono">{post.views_count || 0}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm">{formatDate(post.created_at)}</span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setSelectedPost(post)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Gérer {post.title}</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4">
+                                  <div className="flex items-center space-x-2">
+                                    <Switch
+                                      id="is_published"
+                                      checked={post.is_published}
+                                      onCheckedChange={(checked) =>
+                                        handlePostUpdate({ is_published: checked })
+                                      }
+                                    />
+                                    <Label htmlFor="is_published">Publié</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <Switch
+                                      id="is_featured"
+                                      checked={post.is_featured}
+                                      onCheckedChange={(checked) =>
+                                        handlePostUpdate({ is_featured: checked })
+                                      }
+                                    />
+                                    <Label htmlFor="is_featured">À la une</Label>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <Label className="text-sm">Vues</Label>
+                                      <p className="font-mono">{post.views_count || 0}</p>
+                                    </div>
+                                    <div>
+                                      <Label className="text-sm">Auteur</Label>
+                                      <p>{post.profiles?.username}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => deletePostMutation.mutate(post.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

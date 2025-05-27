@@ -4,309 +4,387 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2, Coins } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Edit, Coins, TrendingUp, TrendingDown, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const AdminBradCoins = () => {
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    bradcoins_amount: 0,
-    price_cents: 0,
-    is_active: true
-  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [coinAmount, setCoinAmount] = useState("");
+  const [showAddDialog, setShowAddDialog] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: pricingPlans, isLoading } = useQuery({
-    queryKey: ['admin-bradcoins-pricing'],
+  const { data: coinBalances, isLoading } = useQuery({
+    queryKey: ['admin-bradcoins', searchTerm],
+    queryFn: async () => {
+      let query = supabase
+        .from('brad_coins')
+        .select('*, profiles(username, avatar_url)')
+        .order('balance', { ascending: false });
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      let filteredData = data;
+      if (searchTerm) {
+        filteredData = data.filter((item) => 
+          item.profiles?.username?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      return filteredData;
+    }
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ['bradcoins-stats'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('bradcoins_pricing')
-        .select('*')
-        .order('price_cents', { ascending: true });
-      
+        .from('brad_coins')
+        .select('balance');
+
       if (error) throw error;
-      return data;
+
+      const totalCoins = data.reduce((sum, coin) => sum + coin.balance, 0);
+      const totalUsers = data.length;
+      const averageBalance = totalUsers > 0 ? Math.round(totalCoins / totalUsers) : 0;
+
+      return {
+        totalCoins,
+        totalUsers,
+        averageBalance
+      };
     }
   });
 
-  const { data: purchases } = useQuery({
-    queryKey: ['admin-bradcoins-purchases'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('bradcoins_purchases')
-        .select(`
-          *,
-          bradcoins_pricing(name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10);
-      
-      if (error) throw error;
-      return data;
-    }
-  });
+  const updateCoinsMutation = useMutation({
+    mutationFn: async ({ userId, amount, operation }: { userId: string, amount: number, operation: 'add' | 'subtract' | 'set' }) => {
+      // Get current balance
+      const { data: currentData, error: fetchError } = await supabase
+        .from('brad_coins')
+        .select('balance')
+        .eq('user_id', userId)
+        .single();
 
-  const createPricingMutation = useMutation({
-    mutationFn: async (data: any) => {
+      if (fetchError) throw fetchError;
+
+      let newBalance = 0;
+      switch (operation) {
+        case 'add':
+          newBalance = currentData.balance + amount;
+          break;
+        case 'subtract':
+          newBalance = Math.max(0, currentData.balance - amount);
+          break;
+        case 'set':
+          newBalance = amount;
+          break;
+      }
+
       const { error } = await supabase
-        .from('bradcoins_pricing')
-        .insert([data]);
+        .from('brad_coins')
+        .update({ balance: newBalance })
+        .eq('user_id', userId);
       
       if (error) throw error;
+
+      // Log admin action
+      await supabase.from('admin_logs').insert({
+        admin_id: (await supabase.auth.getUser()).data.user?.id,
+        action: `${operation}_bradcoins`,
+        target_type: 'user',
+        target_id: userId,
+        details: { amount, operation, previous_balance: currentData.balance, new_balance: newBalance }
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bradcoins-pricing'] });
-      toast.success("Pricing créé avec succès");
-      setShowCreateDialog(false);
-      resetForm();
-    },
-    onError: () => {
-      toast.error("Erreur lors de la création");
-    }
-  });
-
-  const updatePricingMutation = useMutation({
-    mutationFn: async ({ id, ...data }: any) => {
-      const { error } = await supabase
-        .from('bradcoins_pricing')
-        .update(data)
-        .eq('id', id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bradcoins-pricing'] });
-      toast.success("Pricing mis à jour");
-      setEditingItem(null);
-      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['admin-bradcoins'] });
+      queryClient.invalidateQueries({ queryKey: ['bradcoins-stats'] });
+      toast.success("BradCoins mis à jour avec succès");
+      setSelectedUser(null);
+      setCoinAmount("");
+      setShowAddDialog(false);
     },
     onError: () => {
       toast.error("Erreur lors de la mise à jour");
     }
   });
 
-  const deletePricingMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('bradcoins_pricing')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bradcoins-pricing'] });
-      toast.success("Pricing supprimé");
-    },
-    onError: () => {
-      toast.error("Erreur lors de la suppression");
+  const handleCoinsUpdate = (operation: 'add' | 'subtract' | 'set') => {
+    const amount = parseInt(coinAmount);
+    if (isNaN(amount) || amount < 0) {
+      toast.error("Montant invalide");
+      return;
     }
-  });
 
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      bradcoins_amount: 0,
-      price_cents: 0,
-      is_active: true
-    });
-  };
-
-  const handleSubmit = () => {
-    if (editingItem) {
-      updatePricingMutation.mutate({ id: editingItem.id, ...formData });
-    } else {
-      createPricingMutation.mutate(formData);
+    if (selectedUser) {
+      updateCoinsMutation.mutate({ userId: selectedUser.user_id, amount, operation });
     }
-  };
-
-  const openEditDialog = (item: any) => {
-    setEditingItem(item);
-    setFormData({
-      name: item.name,
-      bradcoins_amount: item.bradcoins_amount,
-      price_cents: item.price_cents,
-      is_active: item.is_active
-    });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Coins className="h-5 w-5" />
-              Total Vendu
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {purchases?.filter(p => p.status === 'completed').length || 0}
+    <div className="space-y-3 sm:space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <Coins className="h-8 w-8 text-yellow-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Total BradCoins</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalCoins?.toLocaleString() || 0}</p>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">Achats completés</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenus BradCoins</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              €{((purchases?.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.price_paid_cents, 0) || 0) / 100).toFixed(2)}
+        
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <Users className="h-8 w-8 text-blue-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Utilisateurs actifs</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.totalUsers || 0}</p>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">Total des revenus</p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>BradCoins Distribués</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {(purchases?.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.bradcoins_amount, 0) || 0).toLocaleString()}
+        
+        <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-green-500" />
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Moyenne par utilisateur</p>
+                <p className="text-lg sm:text-2xl font-bold">{stats?.averageBalance || 0}</p>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">BradCoins vendus</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Gestion des Prix BradCoins
-            <Dialog open={showCreateDialog || !!editingItem} onOpenChange={(open) => {
-              if (!open) {
-                setShowCreateDialog(false);
-                setEditingItem(null);
-                resetForm();
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button onClick={() => setShowCreateDialog(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nouveau Pack
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    {editingItem ? 'Modifier le pack' : 'Créer un nouveau pack'}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nom du pack</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="Pack Starter"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="bradcoins_amount">Nombre de BradCoins</Label>
-                    <Input
-                      id="bradcoins_amount"
-                      type="number"
-                      value={formData.bradcoins_amount}
-                      onChange={(e) => setFormData({ ...formData, bradcoins_amount: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="price_cents">Prix (en centimes)</Label>
-                    <Input
-                      id="price_cents"
-                      type="number"
-                      value={formData.price_cents}
-                      onChange={(e) => setFormData({ ...formData, price_cents: parseInt(e.target.value) || 0 })}
-                      placeholder="100 (= 1€)"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      Prix affiché: €{(formData.price_cents / 100).toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="is_active"
-                      checked={formData.is_active}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                    />
-                    <Label htmlFor="is_active">Actif</Label>
-                  </div>
-                  <Button onClick={handleSubmit} className="w-full">
-                    {editingItem ? 'Mettre à jour' : 'Créer'}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+      <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-base sm:text-xl">Gestion des BradCoins</span>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher un utilisateur..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 text-sm"
+              />
+            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           {isLoading ? (
-            <div className="text-center py-8">Chargement...</div>
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+              <p className="text-sm">Chargement...</p>
+            </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Pack</TableHead>
-                  <TableHead>BradCoins</TableHead>
-                  <TableHead>Prix</TableHead>
-                  <TableHead>Ratio</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pricingPlans?.map((plan) => (
-                  <TableRow key={plan.id}>
-                    <TableCell className="font-medium">{plan.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {plan.bradcoins_amount.toLocaleString()} BC
-                      </Badge>
-                    </TableCell>
-                    <TableCell>€{(plan.price_cents / 100).toFixed(2)}</TableCell>
-                    <TableCell>
-                      {Math.round(plan.bradcoins_amount / (plan.price_cents / 100))} BC/€
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={plan.is_active ? "default" : "secondary"}>
-                        {plan.is_active ? "Actif" : "Inactif"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditDialog(plan)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deletePricingMutation.mutate(plan.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+            <>
+              {/* Mobile Cards View */}
+              <div className="block lg:hidden space-y-3">
+                {coinBalances?.map((balance) => (
+                  <Card key={balance.user_id} className="p-3 dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        {balance.profiles?.avatar_url ? (
+                          <img
+                            src={balance.profiles.avatar_url}
+                            alt={balance.profiles.username}
+                            className="h-10 w-10 rounded-full flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                            {balance.profiles?.username?.[0]?.toUpperCase()}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium text-sm truncate">{balance.profiles?.username}</div>
+                          <div className="text-xs text-gray-500">BradCoins</div>
+                        </div>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Badge variant="outline" className="text-sm font-mono">
+                          <Coins className="h-3 w-3 mr-1" />
+                          {balance.balance}
+                        </Badge>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setSelectedUser(balance)}
+                              className="h-8 w-8 p-0"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="w-[95vw] max-w-md mx-auto">
+                            <DialogHeader>
+                              <DialogTitle className="text-lg">Gérer BradCoins - {balance.profiles?.username}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div>
+                                <Label htmlFor="coin_amount" className="text-sm">Montant</Label>
+                                <Input
+                                  id="coin_amount"
+                                  type="number"
+                                  value={coinAmount}
+                                  onChange={(e) => setCoinAmount(e.target.value)}
+                                  placeholder="Entrez le montant"
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div className="grid grid-cols-1 gap-2">
+                                <Button 
+                                  onClick={() => handleCoinsUpdate('add')}
+                                  className="bg-green-600 hover:bg-green-700 text-white text-sm"
+                                  size="sm"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Ajouter
+                                </Button>
+                                <Button 
+                                  onClick={() => handleCoinsUpdate('subtract')}
+                                  variant="destructive"
+                                  size="sm"
+                                  className="text-sm"
+                                >
+                                  <TrendingDown className="h-4 w-4 mr-1" />
+                                  Retirer
+                                </Button>
+                                <Button 
+                                  onClick={() => handleCoinsUpdate('set')}
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-sm"
+                                >
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Définir
+                                </Button>
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                Solde actuel: {balance.balance} BradCoins
+                              </p>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </div>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden lg:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Utilisateur</TableHead>
+                      <TableHead>Balance</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {coinBalances?.map((balance) => (
+                      <TableRow key={balance.user_id}>
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            {balance.profiles?.avatar_url ? (
+                              <img
+                                src={balance.profiles.avatar_url}
+                                alt={balance.profiles.username}
+                                className="h-8 w-8 rounded-full"
+                              />
+                            ) : (
+                              <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                                {balance.profiles?.username?.[0]?.toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-medium">{balance.profiles?.username}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono">
+                            <Coins className="h-3 w-3 mr-1" />
+                            {balance.balance}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedUser(balance)}
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Gérer
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Gérer BradCoins - {balance.profiles?.username}</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div>
+                                  <Label htmlFor="coin_amount">Montant</Label>
+                                  <Input
+                                    id="coin_amount"
+                                    type="number"
+                                    value={coinAmount}
+                                    onChange={(e) => setCoinAmount(e.target.value)}
+                                    placeholder="Entrez le montant"
+                                  />
+                                </div>
+                                <div className="flex space-x-2">
+                                  <Button 
+                                    onClick={() => handleCoinsUpdate('add')}
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Ajouter
+                                  </Button>
+                                  <Button 
+                                    onClick={() => handleCoinsUpdate('subtract')}
+                                    variant="destructive"
+                                  >
+                                    <TrendingDown className="h-4 w-4 mr-2" />
+                                    Retirer
+                                  </Button>
+                                  <Button 
+                                    onClick={() => handleCoinsUpdate('set')}
+                                    variant="outline"
+                                  >
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Définir
+                                  </Button>
+                                </div>
+                                <p className="text-sm text-gray-600">
+                                  Solde actuel: {balance.balance} BradCoins
+                                </p>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
