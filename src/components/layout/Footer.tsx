@@ -22,7 +22,7 @@ const Footer = () => {
       name: "Twitch", 
       url: "https://www.twitch.tv/bradcon91",
       icon: <Twitch className="h-4 w-4" />,
-      color: "from-purple-500 via-purple-600 to-indigo-600"
+      color: "from-slate-500 via-slate-600 to-gray-600"
     },
     { 
       name: "Instagram", 
@@ -40,7 +40,7 @@ const Footer = () => {
       name: "Discord", 
       url: "https://discord.gg/bradhub",
       icon: <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>,
-      color: "from-indigo-500 via-purple-500 to-blue-600"
+      color: "from-slate-500 via-slate-600 to-gray-600"
     },
   ];
 
@@ -55,16 +55,16 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative overflow-hidden bg-white/80 dark:bg-gradient-to-br dark:from-[#0a0a12] dark:via-[#1a1625] dark:to-[#2a1f40] border-t border-gray-100 dark:border-white/10">
+    <footer className="relative overflow-hidden bg-white/80 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900 border-t border-gray-100 dark:border-slate-700/40">
       {/* Enhanced glass effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-white to-blue-50/30 dark:from-black/30 dark:via-purple-900/20 dark:to-blue-900/20 dark:backdrop-blur-2xl"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 via-white to-gray-50/30 dark:from-slate-900/30 dark:via-slate-800/20 dark:to-gray-900/20 dark:backdrop-blur-2xl"></div>
       
       {/* Floating background particles for dark mode */}
       <div className="hidden dark:block absolute inset-0 overflow-hidden">
-        <div className="absolute w-40 h-40 bg-purple-500/15 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
-        <div className="absolute w-32 h-32 bg-blue-500/15 rounded-full blur-2xl animate-float" style={{ top: '70%', right: '10%', animationDelay: '3s' }}></div>
-        <div className="absolute w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl animate-float" style={{ bottom: '10%', left: '15%', animationDelay: '6s' }}></div>
-        <div className="absolute w-28 h-28 bg-purple-600/20 rounded-full blur-2xl animate-float" style={{ top: '40%', right: '20%', animationDelay: '2s' }}></div>
+        <div className="absolute w-40 h-40 bg-slate-500/15 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
+        <div className="absolute w-32 h-32 bg-gray-500/15 rounded-full blur-2xl animate-float" style={{ top: '70%', right: '10%', animationDelay: '3s' }}></div>
+        <div className="absolute w-48 h-48 bg-slate-500/10 rounded-full blur-2xl animate-float" style={{ bottom: '10%', left: '15%', animationDelay: '6s' }}></div>
+        <div className="absolute w-28 h-28 bg-gray-600/20 rounded-full blur-2xl animate-float" style={{ top: '40%', right: '20%', animationDelay: '2s' }}></div>
       </div>
 
       <div className="relative z-10 container mx-auto px-6 py-8">
@@ -82,13 +82,13 @@ const Footer = () => {
                 <BradHubLogo size="sm" withText={false} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white text-gradient-modern">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-slate-300">
                   Qwestoria
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">La communauté Fortnite ultime</p>
+                <p className="text-sm text-gray-600 dark:text-slate-400">La communauté Fortnite ultime</p>
               </div>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm text-center lg:text-left max-w-xs">
+            <p className="text-gray-500 dark:text-slate-400 text-sm text-center lg:text-left max-w-xs">
               Rejoignez des milliers de joueurs dans l'aventure Fortnite la plus épique !
             </p>
           </motion.div>
@@ -100,7 +100,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Navigation</h4>
+            <h4 className="text-base font-semibold text-gray-900 dark:text-slate-300 mb-2">Navigation</h4>
             <div className="grid grid-cols-2 gap-3">
               {footerLinks.map((link, index) => (
                 <motion.div
@@ -110,10 +110,10 @@ const Footer = () => {
                 >
                   <Link 
                     to={link.path} 
-                    className="group relative inline-block text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 text-sm"
+                    className="group relative inline-block text-gray-600 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-300 transition-all duration-300 text-sm"
                   >
                     <span className="relative z-10">{link.name}</span>
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gray-400 to-slate-400 group-hover:w-full transition-all duration-300"></span>
                   </Link>
                 </motion.div>
               ))}
@@ -127,7 +127,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-2">Suivez-nous</h4>
+            <h4 className="text-base font-semibold text-gray-900 dark:text-slate-300 mb-2">Suivez-nous</h4>
             <div className="flex flex-wrap justify-center lg:justify-end gap-3">
               {socialLinks.map((link, index) => (
                 <motion.a
@@ -143,7 +143,7 @@ const Footer = () => {
                   transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
                   <div className={`absolute inset-0 bg-gradient-to-r ${link.color} rounded-xl blur opacity-50 group-hover:opacity-75 transition-all duration-300`}></div>
-                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 dark:bg-black/20 dark:backdrop-blur-xl shadow-lg border border-gray-200 dark:border-white/20 text-gray-700 dark:text-gray-300 group-hover:text-white group-hover:border-transparent dark:group-hover:bg-black/30 transition-all duration-300">
+                  <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 dark:bg-slate-800/20 dark:backdrop-blur-xl shadow-lg border border-gray-200 dark:border-slate-600/30 text-gray-700 dark:text-slate-300 group-hover:text-white group-hover:border-transparent dark:group-hover:bg-slate-700/30 transition-all duration-300">
                     {link.icon}
                   </div>
                 </motion.a>
@@ -154,8 +154,8 @@ const Footer = () => {
         
         {/* Enhanced divider */}
         <div className="relative mb-6">
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/20 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent blur-sm"></div>
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-slate-600/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-500/20 to-transparent blur-sm"></div>
         </div>
 
         {/* Bottom section */}
@@ -165,7 +165,7 @@ const Footer = () => {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <p className="text-gray-500 dark:text-gray-400 mb-3 sm:mb-0">
+          <p className="text-gray-500 dark:text-slate-400 mb-3 sm:mb-0">
             &copy; {new Date().getFullYear()} Qwestoria. Tous droits réservés.
           </p>
           <div className="flex gap-6">
@@ -173,10 +173,10 @@ const Footer = () => {
               <Link 
                 key={item}
                 to={`/${item.toLowerCase()}`} 
-                className="group relative text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300"
+                className="group relative text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300 transition-all duration-300"
               >
                 {item}
-                <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-purple-400 to-blue-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-px bg-gradient-to-r from-gray-400 to-slate-400 group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
           </div>

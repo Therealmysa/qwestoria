@@ -14,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
   const hideFooter = location.pathname === "/messages";
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-[#0f1419] dark:via-[#1a202c] dark:to-[#2d3748] bg-particles">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900 bg-particles">
       {/* Professional floating background particles for dark mode */}
       <div className="hidden dark:block fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute w-40 h-40 bg-slate-500/8 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
