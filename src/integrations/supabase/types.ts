@@ -154,6 +154,7 @@ export type Database = {
       blog_posts: {
         Row: {
           author_id: string
+          category: string | null
           content: string
           created_at: string
           id: string
@@ -167,6 +168,7 @@ export type Database = {
         }
         Insert: {
           author_id: string
+          category?: string | null
           content: string
           created_at?: string
           id?: string
@@ -180,6 +182,7 @@ export type Database = {
         }
         Update: {
           author_id?: string
+          category?: string | null
           content?: string
           created_at?: string
           id?: string
@@ -756,6 +759,38 @@ export type Database = {
           },
         ]
       }
+      user_missions: {
+        Row: {
+          created_at: string
+          id: string
+          mission_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mission_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mission_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_subscriptions: {
         Row: {
           cancelled_at: string | null
@@ -805,7 +840,12 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      shop_categories: {
+        Row: {
+          category: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_blog_post_comment_count: {

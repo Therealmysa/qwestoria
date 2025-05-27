@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,14 +55,6 @@ const Missions = () => {
 
       if (searchTerm) {
         query = query.ilike('title', `%${searchTerm}%`);
-      }
-
-      if (selectedCategory !== "all") {
-        query = query.eq('category', selectedCategory);
-      }
-
-      if (selectedDifficulty !== "all") {
-        query = query.eq('difficulty', selectedDifficulty);
       }
 
       const { data, error } = await query;
@@ -198,14 +191,8 @@ const Missions = () => {
                               </CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <div className="flex items-center space-x-2 mb-2">
-                                <Badge variant="secondary">{mission.difficulty}</Badge>
-                                <Badge variant="outline">{
-                                  categories.find(cat => cat.value === mission.category)?.label
-                                }</Badge>
-                              </div>
                               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                Récompense: {mission.reward}
+                                Récompense: {mission.reward_coins} BradCoins
                               </p>
                               <Button onClick={() => handleCompleteMission(mission.id)}>
                                 Accomplir la mission
@@ -235,14 +222,8 @@ const Missions = () => {
                                 </CardDescription>
                               </CardHeader>
                               <CardContent>
-                                <div className="flex items-center space-x-2 mb-2">
-                                  <Badge variant="secondary">{mission.difficulty}</Badge>
-                                  <Badge variant="outline">{
-                                    categories.find(cat => cat.value === mission.category)?.label
-                                  }</Badge>
-                                </div>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                  Récompense: {mission.reward}
+                                  Récompense: {mission.reward_coins} BradCoins
                                 </p>
                                 <Badge className="bg-green-500 text-white">Mission Accomplie</Badge>
                               </CardContent>

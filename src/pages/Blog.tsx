@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,9 +63,8 @@ const Blog = () => {
     queryKey: ['blog-categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('blog_posts')
-        .select('category')
-        .distinct();
+        .from('shop_categories')
+        .select('category');
 
       if (error) throw error;
       return data.map(item => item.category);

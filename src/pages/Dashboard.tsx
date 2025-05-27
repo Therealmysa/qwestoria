@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap } from "lucide-react";
+import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -36,8 +37,8 @@ const Dashboard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('username, brad_coins')
-        .order('brad_coins', { ascending: false })
+        .select('username, brad_coins:brad_coins(balance)')
+        .order('brad_coins.balance', { ascending: false })
         .limit(5);
       if (error) throw error;
       return data;
@@ -57,6 +58,21 @@ const Dashboard = () => {
     },
   });
 
+  const { data: bradCoinsBalance } = useQuery({
+    queryKey: ['brad-coins', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      const { data, error } = await supabase
+        .from('brad_coins')
+        .select('balance')
+        .eq('user_id', user.id)
+        .single();
+      if (error) return 0;
+      return data?.balance || 0;
+    },
+    enabled: !!user?.id,
+  });
+
   const completeMission = async (missionId: string) => {
     if (!user) {
       toast.error("Vous devez être connecté pour compléter une mission.");
@@ -67,7 +83,7 @@ const Dashboard = () => {
 
     const { data: missionData, error: missionError } = await supabase
       .from('missions')
-      .select('reward_amount')
+      .select('reward_coins')
       .eq('id', missionId)
       .single();
 
@@ -78,7 +94,7 @@ const Dashboard = () => {
       return;
     }
 
-    const { reward_amount } = missionData;
+    const { reward_coins } = missionData;
 
     const { error } = await supabase
       .from('user_missions')
@@ -91,19 +107,21 @@ const Dashboard = () => {
       return;
     }
 
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ brad_coins: (profile?.brad_coins || 0) + reward_amount })
-      .eq('id', user.id);
+    const { error: coinsError } = await supabase
+      .from('brad_coins')
+      .upsert({ 
+        user_id: user.id, 
+        balance: (bradCoinsBalance || 0) + reward_coins 
+      });
 
-    if (profileError) {
-      console.error("Erreur lors de la mise à jour du profil:", profileError);
+    if (coinsError) {
+      console.error("Erreur lors de la mise à jour des BradCoins:", coinsError);
       toast.error("Erreur lors de la mise à jour de votre solde.");
       setSelectedMission(null);
       return;
     }
 
-    toast.success(`Mission complétée ! Vous avez gagné ${reward_amount} BradCoins.`);
+    toast.success(`Mission complétée ! Vous avez gagné ${reward_coins} BradCoins.`);
     setSelectedMission(null);
   };
 
@@ -137,7 +155,7 @@ const Dashboard = () => {
                     <Coins className="h-6 w-6 text-yellow-500" />
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">BradCoins</p>
-                      <p className="text-xl font-bold">{profile?.brad_coins || 0}</p>
+                      <p className="text-xl font-bold">{bradCoinsBalance || 0}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -203,7 +221,7 @@ const Dashboard = () => {
                           <span className="font-medium">{index + 1}.</span>
                           <span>{player.username}</span>
                         </div>
-                        <Badge variant="secondary">{player.brad_coins} BC</Badge>
+                        <Badge variant="secondary">{player.brad_coins?.[0]?.balance || 0} BC</Badge>
                       </div>
                     ))}
                   </div>
