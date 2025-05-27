@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Search, Plus, Edit, Trash2, Eye, MousePointer, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdCreateForm from "./ads/AdCreateForm";
 
 const AdminAdvertisements = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAd, setSelectedAd] = useState<any>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: advertisements, isLoading } = useQuery({
@@ -93,6 +94,7 @@ const AdminAdvertisements = () => {
       queryClient.invalidateQueries({ queryKey: ['advertisements-stats'] });
       toast.success("Publicité mise à jour avec succès");
       setSelectedAd(null);
+      setShowEditDialog(false);
     },
     onError: () => {
       toast.error("Erreur lors de la mise à jour");
@@ -177,14 +179,23 @@ const AdminAdvertisements = () => {
                   className="pl-10 text-sm"
                 />
               </div>
-              <Button 
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvelle Pub
-              </Button>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouvelle Pub
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Créer une nouvelle publicité</DialogTitle>
+                  </DialogHeader>
+                  <AdCreateForm onClose={() => setShowCreateDialog(false)} />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardTitle>
         </CardHeader>
@@ -225,7 +236,10 @@ const AdminAdvertisements = () => {
                         </div>
                       </div>
                       <div className="flex gap-1 flex-shrink-0 ml-2">
-                        <Dialog>
+                        <Dialog open={showEditDialog && selectedAd?.id === ad.id} onOpenChange={(open) => {
+                          setShowEditDialog(open);
+                          if (!open) setSelectedAd(null);
+                        }}>
                           <DialogTrigger asChild>
                             <Button
                               variant="outline"
@@ -349,7 +363,10 @@ const AdminAdvertisements = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Dialog>
+                            <Dialog open={showEditDialog && selectedAd?.id === ad.id} onOpenChange={(open) => {
+                              setShowEditDialog(open);
+                              if (!open) setSelectedAd(null);
+                            }}>
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"

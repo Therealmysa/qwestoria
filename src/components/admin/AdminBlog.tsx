@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Search, Plus, Edit, Trash2, BookOpen, MessageSquare, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import BlogCreateForm from "./blog/BlogCreateForm";
 
 const AdminBlog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: blogPosts, isLoading } = useQuery({
@@ -59,7 +60,7 @@ const AdminBlog = () => {
       return {
         totalPosts,
         publishedPosts,
-        totalViews: 0, // Pas de colonne views_count dans le schéma
+        totalViews: 0,
         totalComments
       };
     }
@@ -98,6 +99,7 @@ const AdminBlog = () => {
       queryClient.invalidateQueries({ queryKey: ['blog-stats'] });
       toast.success("Article mis à jour avec succès");
       setSelectedPost(null);
+      setShowEditDialog(false);
     },
     onError: () => {
       toast.error("Erreur lors de la mise à jour");
@@ -181,14 +183,23 @@ const AdminBlog = () => {
                   className="pl-10 text-sm"
                 />
               </div>
-              <Button 
-                onClick={() => setShowCreateDialog(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                size="sm"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvel Article
-              </Button>
+              <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouvel Article
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Créer un nouvel article</DialogTitle>
+                  </DialogHeader>
+                  <BlogCreateForm onClose={() => setShowCreateDialog(false)} />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardTitle>
         </CardHeader>
@@ -226,7 +237,10 @@ const AdminBlog = () => {
                         </div>
                       </div>
                       <div className="flex gap-1 flex-shrink-0 ml-2">
-                        <Dialog>
+                        <Dialog open={showEditDialog && selectedPost?.id === post.id} onOpenChange={(open) => {
+                          setShowEditDialog(open);
+                          if (!open) setSelectedPost(null);
+                        }}>
                           <DialogTrigger asChild>
                             <Button
                               variant="outline"
@@ -321,7 +335,10 @@ const AdminBlog = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Dialog>
+                            <Dialog open={showEditDialog && selectedPost?.id === post.id} onOpenChange={(open) => {
+                              setShowEditDialog(open);
+                              if (!open) setSelectedPost(null);
+                            }}>
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
