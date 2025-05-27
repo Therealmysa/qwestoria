@@ -22,8 +22,12 @@ const AdminSubscriptions = () => {
     queryKey: ['admin-subscriptions', searchTerm],
     queryFn: async () => {
       let query = supabase
-        .from('subscriptions')
-        .select('*, profiles(username, avatar_url)')
+        .from('user_subscriptions')
+        .select(`
+          *,
+          profiles(username, avatar_url),
+          subscription_plans(name, price_monthly)
+        `)
         .order('created_at', { ascending: false });
 
       const { data, error } = await query;
@@ -44,18 +48,24 @@ const AdminSubscriptions = () => {
     queryKey: ['subscriptions-stats'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('subscriptions')
-        .select('status, amount');
+        .from('user_subscriptions')
+        .select('status');
 
       if (error) throw error;
 
       const activeSubscriptions = data.filter(sub => sub.status === 'active').length;
-      const totalRevenue = data.reduce((sum, sub) => sum + (sub.amount || 0), 0);
       const totalSubscriptions = data.length;
+
+      // Get revenue from subscription plans
+      const { data: plansData } = await supabase
+        .from('subscription_plans')
+        .select('price_monthly');
+
+      const totalRevenue = plansData?.reduce((sum, plan) => sum + (plan.price_monthly || 0), 0) || 0;
 
       return {
         activeSubscriptions,
-        totalRevenue,
+        totalRevenue: totalRevenue / 100, // Convert cents to euros
         totalSubscriptions
       };
     }
@@ -64,7 +74,7 @@ const AdminSubscriptions = () => {
   const updateSubscriptionMutation = useMutation({
     mutationFn: async ({ subscriptionId, updates }: { subscriptionId: string, updates: any }) => {
       const { error } = await supabase
-        .from('subscriptions')
+        .from('user_subscriptions')
         .update(updates)
         .eq('id', subscriptionId);
       
@@ -104,10 +114,10 @@ const AdminSubscriptions = () => {
     switch (status) {
       case 'active':
         return <Badge className="bg-green-500 text-white text-xs">Actif</Badge>;
-      case 'canceled':
+      case 'cancelled':
         return <Badge variant="destructive" className="text-xs">Annulé</Badge>;
-      case 'past_due':
-        return <Badge variant="secondary" className="text-xs">En retard</Badge>;
+      case 'expired':
+        return <Badge variant="secondary" className="text-xs">Expiré</Badge>;
       default:
         return <Badge variant="outline" className="text-xs">{status}</Badge>;
     }
@@ -134,7 +144,7 @@ const AdminSubscriptions = () => {
             <div className="flex items-center space-x-2">
               <Euro className="h-8 w-8 text-green-500" />
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Revenus totaux</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Revenus estimés</p>
                 <p className="text-lg sm:text-2xl font-bold">€{stats?.totalRevenue?.toFixed(2) || 0}</p>
               </div>
             </div>
@@ -196,7 +206,7 @@ const AdminSubscriptions = () => {
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium text-sm truncate">{subscription.profiles?.username}</div>
-                          <div className="text-xs text-gray-500">{subscription.plan_type}</div>
+                          <div className="text-xs text-gray-500">{subscription.subscription_plans?.name}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -223,18 +233,18 @@ const AdminSubscriptions = () => {
                                   id="is_active"
                                   checked={subscription.status === 'active'}
                                   onCheckedChange={(checked) =>
-                                    handleSubscriptionUpdate({ status: checked ? 'active' : 'canceled' })
+                                    handleSubscriptionUpdate({ status: checked ? 'active' : 'cancelled' })
                                   }
                                 />
                               </div>
                               <div className="grid grid-cols-2 gap-2 text-xs">
                                 <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
-                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Montant</div>
-                                  <div className="font-semibold">€{subscription.amount}</div>
+                                  <div className="text-gray-500 dark:text-gray-400 mb-1">Plan</div>
+                                  <div className="font-semibold">{subscription.subscription_plans?.name}</div>
                                 </div>
                                 <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
                                   <div className="text-gray-500 dark:text-gray-400 mb-1">Début</div>
-                                  <div className="font-semibold">{formatDate(subscription.start_date)}</div>
+                                  <div className="font-semibold">{formatDate(subscription.started_at)}</div>
                                 </div>
                               </div>
                             </div>
@@ -246,12 +256,12 @@ const AdminSubscriptions = () => {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
                         <div className="text-gray-500 dark:text-gray-400 mb-1">Plan</div>
-                        <div className="font-semibold">{subscription.plan_type}</div>
+                        <div className="font-semibold">{subscription.subscription_plans?.name}</div>
                       </div>
                       <div className="bg-gray-50 dark:bg-slate-600/10 p-2 rounded">
                         <div className="text-gray-500 dark:text-gray-400 mb-1">Expiration</div>
                         <div className="font-semibold">
-                          {subscription.end_date ? formatDate(subscription.end_date) : 'Illimité'}
+                          {subscription.expires_at ? formatDate(subscription.expires_at) : 'Illimité'}
                         </div>
                       </div>
                     </div>
@@ -267,7 +277,7 @@ const AdminSubscriptions = () => {
                       <TableHead>Utilisateur</TableHead>
                       <TableHead>Plan</TableHead>
                       <TableHead>Statut</TableHead>
-                      <TableHead>Montant</TableHead>
+                      <TableHead>Prix</TableHead>
                       <TableHead>Période</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -296,21 +306,21 @@ const AdminSubscriptions = () => {
                         <TableCell>
                           <Badge variant="outline" className="text-xs">
                             <Crown className="h-3 w-3 mr-1" />
-                            {subscription.plan_type}
+                            {subscription.subscription_plans?.name}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           {getStatusBadge(subscription.status)}
                         </TableCell>
                         <TableCell>
-                          <span className="font-mono">€{subscription.amount}</span>
+                          <span className="font-mono">€{((subscription.subscription_plans?.price_monthly || 0) / 100).toFixed(2)}</span>
                         </TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            {formatDate(subscription.start_date)}
-                            {subscription.end_date && (
+                            {formatDate(subscription.started_at)}
+                            {subscription.expires_at && (
                               <div className="text-xs text-gray-500">
-                                → {formatDate(subscription.end_date)}
+                                → {formatDate(subscription.expires_at)}
                               </div>
                             )}
                           </div>
@@ -337,19 +347,19 @@ const AdminSubscriptions = () => {
                                     id="is_active"
                                     checked={subscription.status === 'active'}
                                     onCheckedChange={(checked) =>
-                                      handleSubscriptionUpdate({ status: checked ? 'active' : 'canceled' })
+                                      handleSubscriptionUpdate({ status: checked ? 'active' : 'cancelled' })
                                     }
                                   />
                                   <Label htmlFor="is_active">Statut actif</Label>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
-                                    <Label className="text-sm">Montant</Label>
-                                    <p className="font-mono">€{subscription.amount}</p>
+                                    <Label className="text-sm">Prix mensuel</Label>
+                                    <p className="font-mono">€{((subscription.subscription_plans?.price_monthly || 0) / 100).toFixed(2)}</p>
                                   </div>
                                   <div>
                                     <Label className="text-sm">Plan</Label>
-                                    <p>{subscription.plan_type}</p>
+                                    <p>{subscription.subscription_plans?.name}</p>
                                   </div>
                                 </div>
                               </div>
