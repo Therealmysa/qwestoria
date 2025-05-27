@@ -122,7 +122,7 @@ const Admin = () => {
         <Sidebar className="border-r border-gray-200 dark:border-slate-700">
           <SidebarHeader className="border-b border-gray-200 dark:border-slate-700 p-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                 Administration
               </h2>
               {profile?.is_owner && (
@@ -157,7 +157,7 @@ const Admin = () => {
           <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
             <SidebarTrigger className="-ml-1" />
             <div className="ml-auto">
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                 {activeTabData?.label}
               </h1>
             </div>
@@ -166,7 +166,7 @@ const Admin = () => {
           <main className="flex-1 p-6">
             <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-gradient-modern">
+                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   {activeTabData && <activeTabData.icon className="h-5 w-5" />}
                   {activeTabData?.label}
                 </CardTitle>

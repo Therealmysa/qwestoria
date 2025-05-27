@@ -111,7 +111,7 @@ const Blog = () => {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <BookOpen className="h-8 w-8 text-primary dark:text-[#9b87f5]" />
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-[#9b87f5] text-gradient-modern">
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
             Blog d'Actualités
           </h1>
         </div>

@@ -113,7 +113,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="p-3 sm:p-6">
-            <CardTitle className="text-gradient-modern text-base sm:text-lg">Activité Récente</CardTitle>
+            <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] text-base sm:text-lg">Activité Récente</CardTitle>
             <CardDescription className="dark:text-gray-300 text-sm">
               Vue d'ensemble des dernières activités
             </CardDescription>
@@ -138,7 +138,7 @@ const AdminDashboard = () => {
 
         <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="p-3 sm:p-6">
-            <CardTitle className="text-gradient-modern text-base sm:text-lg">Performance Publicitaire</CardTitle>
+            <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] text-base sm:text-lg">Performance Publicitaire</CardTitle>
             <CardDescription className="dark:text-gray-300 text-sm">
               Statistiques des publicités cette semaine
             </CardDescription>

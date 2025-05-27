@@ -104,7 +104,7 @@ const BlogPost = () => {
         <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="space-y-6">
             {/* Titre de l'article */}
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-gradient-modern">
+            <h1 className="text-3xl md:text-4xl font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
               {post.title}
             </h1>
 

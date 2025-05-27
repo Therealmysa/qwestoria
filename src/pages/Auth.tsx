@@ -163,12 +163,12 @@ const Auth = () => {
             <div className="absolute h-10 w-10 rounded-full bg-gradient-to-r from-[#9b87f5] to-amber-400 shadow-inner"></div>
             <span className="relative text-lg font-bold text-white">BC</span>
           </div>
-          <h1 className="ml-3 text-3xl font-bold text-gradient-modern">BradFlow</h1>
+          <h1 className="ml-3 text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">BradFlow</h1>
         </motion.div>
 
         <Card className="dark:bg-black/15 dark:backdrop-blur-xl dark:border dark:border-white/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold text-[#9b87f5] text-gradient-modern">
+            <CardTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
               {isLogin ? "Connexion" : "Inscription"} à BradFlow
             </CardTitle>
             <CardDescription className="text-gray-300 dark:text-gray-400">
