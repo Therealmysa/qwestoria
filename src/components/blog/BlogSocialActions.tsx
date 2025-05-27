@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
@@ -145,37 +144,42 @@ const BlogSocialActions = ({ postId, postTitle, postSummary, className = "" }: B
   };
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-3 ${className}`}>
       <Button
         variant="ghost"
         size="sm"
         onClick={handleLike}
         disabled={isLoading}
-        className={`text-gray-500 hover:text-red-500 dark:text-gray-400 transition-colors ${
-          isLiked ? "text-red-500" : ""
+        className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
+          isLiked 
+            ? "text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30" 
+            : "text-gray-600 hover:text-red-500 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20"
         }`}
       >
         <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-        {likeCount > 0 && <span className="ml-1 text-xs">{likeCount}</span>}
+        <span className="text-sm font-medium">{likeCount}</span>
+        <span className="hidden sm:inline text-sm">J'aime</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         onClick={handleComment}
-        className="text-gray-500 hover:text-blue-500 dark:text-gray-400 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-blue-500 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200"
       >
         <MessageCircle className="h-4 w-4" />
-        {commentCount > 0 && <span className="ml-1 text-xs">{commentCount}</span>}
+        <span className="text-sm font-medium">{commentCount}</span>
+        <span className="hidden sm:inline text-sm">Commenter</span>
       </Button>
 
       <Button
         variant="ghost"
         size="sm"
         onClick={handleShare}
-        className="text-gray-500 hover:text-green-500 dark:text-gray-400 transition-colors"
+        className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-green-50 dark:text-gray-400 dark:hover:text-green-400 dark:hover:bg-green-900/20 transition-all duration-200"
       >
         <Share2 className="h-4 w-4" />
+        <span className="hidden sm:inline text-sm">Partager</span>
       </Button>
     </div>
   );
