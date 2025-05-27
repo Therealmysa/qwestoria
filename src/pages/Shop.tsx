@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingBag, Search, Filter, Coins } from "lucide-react";
+import { ShoppingBag, Search, Filter, Coins, Crown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import AdBanner from "@/components/advertisements/AdBanner";
+import BradCoinsShop from "@/components/shop/BradCoinsShop";
+import VipUpgrade from "@/components/vip/VipUpgrade";
 
 const Shop = () => {
   const { user, profile } = useAuth();
@@ -52,7 +54,6 @@ const Shop = () => {
     }
   });
 
-  // Get brad coins balance separately
   const { data: bradCoinsBalance } = useQuery({
     queryKey: ['brad-coins', user?.id],
     queryFn: async () => {
@@ -79,7 +80,6 @@ const Shop = () => {
       return;
     }
 
-    // Déclencher une fonction Edge pour effectuer l'achat
     const { data, error } = await supabase.functions.invoke('purchase-item', {
       body: {
         user_id: user.id,
@@ -94,7 +94,6 @@ const Shop = () => {
     } else {
       console.log("Achat réussi:", data);
       toast.success("Achat réussi !");
-      // Revalider le profil utilisateur pour mettre à jour le solde de BradCoins
       window.location.reload();
     }
   };
@@ -117,78 +116,93 @@ const Shop = () => {
                   Boutique
                 </CardTitle>
                 <CardDescription className="text-gray-500 dark:text-gray-400">
-                  Découvrez nos articles exclusifs et améliorez votre expérience.
+                  Découvrez nos articles exclusifs, achetez des BradCoins et passez Premium/VIP.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="search"
-                      placeholder="Rechercher un article..."
-                      className="pl-10"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Filter className="h-4 w-4" />
-                    Filtrer
-                  </Button>
-                </div>
-              </CardContent>
             </Card>
 
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs defaultValue="items" className="w-full">
               <TabsList className="mb-4">
-                <TabsTrigger value="all" onClick={() => setSelectedCategory("all")}>Tous</TabsTrigger>
-                {categories?.map((category) => (
-                  <TabsTrigger key={category.id} value={category.category} onClick={() => setSelectedCategory(category.category)}>
-                    {category.name}
-                  </TabsTrigger>
-                ))}
+                <TabsTrigger value="items">Articles</TabsTrigger>
+                <TabsTrigger value="bradcoins">
+                  <Coins className="h-4 w-4 mr-2" />
+                  BradCoins
+                </TabsTrigger>
+                <TabsTrigger value="premium">
+                  <Crown className="h-4 w-4 mr-2" />
+                  Premium/VIP
+                </TabsTrigger>
               </TabsList>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {isLoading ? (
-                  <div className="col-span-full text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
-                    <p className="text-sm">Chargement des articles...</p>
-                  </div>
-                ) : (
-                  shopItems?.map((item) => (
-                    <Card key={item.id} className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
-                      <CardHeader>
-                        <CardTitle>{item.name}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex flex-col space-y-4">
-                        {item.image_url && (
-                          <img
-                            src={item.image_url}
-                            alt={item.name}
-                            className="w-full h-32 object-cover rounded-md"
-                          />
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-lg font-semibold flex items-center gap-1">
-                            <Coins className="h-4 w-4 text-yellow-500" />
-                            {item.price}
-                          </span>
-                          <Button onClick={() => handlePurchase(item.id, item.price)}>Acheter</Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
+              <TabsContent value="items" className="space-y-6">
+                <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="search"
+                          placeholder="Rechercher un article..."
+                          className="pl-10"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Filter className="h-4 w-4" />
+                        Filtrer
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {isLoading ? (
+                    <div className="col-span-full text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+                      <p className="text-sm">Chargement des articles...</p>
+                    </div>
+                  ) : (
+                    shopItems?.map((item) => (
+                      <Card key={item.id} className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+                        <CardHeader>
+                          <CardTitle>{item.name}</CardTitle>
+                          <CardDescription>{item.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col space-y-4">
+                          {item.image_url && (
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="w-full h-32 object-cover rounded-md"
+                            />
+                          )}
+                          <div className="flex items-center justify-between">
+                            <span className="text-lg font-semibold flex items-center gap-1">
+                              <Coins className="h-4 w-4 text-yellow-500" />
+                              {item.price}
+                            </span>
+                            <Button onClick={() => handlePurchase(item.id, item.price)}>Acheter</Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bradcoins">
+                <BradCoinsShop />
+              </TabsContent>
+
+              <TabsContent value="premium">
+                <VipUpgrade />
+              </TabsContent>
             </Tabs>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Sidebar Ads */}
             <AdBanner position="sidebar" maxAds={2} />
             
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
@@ -215,7 +229,6 @@ const Shop = () => {
         </div>
       </div>
 
-      {/* Popup Ads */}
       <AdBanner position="popup" maxAds={1} />
     </div>
   );

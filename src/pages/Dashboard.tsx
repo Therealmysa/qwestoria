@@ -15,15 +15,20 @@ const Dashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
-  const { data: userMissions, isLoading: isLoadingMissions } = useQuery({
-    queryKey: ['user-missions', user?.id],
+  const { data: completedMissions, isLoading: isLoadingMissions } = useQuery({
+    queryKey: ['completed-missions', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
-        .from('user_missions')
-        .select('*, mission:missions(*)')
+        .from('mission_submissions')
+        .select(`
+          *,
+          mission:missions(*)
+        `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .eq('status', 'verified')
+        .order('created_at', { ascending: false })
+        .limit(5);
       if (error) throw error;
       return data;
     },
@@ -46,14 +51,31 @@ const Dashboard = () => {
   const { data: availableMissions, isLoading: isLoadingAvailableMissions } = useQuery({
     queryKey: ['available-missions'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      if (!user?.id) return [];
+      
+      // Get missions that the user hasn't submitted yet
+      const { data: submittedMissionIds } = await supabase
+        .from('mission_submissions')
+        .select('mission_id')
+        .eq('user_id', user.id);
+      
+      const submittedIds = submittedMissionIds?.map(s => s.mission_id) || [];
+      
+      let query = supabase
         .from('missions')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(10);
+      
+      if (submittedIds.length > 0) {
+        query = query.not('id', 'in', `(${submittedIds.join(',')})`);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
+    enabled: !!user?.id,
   });
 
   const { data: bradCoinsBalance } = useQuery({
@@ -77,40 +99,18 @@ const Dashboard = () => {
       return;
     }
 
-    // Vérifier si l'utilisateur a déjà cette mission
-    const existingMission = userMissions?.find(um => um.mission_id === missionId);
-    if (existingMission) {
-      toast.error("Vous avez déjà cette mission.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from('user_missions')
-      .insert([{ user_id: user.id, mission_id: missionId }]);
-
-    if (error) {
-      console.error("Erreur lors du démarrage de la mission:", error);
-      toast.error("Erreur lors du démarrage de la mission.");
-      return;
-    }
-
-    toast.success("Mission ajoutée à votre liste !");
-    // Recharger les missions utilisateur
-    window.location.reload();
+    navigate(`/missions/${missionId}`);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
-      {/* Banner Ad */}
       <div className="container mx-auto px-4 pt-6">
         <AdBanner position="banner" maxAds={1} />
       </div>
 
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Content - 3 columns */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Welcome Section */}
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Bienvenue, {profile?.username} !</CardTitle>
@@ -121,7 +121,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
                 <CardContent className="p-3">
@@ -141,57 +140,87 @@ const Dashboard = () => {
                     <Trophy className="h-6 w-6 text-purple-500" />
                     <div>
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Missions Complétées</p>
-                      <p className="text-xl font-bold">{userMissions?.length || 0}</p>
+                      <p className="text-xl font-bold">{completedMissions?.length || 0}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Available Missions */}
+            {/* Missions Récemment Complétées */}
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold">Missions Disponibles</CardTitle>
+                <CardTitle className="text-lg font-semibold">Missions Récemment Complétées</CardTitle>
+                <CardDescription>Vos dernières missions vérifiées avec succès.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoadingMissions ? (
+                  <p>Chargement des missions...</p>
+                ) : completedMissions && completedMissions.length > 0 ? (
+                  completedMissions.slice(0, 3).map((submission) => (
+                    <div key={submission.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/10 rounded-lg">
+                      <div>
+                        <h3 className="text-sm font-medium">{submission.mission?.title}</h3>
+                        <p className="text-xs text-gray-500">{submission.mission?.description}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-yellow-600 flex items-center gap-1">
+                            <Coins className="h-3 w-3" />
+                            {submission.mission?.reward_coins} BradCoins
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Complétée le {new Date(submission.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        <Trophy className="h-3 w-3 mr-1" />
+                        Complétée
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">Aucune mission complétée pour le moment.</p>
+                )}
+                <Button variant="ghost" onClick={() => navigate("/missions")} className="w-full">
+                  Voir toutes les missions
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Nouvelles Missions Disponibles */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold">Nouvelles Missions Disponibles</CardTitle>
                 <CardDescription>Découvrez les nouvelles missions et commencez à les accomplir.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {isLoadingAvailableMissions ? (
                   <p>Chargement des missions...</p>
-                ) : (
-                  availableMissions?.slice(0, 3).map((mission) => {
-                    const isAlreadyStarted = userMissions?.some(um => um.mission_id === mission.id);
-                    return (
-                      <div key={mission.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/10 rounded-lg">
-                        <div>
-                          <h3 className="text-sm font-medium">{mission.title}</h3>
-                          <p className="text-xs text-gray-500">{mission.description}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-yellow-600 flex items-center gap-1">
-                              <Coins className="h-3 w-3" />
-                              {mission.reward_coins} BradCoins
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {isAlreadyStarted ? (
-                            <Badge variant="secondary">En cours</Badge>
-                          ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => startMission(mission.id)}
-                            >
-                              Commencer
-                            </Button>
-                          )}
+                ) : availableMissions && availableMissions.length > 0 ? (
+                  availableMissions.slice(0, 3).map((mission) => (
+                    <div key={mission.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-600/10 rounded-lg">
+                      <div>
+                        <h3 className="text-sm font-medium">{mission.title}</h3>
+                        <p className="text-xs text-gray-500">{mission.description}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-yellow-600 flex items-center gap-1">
+                            <Coins className="h-3 w-3" />
+                            {mission.reward_coins} BradCoins
+                          </span>
                         </div>
                       </div>
-                    );
-                  })
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => startMission(mission.id)}
+                      >
+                        Commencer
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">Toutes les missions disponibles ont été complétées !</p>
                 )}
-                <Button variant="ghost" onClick={() => navigate("/missions")} className="w-full">
-                  Voir toutes les missions
-                </Button>
               </CardContent>
             </Card>
 
@@ -221,12 +250,9 @@ const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Sidebar - 1 column */}
           <div className="space-y-6">
-            {/* Sidebar Ads */}
             <AdBanner position="sidebar" maxAds={2} />
             
-            {/* Quick Actions */}
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Actions Rapides</CardTitle>
@@ -251,7 +277,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Popup Ads */}
       <AdBanner position="popup" maxAds={1} />
     </div>
   );
