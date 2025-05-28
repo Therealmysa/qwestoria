@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,7 +97,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 space-y-6">
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Bienvenue, {profile?.username} !
@@ -115,7 +114,7 @@ const Dashboard = () => {
             </Card>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="glass-card bg-white/90 backdrop-blur-md shadow-xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+              <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600">
@@ -129,7 +128,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="glass-card bg-white/90 backdrop-blur-md shadow-xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+              <Card className="bg-gradient-to-br from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700">
@@ -145,7 +144,7 @@ const Dashboard = () => {
             </div>
 
             {/* Missions Récemment Complétées */}
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Missions Récemment Complétées
@@ -193,7 +192,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Nouvelles Missions Disponibles */}
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Nouvelles Missions Disponibles
@@ -235,7 +234,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Leaderboard */}
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Classement
@@ -269,7 +268,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Actions Rapides

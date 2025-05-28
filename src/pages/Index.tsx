@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -169,7 +168,7 @@ const Index = () => {
                   key={index}
                   variants={itemVariants}
                   whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300 rounded-2xl p-8"
+                  className={`rounded-2xl bg-gradient-to-br ${item.color} backdrop-blur-sm p-8 shadow-lg hover:shadow-xl ${item.glow} border border-gray-200 dark:border-white/10 transition-all duration-300 card-hover`}
                 >
                   <div className="mb-4 h-14 w-14 rounded-xl bg-white dark:bg-white/10 p-3 text-center shadow-inner flex items-center justify-center">
                     {item.icon}
@@ -204,7 +203,7 @@ const Index = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   viewport={{ once: true }}
-                  className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300 p-6 rounded-2xl"
+                  className="bg-white dark:bg-white/5 backdrop-blur-sm p-6 rounded-2xl shadow-md hover:shadow-lg border border-gray-100 dark:border-white/10 transition-all duration-300"
                 >
                   <div className="flex items-center mb-4">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 dark:from-[#9b87f5] dark:to-[#7654d3] flex items-center justify-center text-white font-bold">
@@ -245,7 +244,7 @@ const Index = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               whileInView={{ scale: 1, opacity: 1 }}
               viewport={{ once: true }}
-              className="mb-8 p-6 rounded-full glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20 animate-glow"
+              className="mb-8 p-6 rounded-full bg-white/80 dark:bg-white/5 backdrop-blur-md shadow-xl animate-glow"
             >
               <QwestoriaLogo size="lg" />
             </motion.div>

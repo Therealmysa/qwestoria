@@ -26,7 +26,7 @@ const Shop = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <Card className="mb-8 glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20">
+            <Card className="mb-8 bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300">
               <CardHeader className="flex flex-col space-y-3">
                 <CardTitle className="text-xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   <ShoppingBag className="h-5 w-5 text-purple-600 dark:text-[#9b87f5]" />
@@ -39,7 +39,7 @@ const Shop = () => {
             </Card>
 
             <Tabs defaultValue="items" className="w-full">
-              <TabsList className="mb-4 glass-card bg-white/80 backdrop-blur-md dark:bg-slate-800/30 dark:backdrop-blur-xl border border-gray-200/50 dark:border-slate-600/30">
+              <TabsList className="mb-4 bg-gradient-to-r from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
                 <TabsTrigger value="items" className="data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">Articles</TabsTrigger>
                 <TabsTrigger value="bradcoins" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">
                   <Coins className="h-4 w-4" />
@@ -69,7 +69,7 @@ const Shop = () => {
           <div className="space-y-6">
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
+            <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   <Coins className="h-5 w-5 text-yellow-500" />
