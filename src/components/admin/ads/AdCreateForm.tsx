@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,14 +21,15 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
     title: "",
     description: "",
     image_url: "",
-    link_url: "/",
+    destination_url: "",
     position: "sidebar",
     is_active: true,
     start_date: "",
-    end_date: ""
+    end_date: "",
+    target_pages: [] as string[]
   });
 
-  const sitePages = [
+  const availablePages = [
     { value: "/", label: "Accueil" },
     { value: "/missions", label: "Missions" },
     { value: "/blog", label: "Blog" },
@@ -45,9 +47,15 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
       const { error } = await supabase
         .from('advertisements')
         .insert([{
-          ...adData,
+          title: adData.title,
+          description: adData.description,
+          image_url: adData.image_url,
+          link_url: adData.destination_url,
+          position: adData.position,
+          is_active: adData.is_active,
           start_date: adData.start_date || null,
-          end_date: adData.end_date || null
+          end_date: adData.end_date || null,
+          target_pages: adData.target_pages
         }]);
       
       if (error) throw error;
@@ -66,11 +74,25 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title || !formData.link_url) {
-      toast.error("Titre et page de destination requis");
+    if (!formData.title || !formData.destination_url || formData.target_pages.length === 0) {
+      toast.error("Titre, URL de destination et au moins une page cible requis");
       return;
     }
     createAdMutation.mutate(formData);
+  };
+
+  const handlePageToggle = (pageValue: string, checked: boolean) => {
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        target_pages: [...prev.target_pages, pageValue]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        target_pages: prev.target_pages.filter(page => page !== pageValue)
+      }));
+    }
   };
 
   return (
@@ -96,19 +118,14 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
         />
       </div>
       <div>
-        <Label htmlFor="link_url">Page de destination</Label>
-        <Select value={formData.link_url} onValueChange={(value) => setFormData({ ...formData, link_url: value })}>
-          <SelectTrigger>
-            <SelectValue placeholder="Choisir une page" />
-          </SelectTrigger>
-          <SelectContent>
-            {sitePages.map((page) => (
-              <SelectItem key={page.value} value={page.value}>
-                {page.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Label htmlFor="destination_url">URL de destination</Label>
+        <Input
+          id="destination_url"
+          value={formData.destination_url}
+          onChange={(e) => setFormData({ ...formData, destination_url: e.target.value })}
+          placeholder="https://example.com ou /page-interne"
+          required
+        />
       </div>
       <div>
         <Label htmlFor="image_url">URL de l'image</Label>
@@ -131,6 +148,23 @@ const AdCreateForm = ({ onClose }: AdCreateFormProps) => {
             <SelectItem value="popup">Popup</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label>Pages où afficher la publicité</Label>
+        <div className="grid grid-cols-2 gap-3 mt-2 max-h-40 overflow-y-auto">
+          {availablePages.map((page) => (
+            <div key={page.value} className="flex items-center space-x-2">
+              <Checkbox
+                id={`page-${page.value}`}
+                checked={formData.target_pages.includes(page.value)}
+                onCheckedChange={(checked) => handlePageToggle(page.value, checked as boolean)}
+              />
+              <Label htmlFor={`page-${page.value}`} className="text-sm">
+                {page.label}
+              </Label>
+            </div>
+          ))}
+        </div>
       </div>
       <div>
         <Label htmlFor="start_date">Date de début (optionnel)</Label>

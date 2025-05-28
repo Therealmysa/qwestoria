@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 interface AdBannerProps {
   position: 'sidebar' | 'banner' | 'popup';
@@ -13,13 +14,16 @@ interface AdBannerProps {
 }
 
 const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
   const [dismissedAds, setDismissedAds] = useState<string[]>([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [popupShown, setPopupShown] = useState(false);
 
   const { data: ads } = useQuery({
-    queryKey: ['advertisements', position],
+    queryKey: ['advertisements', position, currentPath],
     queryFn: async () => {
-      console.log('Fetching ads for position:', position);
+      console.log('Fetching ads for position:', position, 'on page:', currentPath);
       
       const now = new Date().toISOString();
       let query = supabase
@@ -38,8 +42,21 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
       }
       
       console.log('Fetched ads:', data);
-      const filteredAds = data?.filter(ad => !dismissedAds.includes(ad.id)) || [];
-      console.log('Filtered ads (after dismissal):', filteredAds);
+      
+      // Filtrer les publicités pour la page actuelle
+      const pageFilteredAds = data?.filter(ad => {
+        // Si target_pages n'existe pas ou est vide, garder l'ancien comportement
+        if (!ad.target_pages || ad.target_pages.length === 0) {
+          return true;
+        }
+        // Vérifier si la page actuelle est dans les pages cibles
+        return ad.target_pages.includes(currentPath);
+      }) || [];
+      
+      console.log('Page filtered ads:', pageFilteredAds);
+      
+      const filteredAds = pageFilteredAds.filter(ad => !dismissedAds.includes(ad.id));
+      console.log('Final filtered ads (after dismissal):', filteredAds);
       return filteredAds;
     }
   });
@@ -110,6 +127,12 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
     }
   };
 
+  // Reset popup state when changing pages
+  useEffect(() => {
+    setPopupShown(false);
+    setShowPopup(false);
+  }, [currentPath]);
+
   // Track impressions when ads are shown
   useEffect(() => {
     if (ads && ads.length > 0) {
@@ -118,18 +141,19 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
         incrementImpressionMutation.mutate(ad.id);
       });
       
-      // Show popup after a delay for popup ads
-      if (position === 'popup') {
+      // Show popup after a delay for popup ads, but only once per page
+      if (position === 'popup' && !popupShown) {
         const timer = setTimeout(() => {
           setShowPopup(true);
+          setPopupShown(true);
         }, 3000);
         return () => clearTimeout(timer);
       }
     }
-  }, [ads]);
+  }, [ads, position, popupShown]);
 
   if (!ads || ads.length === 0) {
-    console.log('No ads to display for position:', position);
+    console.log('No ads to display for position:', position, 'on page:', currentPath);
     return null;
   }
 

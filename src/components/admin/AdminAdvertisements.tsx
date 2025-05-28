@@ -100,6 +100,13 @@ const AdminAdvertisements = () => {
     return pageMap[url] || url;
   };
 
+  const formatTargetPages = (targetPages: string[] | null) => {
+    if (!targetPages || targetPages.length === 0) {
+      return "Toutes les pages";
+    }
+    return targetPages.map(page => getPageLabel(page)).join(", ");
+  };
+
   return (
     <div className="space-y-3 sm:space-y-6">
       {/* Stats Cards */}
@@ -210,7 +217,10 @@ const AdminAdvertisements = () => {
                         )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium text-sm mb-1 line-clamp-2">{ad.title}</div>
-                          <div className="text-xs text-gray-500 mb-2">Vers: {getPageLabel(ad.link_url)}</div>
+                          <div className="text-xs text-gray-500 mb-2">
+                            <div>Destination: {ad.link_url}</div>
+                            <div>Pages: {formatTargetPages(ad.target_pages)}</div>
+                          </div>
                           <div className="flex flex-wrap gap-1">
                             {ad.is_active ? (
                               <Badge className="bg-green-500 text-white text-xs">Active</Badge>
@@ -274,7 +284,8 @@ const AdminAdvertisements = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Publicité</TableHead>
-                      <TableHead>Page</TableHead>
+                      <TableHead>Destination</TableHead>
+                      <TableHead>Pages cibles</TableHead>
                       <TableHead>Position</TableHead>
                       <TableHead>Statut</TableHead>
                       <TableHead>Statistiques</TableHead>
@@ -301,7 +312,10 @@ const AdminAdvertisements = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm">{getPageLabel(ad.link_url)}</span>
+                          <span className="text-sm max-w-xs truncate block">{ad.link_url}</span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm max-w-xs truncate block">{formatTargetPages(ad.target_pages)}</span>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="text-xs">{ad.position}</Badge>
