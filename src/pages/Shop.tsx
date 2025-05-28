@@ -26,10 +26,10 @@ const Shop = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <Card className="mb-8 dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+            <Card className="mb-8 glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20">
               <CardHeader className="flex flex-col space-y-3">
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
-                  <ShoppingBag className="h-5 w-5" />
+                <CardTitle className="text-xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                  <ShoppingBag className="h-5 w-5 text-purple-600 dark:text-[#9b87f5]" />
                   Boutique
                 </CardTitle>
                 <CardDescription className="text-gray-500 dark:text-gray-400">
@@ -39,14 +39,14 @@ const Shop = () => {
             </Card>
 
             <Tabs defaultValue="items" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="items">Articles</TabsTrigger>
-                <TabsTrigger value="bradcoins">
-                  <Coins className="h-4 w-4 mr-2" />
+              <TabsList className="mb-4 glass-card bg-white/80 backdrop-blur-md dark:bg-slate-800/30 dark:backdrop-blur-xl border border-gray-200/50 dark:border-slate-600/30">
+                <TabsTrigger value="items" className="data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">Articles</TabsTrigger>
+                <TabsTrigger value="bradcoins" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">
+                  <Coins className="h-4 w-4" />
                   BradCoins
                 </TabsTrigger>
-                <TabsTrigger value="premium">
-                  <Crown className="h-4 w-4 mr-2" />
+                <TabsTrigger value="premium" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">
+                  <Crown className="h-4 w-4" />
                   Premium/VIP
                 </TabsTrigger>
               </TabsList>
@@ -69,9 +69,9 @@ const Shop = () => {
           <div className="space-y-6">
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+            <Card className="glass-card bg-white/90 backdrop-blur-md shadow-2xl dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   <Coins className="h-5 w-5 text-yellow-500" />
                   BradCoins
                 </CardTitle>
@@ -80,7 +80,7 @@ const Shop = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold flex items-center gap-1">
+                <div className="text-2xl font-bold flex items-center gap-1 text-gray-900 dark:text-white">
                   {bradCoinsBalance}
                   <Coins className="h-5 w-5 text-yellow-500" />
                 </div>
@@ -90,7 +90,7 @@ const Shop = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="mt-3"
+                  className="mt-3 bg-white/70 hover:bg-white/90 dark:bg-slate-700/50 dark:hover:bg-slate-700/70 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
                   onClick={() => refetchBalance()}
                 >
                   Actualiser
