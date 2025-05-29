@@ -19,6 +19,8 @@ Deno.serve(async (req) => {
 
     const { user_id, amount } = await req.json()
 
+    console.log('Processing BradCoins update:', { user_id, amount })
+
     if (!user_id || amount === undefined) {
       return new Response(
         JSON.stringify({ error: 'user_id and amount are required' }),
@@ -29,30 +31,36 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Créer un compte BradCoins si l'utilisateur n'en a pas encore
-    const { error: upsertError } = await supabaseClient
-      .from('brad_coins')
-      .upsert({ 
-        user_id, 
-        balance: 0 
-      }, { 
-        onConflict: 'user_id',
-        ignoreDuplicates: true 
-      })
+    // Vérifier d'abord si l'utilisateur existe dans la table profiles
+    const { data: userProfile, error: profileError } = await supabaseClient
+      .from('profiles')
+      .select('id')
+      .eq('id', user_id)
+      .single()
 
-    if (upsertError) {
-      console.error('Error upserting brad_coins:', upsertError)
+    if (profileError || !userProfile) {
+      console.error('User profile not found:', profileError)
+      return new Response(
+        JSON.stringify({ error: 'User profile not found' }),
+        { 
+          status: 404, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
-    // Récupérer le solde actuel
-    const { data: currentBalance, error: fetchError } = await supabaseClient
+    // Vérifier si l'utilisateur a déjà un compte BradCoins
+    const { data: existingAccount, error: fetchError } = await supabaseClient
       .from('brad_coins')
       .select('balance')
       .eq('user_id', user_id)
       .single()
 
-    if (fetchError) {
-      console.error('Error fetching current balance:', fetchError)
+    let newBalance = amount
+
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      // Erreur autre que "pas de résultat trouvé"
+      console.error('Error checking existing BradCoins account:', fetchError)
       return new Response(
         JSON.stringify({ error: fetchError.message }),
         { 
@@ -62,27 +70,53 @@ Deno.serve(async (req) => {
       )
     }
 
-    const newBalance = (currentBalance?.balance || 0) + amount
+    if (existingAccount) {
+      // L'utilisateur a déjà un compte, on met à jour le solde
+      newBalance = existingAccount.balance + amount
+      
+      const { error: updateError } = await supabaseClient
+        .from('brad_coins')
+        .update({ 
+          balance: newBalance,
+          last_updated: new Date().toISOString()
+        })
+        .eq('user_id', user_id)
 
-    // Mettre à jour le solde
-    const { error: updateError } = await supabaseClient
-      .from('brad_coins')
-      .update({ 
-        balance: newBalance,
-        last_updated: new Date().toISOString()
-      })
-      .eq('user_id', user_id)
+      if (updateError) {
+        console.error('Error updating BradCoins balance:', updateError)
+        return new Response(
+          JSON.stringify({ error: updateError.message }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+    } else {
+      // L'utilisateur n'a pas de compte, on en crée un
+      const { error: insertError } = await supabaseClient
+        .from('brad_coins')
+        .insert({ 
+          user_id, 
+          balance: Math.max(0, amount), // S'assurer que le solde initial n'est pas négatif
+          last_updated: new Date().toISOString()
+        })
 
-    if (updateError) {
-      console.error('Error updating balance:', updateError)
-      return new Response(
-        JSON.stringify({ error: updateError.message }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
+      if (insertError) {
+        console.error('Error creating BradCoins account:', insertError)
+        return new Response(
+          JSON.stringify({ error: insertError.message }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+      
+      newBalance = Math.max(0, amount)
     }
+
+    console.log('BradCoins update successful:', { user_id, new_balance: newBalance })
 
     return new Response(
       JSON.stringify({ success: true, new_balance: newBalance }),

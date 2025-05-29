@@ -33,19 +33,15 @@ const AdminMissionSubmissions = () => {
     }
   });
 
-  // Fonction corrigée pour supprimer les fichiers du storage Supabase
   const deleteFileFromStorage = async (fileUrl: string) => {
     if (!fileUrl) return;
     
     try {
       console.log('Attempting to delete file from URL:', fileUrl);
       
-      // Extraire le chemin du fichier depuis l'URL publique Supabase
-      // Format URL: https://wzgnionuvdjxvnpocytb.supabase.co/storage/v1/object/public/temp/filename
       const url = new URL(fileUrl);
       const pathSegments = url.pathname.split('/');
       
-      // Trouver l'index de "public" dans le chemin
       const publicIndex = pathSegments.findIndex(segment => segment === 'public');
       
       if (publicIndex === -1 || publicIndex >= pathSegments.length - 1) {
@@ -53,11 +49,8 @@ const AdminMissionSubmissions = () => {
         return;
       }
       
-      // Le chemin du fichier commence après "public" et le nom du bucket
-      // Format: /storage/v1/object/public/temp/temp/filename
-      // On veut récupérer: temp/filename (en sautant le bucket name)
-      const bucketName = pathSegments[publicIndex + 1]; // "temp"
-      const filePath = pathSegments.slice(publicIndex + 2).join('/'); // "temp/filename" ou juste "filename"
+      const bucketName = pathSegments[publicIndex + 1];
+      const filePath = pathSegments.slice(publicIndex + 2).join('/');
       
       console.log('Bucket:', bucketName);
       console.log('File path to delete:', filePath);
@@ -83,6 +76,8 @@ const AdminMissionSubmissions = () => {
 
   const updateSubmissionMutation = useMutation({
     mutationFn: async ({ submissionId, status, notes }: { submissionId: string, status: string, notes?: string }) => {
+      console.log('Updating mission submission:', { submissionId, status, notes });
+      
       const updates: any = { status };
       if (notes) updates.admin_notes = notes;
 
@@ -97,22 +92,34 @@ const AdminMissionSubmissions = () => {
       
       // Si validé, ajouter les BradCoins via l'edge function
       if (status === 'verified' && submission) {
-        const { error: coinsError } = await supabase.functions.invoke('update-bradcoins', {
+        console.log('Mission verified, adding BradCoins reward:', submission.missions.reward_coins);
+        
+        const { data: bradCoinsResult, error: coinsError } = await supabase.functions.invoke('update-bradcoins', {
           body: {
             user_id: submission.user_id,
             amount: submission.missions.reward_coins
           }
         });
 
-        if (coinsError) throw coinsError;
+        if (coinsError) {
+          console.error('Error updating BradCoins:', coinsError);
+          throw coinsError;
+        }
 
-        // Créer une transaction
-        await supabase.from('transactions').insert({
+        console.log('BradCoins updated successfully:', bradCoinsResult);
+
+        // Créer une transaction pour traçabilité
+        const { error: transactionError } = await supabase.from('transactions').insert({
           user_id: submission.user_id,
           amount: submission.missions.reward_coins,
           type: 'mission_reward',
           description: `Récompense pour la mission: ${submission.missions.title}`
         });
+
+        if (transactionError) {
+          console.error('Error creating transaction:', transactionError);
+          // Ne pas throw ici car les BradCoins ont été ajoutés
+        }
       }
 
       // Supprimer le fichier de preuve du storage si il existe et que la mission est validée ou rejetée
@@ -122,8 +129,9 @@ const AdminMissionSubmissions = () => {
       }
 
       // Log admin action
+      const { data: { user } } = await supabase.auth.getUser();
       await supabase.from('admin_logs').insert({
-        admin_id: (await supabase.auth.getUser()).data.user?.id,
+        admin_id: user?.id,
         action: `${status}_mission_submission`,
         target_type: 'mission_submission',
         target_id: submissionId,
@@ -132,11 +140,14 @@ const AdminMissionSubmissions = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-mission-submissions'] });
-      toast.success("Soumission mise à jour");
+      queryClient.invalidateQueries({ queryKey: ['brad-coins-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-bradcoins'] });
+      toast.success("Soumission mise à jour avec succès");
       setShowDetailsDialog(false);
       setAdminNotes("");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error updating submission:', error);
       toast.error("Erreur lors de la mise à jour");
     }
   });

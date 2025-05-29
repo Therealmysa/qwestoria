@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,21 +21,53 @@ const AdminBradCoins = () => {
   const { data: coinBalances, isLoading } = useQuery({
     queryKey: ['admin-bradcoins', searchTerm],
     queryFn: async () => {
-      let query = supabase
+      console.log('Fetching BradCoins balances for admin...');
+      
+      // Récupérer tous les utilisateurs avec leurs profils
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url');
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
+      }
+
+      // Récupérer les soldes BradCoins
+      const { data: bradCoins, error: bradCoinsError } = await supabase
         .from('brad_coins')
-        .select('*, profiles(username, avatar_url)')
-        .order('balance', { ascending: false });
+        .select('user_id, balance');
 
-      const { data, error } = await query;
-      if (error) throw error;
+      if (bradCoinsError) {
+        console.error('Error fetching BradCoins:', bradCoinsError);
+        throw bradCoinsError;
+      }
 
-      let filteredData = data;
+      // Combiner les données
+      const combinedData = profiles.map(profile => {
+        const bradCoinAccount = bradCoins.find(bc => bc.user_id === profile.id);
+        return {
+          user_id: profile.id,
+          balance: bradCoinAccount?.balance || 0,
+          profiles: {
+            username: profile.username,
+            avatar_url: profile.avatar_url
+          }
+        };
+      });
+
+      // Filtrer par terme de recherche si nécessaire
+      let filteredData = combinedData;
       if (searchTerm) {
-        filteredData = data.filter((item) => 
+        filteredData = combinedData.filter((item) => 
           item.profiles?.username?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
+      // Trier par solde décroissant
+      filteredData.sort((a, b) => b.balance - a.balance);
+
+      console.log('BradCoins data fetched:', filteredData.length, 'users');
       return filteredData;
     }
   });
@@ -64,53 +95,57 @@ const AdminBradCoins = () => {
 
   const updateCoinsMutation = useMutation({
     mutationFn: async ({ userId, amount, operation }: { userId: string, amount: number, operation: 'add' | 'subtract' | 'set' }) => {
-      // Get current balance
-      const { data: currentData, error: fetchError } = await supabase
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', userId)
-        .single();
+      console.log('Updating BradCoins:', { userId, amount, operation });
 
-      if (fetchError) throw fetchError;
+      if (operation === 'add' || operation === 'subtract') {
+        // Utiliser la fonction edge pour ajouter/soustraire
+        const finalAmount = operation === 'subtract' ? -amount : amount;
+        
+        const { data, error } = await supabase.functions.invoke('update-bradcoins', {
+          body: {
+            user_id: userId,
+            amount: finalAmount
+          }
+        });
 
-      let newBalance = 0;
-      switch (operation) {
-        case 'add':
-          newBalance = currentData.balance + amount;
-          break;
-        case 'subtract':
-          newBalance = Math.max(0, currentData.balance - amount);
-          break;
-        case 'set':
-          newBalance = amount;
-          break;
+        if (error) throw error;
+        
+        console.log('BradCoins updated via edge function:', data);
+      } else if (operation === 'set') {
+        // Pour "set", on fait une mise à jour directe
+        // D'abord, s'assurer qu'un compte existe
+        const { error: upsertError } = await supabase
+          .from('brad_coins')
+          .upsert({ 
+            user_id: userId, 
+            balance: amount,
+            last_updated: new Date().toISOString()
+          });
+
+        if (upsertError) throw upsertError;
       }
 
-      const { error } = await supabase
-        .from('brad_coins')
-        .update({ balance: newBalance })
-        .eq('user_id', userId);
-      
-      if (error) throw error;
-
       // Log admin action
+      const { data: { user } } = await supabase.auth.getUser();
       await supabase.from('admin_logs').insert({
-        admin_id: (await supabase.auth.getUser()).data.user?.id,
+        admin_id: user?.id,
         action: `${operation}_bradcoins`,
         target_type: 'user',
         target_id: userId,
-        details: { amount, operation, previous_balance: currentData.balance, new_balance: newBalance }
+        details: { amount, operation }
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bradcoins'] });
       queryClient.invalidateQueries({ queryKey: ['bradcoins-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['brad-coins-balance'] });
       toast.success("BradCoins mis à jour avec succès");
       setSelectedUser(null);
       setCoinAmount("");
       setShowAddDialog(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Error updating BradCoins:', error);
       toast.error("Erreur lors de la mise à jour");
     }
   });
@@ -148,7 +183,7 @@ const AdminBradCoins = () => {
             <div className="flex items-center space-x-2">
               <Users className="h-8 w-8 text-blue-500" />
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Utilisateurs actifs</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">Utilisateurs avec BradCoins</p>
                 <p className="text-lg sm:text-2xl font-bold">{stats?.totalUsers || 0}</p>
               </div>
             </div>
