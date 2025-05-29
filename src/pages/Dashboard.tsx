@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -97,7 +98,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3 space-y-6">
-            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Bienvenue, {profile?.username} !
@@ -114,7 +115,7 @@ const Dashboard = () => {
             </Card>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+              <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600">
@@ -128,7 +129,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+              <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-purple-700">
@@ -144,7 +145,7 @@ const Dashboard = () => {
             </div>
 
             {/* Missions Récemment Complétées */}
-            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Missions Récemment Complétées
@@ -158,7 +159,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 dark:text-gray-400">Chargement des missions...</p>
                 ) : completedMissions && completedMissions.length > 0 ? (
                   completedMissions.slice(0, 3).map((submission) => (
-                    <div key={submission.id} className="flex items-center justify-between p-4 glass-card bg-white/70 dark:bg-slate-700/30 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-slate-600/30">
+                    <div key={submission.id} className="flex items-center justify-between p-4 dark:bg-slate-700/30 bg-white/70 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-slate-600/30">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-white">{submission.mission?.title}</h3>
                         <p className="text-xs text-gray-600 dark:text-gray-300">{submission.mission?.description}</p>
@@ -184,7 +185,7 @@ const Dashboard = () => {
                 <Button 
                   variant="ghost" 
                   onClick={() => navigate("/missions")} 
-                  className="w-full bg-white/50 hover:bg-white/80 dark:bg-slate-700/30 dark:hover:bg-slate-700/50 backdrop-blur-sm"
+                  className="w-full dark:bg-slate-700/30 dark:hover:bg-slate-700/50 bg-white/50 hover:bg-white/80 backdrop-blur-sm"
                 >
                   Voir toutes les missions
                 </Button>
@@ -192,7 +193,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Nouvelles Missions Disponibles */}
-            <Card className="bg-gradient-to-br from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Nouvelles Missions Disponibles
@@ -206,7 +207,7 @@ const Dashboard = () => {
                   <p className="text-gray-500 dark:text-gray-400">Chargement des missions...</p>
                 ) : availableMissions && availableMissions.length > 0 ? (
                   availableMissions.slice(0, 3).map((mission) => (
-                    <div key={mission.id} className="flex items-center justify-between p-4 glass-card bg-white/70 dark:bg-slate-700/30 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-slate-600/30">
+                    <div key={mission.id} className="flex items-center justify-between p-4 dark:bg-slate-700/30 bg-white/70 backdrop-blur-md rounded-lg border border-gray-200/50 dark:border-slate-600/30">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-white">{mission.title}</h3>
                         <p className="text-xs text-gray-600 dark:text-gray-300">{mission.description}</p>
@@ -220,7 +221,7 @@ const Dashboard = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-white/70 hover:bg-white/90 dark:bg-slate-700/50 dark:hover:bg-slate-700/70 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
+                        className="dark:bg-slate-700/50 dark:hover:bg-slate-700/70 bg-white/70 hover:bg-white/90 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
                         onClick={() => startMission(mission.id)}
                       >
                         Commencer
@@ -234,7 +235,7 @@ const Dashboard = () => {
             </Card>
 
             {/* Leaderboard */}
-            <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Classement
@@ -249,12 +250,12 @@ const Dashboard = () => {
                 ) : (
                   <div className="space-y-2">
                     {leaderboard?.map((player, index) => (
-                      <div key={index} className="flex items-center justify-between p-2 glass-card bg-white/50 dark:bg-slate-700/20 backdrop-blur-sm rounded border border-gray-200/30 dark:border-slate-600/20">
+                      <div key={index} className="flex items-center justify-between p-2 dark:bg-slate-700/20 bg-white/50 backdrop-blur-sm rounded border border-gray-200/30 dark:border-slate-600/20">
                         <div className="flex items-center space-x-2">
                           <span className="font-medium text-gray-900 dark:text-white">{index + 1}.</span>
                           <span className="text-gray-800 dark:text-gray-200">{player.username}</span>
                         </div>
-                        <Badge variant="secondary" className="bg-white/80 dark:bg-slate-700/50 backdrop-blur-sm">
+                        <Badge variant="secondary" className="dark:bg-slate-700/50 bg-white/80 backdrop-blur-sm">
                           {player.brad_coins?.[0]?.balance || 0} BC
                         </Badge>
                       </div>
@@ -268,7 +269,7 @@ const Dashboard = () => {
           <div className="space-y-6">
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-slate-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                   Actions Rapides
@@ -281,7 +282,7 @@ const Dashboard = () => {
                 <Button 
                   variant="secondary" 
                   onClick={() => navigate("/missions")}
-                  className="bg-white/70 hover:bg-white/90 dark:bg-slate-700/30 dark:hover:bg-slate-700/50 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
+                  className="dark:bg-slate-700/30 dark:hover:bg-slate-700/50 bg-white/70 hover:bg-white/90 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
                 >
                   <Target className="h-4 w-4 mr-2" />
                   Voir les Missions
@@ -289,7 +290,7 @@ const Dashboard = () => {
                 <Button 
                   variant="secondary" 
                   onClick={() => navigate("/shop")}
-                  className="bg-white/70 hover:bg-white/90 dark:bg-slate-700/30 dark:hover:bg-slate-700/50 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
+                  className="dark:bg-slate-700/30 dark:hover:bg-slate-700/50 bg-white/70 hover:bg-white/90 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
                 >
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   Visiter la Boutique
@@ -297,7 +298,7 @@ const Dashboard = () => {
                 <Button 
                   variant="secondary" 
                   onClick={() => navigate("/leaderboard")}
-                  className="bg-white/70 hover:bg-white/90 dark:bg-slate-700/30 dark:hover:bg-slate-700/50 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
+                  className="dark:bg-slate-700/30 dark:hover:bg-slate-700/50 bg-white/70 hover:bg-white/90 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
                 >
                   <Star className="h-4 w-4 mr-2" />
                   Consulter le Classement
