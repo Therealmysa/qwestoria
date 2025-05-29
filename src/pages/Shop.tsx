@@ -16,7 +16,7 @@ const Shop = () => {
   const { balance: bradCoinsBalance, refetch: refetchBalance } = useBradCoins();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-purple-50 to-purple-100 dark:from-purple-900 dark:via-purple-800 dark:to-purple-900">
       {/* Banner Ad */}
       <div className="container mx-auto px-4 pt-6">
         <AdBanner position="banner" maxAds={1} />
@@ -26,26 +26,26 @@ const Shop = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <Card className="mb-8 bg-gradient-to-br from-purple-500/20 to-purple-500/10 dark:from-purple-400/20 dark:to-purple-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300">
+            <Card className="mb-8 dark:bg-purple-800/20 dark:backdrop-blur-xl dark:border dark:border-purple-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader className="flex flex-col space-y-3">
-                <CardTitle className="text-xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
-                  <ShoppingBag className="h-5 w-5 text-purple-600 dark:text-[#9b87f5]" />
+                <CardTitle className="text-xl font-bold flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-500">
+                  <ShoppingBag className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   Boutique
                 </CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   Découvrez nos articles exclusifs, achetez des BradCoins et passez Premium/VIP.
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Tabs defaultValue="items" className="w-full">
-              <TabsList className="mb-4 bg-gradient-to-r from-teal-500/20 to-teal-500/10 dark:from-teal-400/20 dark:to-teal-400/5 backdrop-blur-sm border border-gray-200/50 dark:border-white/10">
-                <TabsTrigger value="items" className="data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">Articles</TabsTrigger>
-                <TabsTrigger value="bradcoins" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">
+              <TabsList className="mb-4 dark:bg-purple-800/20 dark:backdrop-blur-xl dark:border dark:border-purple-500/20 bg-purple-50/70 backdrop-blur-md">
+                <TabsTrigger value="items" className="data-[state=active]:bg-white/90 dark:data-[state=active]:bg-purple-700/50">Articles</TabsTrigger>
+                <TabsTrigger value="bradcoins" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-purple-700/50">
                   <Coins className="h-4 w-4" />
                   BradCoins
                 </TabsTrigger>
-                <TabsTrigger value="premium" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-slate-700/50">
+                <TabsTrigger value="premium" className="flex items-center gap-2 data-[state=active]:bg-white/90 dark:data-[state=active]:bg-purple-700/50">
                   <Crown className="h-4 w-4" />
                   Premium/VIP
                 </TabsTrigger>
@@ -69,13 +69,13 @@ const Shop = () => {
           <div className="space-y-6">
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="bg-gradient-to-br from-amber-500/20 to-amber-500/10 dark:from-amber-400/20 dark:to-amber-400/5 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 dark:border-white/10 transition-all duration-300 transform hover:scale-[1.02]">
+            <Card className="dark:bg-purple-800/20 dark:backdrop-blur-xl dark:border dark:border-purple-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-400 dark:to-purple-500">
                   <Coins className="h-5 w-5 text-yellow-500" />
                   BradCoins
                 </CardTitle>
-                <CardDescription className="text-gray-500 dark:text-gray-400">
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   Votre solde actuel
                 </CardDescription>
               </CardHeader>
@@ -84,13 +84,13 @@ const Shop = () => {
                   {bradCoinsBalance}
                   <Coins className="h-5 w-5 text-yellow-500" />
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                   Utilisez vos BradCoins pour acheter des articles exclusifs dans la boutique.
                 </p>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="mt-3 bg-white/70 hover:bg-white/90 dark:bg-slate-700/50 dark:hover:bg-slate-700/70 backdrop-blur-sm border-gray-200 dark:border-slate-600/30"
+                  className="mt-3 dark:bg-purple-700/30 dark:hover:bg-purple-700/50 bg-purple-100/70 hover:bg-purple-200/90 backdrop-blur-sm border-purple-300 dark:border-purple-500/30 text-purple-700 dark:text-purple-300"
                   onClick={() => refetchBalance()}
                 >
                   Actualiser

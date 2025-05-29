@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -98,9 +97,6 @@ const Missions = () => {
     },
     onSuccess: () => {
       toast.success("Mission accomplie !");
-      // Invalidate queries to refetch missions data
-      // queryClient.invalidateQueries({ queryKey: ['missions'] });
-      // queryClient.invalidateQueries({ queryKey: ['user-missions'] });
     },
     onError: (error) => {
       toast.error("Erreur lors de la validation de la mission.");
@@ -115,7 +111,7 @@ const Missions = () => {
   const isLoading = isLoadingMissions || isLoadingUserMissions;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-amber-50 to-amber-100 dark:from-amber-900 dark:via-amber-800 dark:to-amber-900">
       {/* Banner Ad */}
       <div className="container mx-auto px-4 pt-6">
         <AdBanner position="banner" maxAds={1} />
@@ -125,13 +121,13 @@ const Missions = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+            <Card className="dark:bg-amber-800/20 dark:backdrop-blur-xl dark:border dark:border-amber-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-amber-500/20">
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <ShieldCheck className="h-5 w-5 text-blue-500" />
+                <CardTitle className="flex items-center space-x-2 text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 dark:from-amber-400 dark:to-amber-500">
+                  <ShieldCheck className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                   <span>Missions</span>
                 </CardTitle>
-                <CardDescription className="dark:text-gray-300">
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   Explorez les missions disponibles et accomplissez-les pour gagner des récompenses.
                 </CardDescription>
               </CardHeader>
@@ -142,13 +138,13 @@ const Missions = () => {
                     <Input
                       type="search"
                       placeholder="Rechercher une mission..."
-                      className="pl-10"
+                      className="pl-10 dark:bg-amber-900/20 bg-amber-50/70 backdrop-blur-sm border-amber-200 dark:border-amber-500/30"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] dark:bg-amber-900/20 bg-amber-50/70 backdrop-blur-sm border-amber-200 dark:border-amber-500/30">
                       <SelectValue placeholder="Catégorie" />
                     </SelectTrigger>
                     <SelectContent>
@@ -160,7 +156,7 @@ const Missions = () => {
                     </SelectContent>
                   </Select>
                   <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
-                    <SelectTrigger className="w-[150px]">
+                    <SelectTrigger className="w-[150px] dark:bg-amber-900/20 bg-amber-50/70 backdrop-blur-sm border-amber-200 dark:border-amber-500/30">
                       <SelectValue placeholder="Difficulté" />
                     </SelectTrigger>
                     <SelectContent>
@@ -175,7 +171,7 @@ const Missions = () => {
 
                 {isLoading ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600 mx-auto mb-2"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-2"></div>
                     <p className="text-sm">Chargement des missions...</p>
                   </div>
                 ) : (
@@ -183,18 +179,21 @@ const Missions = () => {
                     {availableMissions.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableMissions.map((mission) => (
-                          <Card key={mission.id} className="bg-white dark:bg-slate-700/20 border border-slate-200 dark:border-slate-600/30">
+                          <Card key={mission.id} className="dark:bg-amber-900/20 bg-amber-50/70 backdrop-blur-md border border-amber-200/50 dark:border-amber-500/30">
                             <CardHeader>
-                              <CardTitle className="text-lg font-semibold">{mission.title}</CardTitle>
-                              <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">{mission.title}</CardTitle>
+                              <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
                                 {mission.description}
                               </CardDescription>
                             </CardHeader>
                             <CardContent>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                              <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">
                                 Récompense: {mission.reward_coins} BradCoins
                               </p>
-                              <Button onClick={() => handleCompleteMission(mission.id)}>
+                              <Button 
+                                className="dark:bg-amber-700/50 dark:hover:bg-amber-700/70 bg-amber-100/70 hover:bg-amber-200/90 backdrop-blur-sm border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-300"
+                                onClick={() => handleCompleteMission(mission.id)}
+                              >
                                 Accomplir la mission
                               </Button>
                             </CardContent>
@@ -203,7 +202,7 @@ const Missions = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
                           Aucune mission disponible pour le moment.
                         </p>
                       </div>
@@ -211,13 +210,13 @@ const Missions = () => {
 
                     {completedMissions.length > 0 && (
                       <>
-                        <h3 className="text-lg font-semibold mt-8 mb-4">Missions Accomplies</h3>
+                        <h3 className="text-lg font-semibold mt-8 mb-4 text-amber-700 dark:text-amber-300">Missions Accomplies</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                           {completedMissions.map((mission) => (
-                            <Card key={mission.id} className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700">
+                            <Card key={mission.id} className="dark:bg-green-900/20 bg-green-50/70 backdrop-blur-md border border-green-200/50 dark:border-green-500/30">
                               <CardHeader>
-                                <CardTitle className="text-lg font-semibold">{mission.title}</CardTitle>
-                                <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+                                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">{mission.title}</CardTitle>
+                                <CardDescription className="text-sm text-gray-600 dark:text-gray-300">
                                   {mission.description}
                                 </CardDescription>
                               </CardHeader>
@@ -243,18 +242,18 @@ const Missions = () => {
             {/* Sidebar Ads */}
             <AdBanner position="sidebar" maxAds={2} />
             
-            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+            <Card className="dark:bg-amber-800/20 dark:backdrop-blur-xl dark:border dark:border-amber-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-amber-500/20">
               <CardHeader>
-                <CardTitle>Filtres</CardTitle>
-                <CardDescription className="dark:text-gray-300">
+                <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-amber-800 dark:from-amber-400 dark:to-amber-500">Filtres</CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
                   Filtrer les missions par catégorie et difficulté.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <Label className="block text-sm font-medium mb-2">Catégories</Label>
-                    <ScrollArea className="h-[200px] w-full rounded-md border">
+                    <Label className="block text-sm font-medium mb-2 text-amber-700 dark:text-amber-300">Catégories</Label>
+                    <ScrollArea className="h-[200px] w-full rounded-md border border-amber-200 dark:border-amber-500/30 dark:bg-amber-900/20 bg-amber-50/70">
                       <div className="p-3">
                         {categories.map((category) => (
                           <div key={category.value} className="flex items-center space-x-2 py-1">
@@ -276,8 +275,8 @@ const Missions = () => {
                   </div>
 
                   <div>
-                    <Label className="block text-sm font-medium mb-2">Difficultés</Label>
-                    <ScrollArea className="h-[150px] w-full rounded-md border">
+                    <Label className="block text-sm font-medium mb-2 text-amber-700 dark:text-amber-300">Difficultés</Label>
+                    <ScrollArea className="h-[150px] w-full rounded-md border border-amber-200 dark:border-amber-500/30 dark:bg-amber-900/20 bg-amber-50/70">
                       <div className="p-3">
                         {difficulties.map((difficulty) => (
                           <div key={difficulty.value} className="flex items-center space-x-2 py-1">
