@@ -17,7 +17,7 @@ export const useBradCoins = () => {
       console.log('🔍 useBradCoins: Fetching BradCoins for user:', user.id);
       
       try {
-        // Récupérer le solde depuis la table brad_coins
+        // Récupérer le solde depuis la table brad_coins (maintenant avec contrainte unique)
         const { data, error } = await supabase
           .from('brad_coins')
           .select('balance, last_updated')
@@ -33,7 +33,11 @@ export const useBradCoins = () => {
             
             const { data: newAccount, error: createError } = await supabase
               .from('brad_coins')
-              .insert({ user_id: user.id, balance: 0 })
+              .upsert({ 
+                user_id: user.id, 
+                balance: 0,
+                last_updated: new Date().toISOString()
+              })
               .select('balance')
               .single();
             

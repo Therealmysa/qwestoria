@@ -112,14 +112,16 @@ const AdminBradCoins = () => {
         
         console.log('BradCoins updated via edge function:', data);
       } else if (operation === 'set') {
-        // Pour "set", on fait une mise à jour directe
-        // D'abord, s'assurer qu'un compte existe
+        // Pour "set", utiliser UPSERT pour éviter les doublons
         const { error: upsertError } = await supabase
           .from('brad_coins')
           .upsert({ 
             user_id: userId, 
             balance: amount,
             last_updated: new Date().toISOString()
+          }, {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
           });
 
         if (upsertError) throw upsertError;

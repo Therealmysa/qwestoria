@@ -49,38 +49,57 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Vérifier si l'utilisateur a déjà un compte BradCoins
-    const { data: existingAccount, error: fetchError } = await supabaseClient
+    // Utiliser UPSERT pour éviter les doublons - soit mettre à jour, soit insérer
+    const { data: updatedAccount, error: upsertError } = await supabaseClient
       .from('brad_coins')
-      .select('balance')
-      .eq('user_id', user_id)
-      .single()
-
-    let newBalance = amount
-
-    if (fetchError && fetchError.code !== 'PGRST116') {
-      // Erreur autre que "pas de résultat trouvé"
-      console.error('Error checking existing BradCoins account:', fetchError)
-      return new Response(
-        JSON.stringify({ error: fetchError.message }),
+      .upsert(
         { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          user_id,
+          balance: amount,
+          last_updated: new Date().toISOString()
+        },
+        { 
+          onConflict: 'user_id',
+          ignoreDuplicates: false
         }
       )
-    }
+      .select('balance')
+      .single()
 
-    if (existingAccount) {
-      // L'utilisateur a déjà un compte, on met à jour le solde
-      newBalance = existingAccount.balance + amount
+    if (upsertError) {
+      console.error('Error upserting BradCoins balance:', upsertError)
       
-      const { error: updateError } = await supabaseClient
+      // Si c'est un problème d'addition/soustraction, essayons de récupérer le solde actuel et faire l'opération
+      const { data: currentAccount, error: fetchError } = await supabaseClient
+        .from('brad_coins')
+        .select('balance')
+        .eq('user_id', user_id)
+        .single()
+
+      if (fetchError) {
+        console.error('Error fetching current balance:', fetchError)
+        return new Response(
+          JSON.stringify({ error: 'Failed to update BradCoins balance' }),
+          { 
+            status: 500, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+
+      // Calculer le nouveau solde
+      const newBalance = (currentAccount?.balance || 0) + amount
+
+      // Mettre à jour avec le nouveau solde calculé
+      const { data: finalAccount, error: updateError } = await supabaseClient
         .from('brad_coins')
         .update({ 
-          balance: newBalance,
+          balance: Math.max(0, newBalance), // S'assurer que le solde ne soit jamais négatif
           last_updated: new Date().toISOString()
         })
         .eq('user_id', user_id)
+        .select('balance')
+        .single()
 
       if (updateError) {
         console.error('Error updating BradCoins balance:', updateError)
@@ -92,34 +111,20 @@ Deno.serve(async (req) => {
           }
         )
       }
-    } else {
-      // L'utilisateur n'a pas de compte, on en crée un
-      const { error: insertError } = await supabaseClient
-        .from('brad_coins')
-        .insert({ 
-          user_id, 
-          balance: Math.max(0, amount), // S'assurer que le solde initial n'est pas négatif
-          last_updated: new Date().toISOString()
-        })
 
-      if (insertError) {
-        console.error('Error creating BradCoins account:', insertError)
-        return new Response(
-          JSON.stringify({ error: insertError.message }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-      
-      newBalance = Math.max(0, amount)
+      console.log('BradCoins update successful (via update):', { user_id, new_balance: finalAccount.balance })
+      return new Response(
+        JSON.stringify({ success: true, new_balance: finalAccount.balance }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
-    console.log('BradCoins update successful:', { user_id, new_balance: newBalance })
+    console.log('BradCoins update successful (via upsert):', { user_id, new_balance: updatedAccount.balance })
 
     return new Response(
-      JSON.stringify({ success: true, new_balance: newBalance }),
+      JSON.stringify({ success: true, new_balance: updatedAccount.balance }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
