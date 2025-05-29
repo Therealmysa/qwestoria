@@ -4,14 +4,30 @@ import { Button } from "@/components/ui/button";
 import { Coins, RefreshCw } from "lucide-react";
 import { useBradCoins } from "@/hooks/useBradCoins";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 const BradCoinsDisplay = () => {
-  const { balance: bradCoinsBalance, refetch, isLoading } = useBradCoins();
+  const { balance: bradCoinsBalance, refetch, isLoading, error } = useBradCoins();
   const { user } = useAuth();
 
+  // Log à chaque changement
+  useEffect(() => {
+    console.log('🎨 BradCoinsDisplay: Component updated', {
+      userId: user?.id,
+      balance: bradCoinsBalance,
+      isLoading,
+      error: error?.message,
+    });
+  }, [bradCoinsBalance, isLoading, error, user?.id]);
+
   const handleRefresh = async () => {
-    console.log('Manual refresh triggered for user:', user?.id);
-    await refetch();
+    console.log('🔄 BradCoinsDisplay: Manual refresh triggered for user:', user?.id);
+    try {
+      const result = await refetch();
+      console.log('✅ BradCoinsDisplay: Refresh result:', result.data);
+    } catch (refreshError) {
+      console.error('❌ BradCoinsDisplay: Refresh error:', refreshError);
+    }
   };
 
   return (
@@ -31,6 +47,10 @@ const BradCoinsDisplay = () => {
             <span className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5 animate-spin" />
               Chargement...
+            </span>
+          ) : error ? (
+            <span className="text-red-500 text-sm">
+              Erreur: {error.message}
             </span>
           ) : (
             <>
@@ -55,9 +75,11 @@ const BradCoinsDisplay = () => {
           </Button>
         </div>
         {user && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-            User ID: {user.id.slice(0, 8)}...
-          </p>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <p>User ID: {user.id.slice(0, 8)}...</p>
+            <p>Balance affiché: {bradCoinsBalance}</p>
+            <p>État: {isLoading ? 'Chargement' : error ? 'Erreur' : 'Chargé'}</p>
+          </div>
         )}
       </CardContent>
     </Card>

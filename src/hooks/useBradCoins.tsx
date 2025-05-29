@@ -10,64 +10,77 @@ export const useBradCoins = () => {
     queryKey: ['brad-coins-balance', user?.id],
     queryFn: async () => {
       if (!user?.id) {
-        console.log('No user ID available for BradCoins fetch');
+        console.log('❌ useBradCoins: No user ID available');
         return 0;
       }
       
-      console.log('Fetching BradCoins balance for user:', user.id);
+      console.log('🔍 useBradCoins: Fetching BradCoins for user:', user.id);
       
-      // Récupérer directement le solde depuis la table brad_coins
-      const { data, error } = await supabase
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error fetching BradCoins:', error);
-        // Si erreur, essayer de créer un compte
-        const { data: newAccount, error: createError } = await supabase
+      try {
+        // Récupérer le solde depuis la table brad_coins
+        const { data, error } = await supabase
           .from('brad_coins')
-          .insert({ user_id: user.id, balance: 0 })
-          .select('balance')
+          .select('balance, last_updated')
+          .eq('user_id', user.id)
           .single();
         
-        if (createError) {
-          console.error('Error creating BradCoins account:', createError);
+        if (error) {
+          console.error('❌ useBradCoins: Error fetching BradCoins:', error);
+          
+          // Si l'erreur est "pas de résultat trouvé", créer un compte
+          if (error.code === 'PGRST116') {
+            console.log('📝 useBradCoins: No account found, creating one...');
+            
+            const { data: newAccount, error: createError } = await supabase
+              .from('brad_coins')
+              .insert({ user_id: user.id, balance: 0 })
+              .select('balance')
+              .single();
+            
+            if (createError) {
+              console.error('❌ useBradCoins: Error creating account:', createError);
+              return 0;
+            }
+            
+            console.log('✅ useBradCoins: Account created with balance:', newAccount.balance);
+            return newAccount.balance || 0;
+          }
+          
+          // Autre erreur
+          console.error('❌ useBradCoins: Database error:', error);
           return 0;
         }
         
-        console.log('BradCoins account created with balance:', newAccount?.balance || 0);
-        return newAccount?.balance || 0;
-      }
-      
-      if (!data) {
-        // Aucun enregistrement trouvé, créer un compte
-        console.log('No BradCoins account found, creating one...');
-        
-        const { data: newAccount, error: createError } = await supabase
-          .from('brad_coins')
-          .insert({ user_id: user.id, balance: 0 })
-          .select('balance')
-          .single();
-        
-        if (createError) {
-          console.error('Error creating BradCoins account:', createError);
+        if (!data) {
+          console.log('⚠️ useBradCoins: No data returned but no error');
           return 0;
         }
         
-        console.log('BradCoins account created with balance:', newAccount?.balance || 0);
-        return newAccount?.balance || 0;
+        console.log('✅ useBradCoins: Successfully fetched balance:', data.balance);
+        console.log('📊 useBradCoins: Last updated:', data.last_updated);
+        
+        return data.balance || 0;
+        
+      } catch (catchError) {
+        console.error('❌ useBradCoins: Caught error:', catchError);
+        return 0;
       }
-      
-      console.log('BradCoins balance fetched:', data.balance);
-      return data.balance || 0;
     },
     enabled: !!user?.id,
-    staleTime: 0, // Toujours refetch pour éviter les données obsolètes
+    staleTime: 0, // Toujours refetch
     gcTime: 0, // Ne pas mettre en cache
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+    retry: 3,
+    retryDelay: 1000,
+  });
+
+  // Log des états du hook
+  console.log('📊 useBradCoins hook state:', {
+    userId: user?.id,
+    balance,
+    isLoading,
+    error: error?.message,
   });
 
   return {

@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag } from "lucide-react";
+import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +14,10 @@ import { useBradCoins } from "@/hooks/useBradCoins";
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const { balance: bradCoinsBalance } = useBradCoins();
+  const { balance: bradCoinsBalance, refetch: refetchBradCoins, isLoading: isLoadingBradCoins } = useBradCoins();
+
+  // Log du solde BradCoins sur le Dashboard
+  console.log('📊 Dashboard: BradCoins balance:', bradCoinsBalance, 'for user:', user?.id);
 
   const { data: completedMissions, isLoading: isLoadingMissions } = useQuery({
     queryKey: ['completed-missions', user?.id],
@@ -89,6 +91,11 @@ const Dashboard = () => {
     navigate(`/missions/${missionId}`);
   };
 
+  const handleRefreshBradCoins = async () => {
+    console.log('🔄 Dashboard: Manual BradCoins refresh triggered');
+    await refetchBradCoins();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
       <div className="container mx-auto px-4 pt-6">
@@ -121,9 +128,25 @@ const Dashboard = () => {
                     <div className="p-2 rounded-lg bg-gradient-to-r from-yellow-400 to-yellow-600">
                       <Coins className="h-6 w-6 text-white" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-300">BradCoins</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{bradCoinsBalance}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {isLoadingBradCoins ? 'Chargement...' : bradCoinsBalance.toLocaleString()}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRefreshBradCoins}
+                          disabled={isLoadingBradCoins}
+                          className="h-6 w-6 p-0"
+                        >
+                          <RefreshCw className={`h-3 w-3 ${isLoadingBradCoins ? 'animate-spin' : ''}`} />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Debug: User {user?.id?.slice(0, 8)}... | Balance: {bradCoinsBalance}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
