@@ -16,43 +16,58 @@ export const useBradCoins = () => {
       
       console.log('Fetching BradCoins balance for user:', user.id);
       
-      // D'abord vérifier si l'utilisateur a un compte BradCoins
+      // Récupérer directement le solde depuis la table brad_coins
       const { data, error } = await supabase
         .from('brad_coins')
         .select('balance')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Aucun enregistrement trouvé, créer un compte avec 0 BradCoins
-          console.log('No BradCoins account found, creating one...');
-          
-          const { data: newAccount, error: createError } = await supabase
-            .from('brad_coins')
-            .insert({ user_id: user.id, balance: 0 })
-            .select('balance')
-            .single();
-          
-          if (createError) {
-            console.error('Error creating BradCoins account:', createError);
-            return 0;
-          }
-          
-          console.log('BradCoins account created with balance:', newAccount?.balance || 0);
-          return newAccount?.balance || 0;
-        } else {
-          console.error('Error fetching BradCoins:', error);
+        console.error('Error fetching BradCoins:', error);
+        // Si erreur, essayer de créer un compte
+        const { data: newAccount, error: createError } = await supabase
+          .from('brad_coins')
+          .insert({ user_id: user.id, balance: 0 })
+          .select('balance')
+          .single();
+        
+        if (createError) {
+          console.error('Error creating BradCoins account:', createError);
           return 0;
         }
+        
+        console.log('BradCoins account created with balance:', newAccount?.balance || 0);
+        return newAccount?.balance || 0;
       }
       
-      console.log('BradCoins balance fetched:', data?.balance || 0);
-      return data?.balance || 0;
+      if (!data) {
+        // Aucun enregistrement trouvé, créer un compte
+        console.log('No BradCoins account found, creating one...');
+        
+        const { data: newAccount, error: createError } = await supabase
+          .from('brad_coins')
+          .insert({ user_id: user.id, balance: 0 })
+          .select('balance')
+          .single();
+        
+        if (createError) {
+          console.error('Error creating BradCoins account:', createError);
+          return 0;
+        }
+        
+        console.log('BradCoins account created with balance:', newAccount?.balance || 0);
+        return newAccount?.balance || 0;
+      }
+      
+      console.log('BradCoins balance fetched:', data.balance);
+      return data.balance || 0;
     },
     enabled: !!user?.id,
-    staleTime: 30000, // Cache for 30 seconds
-    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    staleTime: 0, // Toujours refetch pour éviter les données obsolètes
+    gcTime: 0, // Ne pas mettre en cache
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   return {
