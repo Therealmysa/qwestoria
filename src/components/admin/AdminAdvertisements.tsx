@@ -13,16 +13,33 @@ import { toast } from "sonner";
 import AdCreateForm from "./ads/AdCreateForm";
 import AdEditForm from "./ads/AdEditForm";
 
+interface Advertisement {
+  id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  link_url: string;
+  position: string;
+  is_active: boolean;
+  start_date?: string;
+  end_date?: string;
+  target_pages?: string[];
+  impression_count: number;
+  click_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 const AdminAdvertisements = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedAd, setSelectedAd] = useState<any>(null);
+  const [selectedAd, setSelectedAd] = useState<Advertisement | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: advertisements, isLoading } = useQuery({
     queryKey: ['admin-advertisements', searchTerm],
-    queryFn: async () => {
+    queryFn: async (): Promise<Advertisement[]> => {
       let query = supabase
         .from('advertisements')
         .select('*')
@@ -34,7 +51,7 @@ const AdminAdvertisements = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data || [];
     }
   });
 
@@ -100,7 +117,7 @@ const AdminAdvertisements = () => {
     return pageMap[url] || url;
   };
 
-  const formatTargetPages = (targetPages: string[] | null) => {
+  const formatTargetPages = (targetPages: string[] | null | undefined) => {
     if (!targetPages || targetPages.length === 0) {
       return "Toutes les pages";
     }

@@ -8,6 +8,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
+interface Advertisement {
+  id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  link_url: string;
+  position: string;
+  is_active: boolean;
+  start_date?: string;
+  end_date?: string;
+  target_pages?: string[];
+  impression_count: number;
+  click_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AdBannerProps {
   position: 'sidebar' | 'banner' | 'popup';
   maxAds?: number;
@@ -22,7 +39,7 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
 
   const { data: ads } = useQuery({
     queryKey: ['advertisements', position, currentPath],
-    queryFn: async () => {
+    queryFn: async (): Promise<Advertisement[]> => {
       console.log('Fetching ads for position:', position, 'on page:', currentPath);
       
       const now = new Date().toISOString();
@@ -44,7 +61,7 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
       console.log('Fetched ads:', data);
       
       // Filtrer les publicités pour la page actuelle
-      const pageFilteredAds = data?.filter(ad => {
+      const pageFilteredAds = data?.filter((ad: Advertisement) => {
         // Si target_pages n'existe pas ou est vide, garder l'ancien comportement
         if (!ad.target_pages || ad.target_pages.length === 0) {
           return true;
@@ -107,7 +124,7 @@ const AdBanner = ({ position, maxAds = 1 }: AdBannerProps) => {
     }
   });
 
-  const handleAdClick = (ad: any) => {
+  const handleAdClick = (ad: Advertisement) => {
     console.log('Ad clicked:', ad);
     incrementClickMutation.mutate(ad.id);
     

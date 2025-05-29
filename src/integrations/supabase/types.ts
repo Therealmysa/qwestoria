@@ -52,6 +52,7 @@ export type Database = {
           link_url: string
           position: string
           start_date: string | null
+          target_pages: string[] | null
           title: string
           updated_at: string
         }
@@ -67,6 +68,7 @@ export type Database = {
           link_url: string
           position?: string
           start_date?: string | null
+          target_pages?: string[] | null
           title: string
           updated_at?: string
         }
@@ -82,6 +84,7 @@ export type Database = {
           link_url?: string
           position?: string
           start_date?: string | null
+          target_pages?: string[] | null
           title?: string
           updated_at?: string
         }
