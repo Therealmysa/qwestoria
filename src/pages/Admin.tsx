@@ -50,10 +50,10 @@ const Admin = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Vérification des permissions...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium">Vérification des permissions...</p>
         </div>
       </div>
     );
@@ -118,34 +118,39 @@ const Admin = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
-        <Sidebar className="border-r border-gray-200 dark:border-slate-700">
-          <SidebarHeader className="border-b border-gray-200 dark:border-slate-700 p-4">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <Sidebar className="border-r border-slate-200 bg-white shadow-lg">
+          <SidebarHeader className="border-b border-slate-200 p-6 bg-gradient-to-r from-blue-600 to-indigo-600">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+              <Shield className="h-6 w-6 text-white" />
+              <h2 className="text-xl font-bold text-white">
                 Administration
               </h2>
               {profile?.is_owner && (
-                <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded-full">
+                <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full font-semibold">
                   Propriétaire
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <p className="text-blue-100 mt-2 text-sm">
               Panneau de contrôle Qwestoria
             </p>
           </SidebarHeader>
-          <SidebarContent>
-            <SidebarMenu className="p-2">
+          <SidebarContent className="bg-white">
+            <SidebarMenu className="p-3 space-y-1">
               {tabs.map((tab) => (
                 <SidebarMenuItem key={tab.id}>
                   <SidebarMenuButton
                     onClick={() => setActiveTab(tab.id)}
                     isActive={activeTab === tab.id}
-                    className="flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
+                    className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                      activeTab === tab.id
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg"
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                    }`}
                   >
-                    <tab.icon className="h-4 w-4" />
-                    <span className="text-sm">{tab.label}</span>
+                    <tab.icon className="h-5 w-5" />
+                    <span className="font-medium">{tab.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -154,27 +159,37 @@ const Admin = () => {
         </Sidebar>
 
         <SidebarInset className="flex-1">
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <div className="ml-auto">
-              <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
-                {activeTabData?.label}
-              </h1>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 px-6 bg-white shadow-sm">
+            <SidebarTrigger className="-ml-1 text-gray-600 hover:text-blue-600" />
+            <div className="ml-auto flex items-center gap-3">
+              <div className="text-right">
+                <h1 className="text-xl font-bold text-gray-800">
+                  {activeTabData?.label}
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Gestion et administration
+                </p>
+              </div>
+              {activeTabData && (
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg">
+                  <activeTabData.icon className="h-5 w-5 text-white" />
+                </div>
+              )}
             </div>
           </header>
 
           <main className="flex-1 p-6">
-            <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
-                  {activeTabData && <activeTabData.icon className="h-5 w-5" />}
+            <Card className="bg-white shadow-xl border border-slate-200 rounded-2xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200 p-6">
+                <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-800">
+                  {activeTabData && <activeTabData.icon className="h-6 w-6 text-blue-600" />}
                   {activeTabData?.label}
                 </CardTitle>
-                <CardDescription className="dark:text-gray-300">
+                <CardDescription className="text-gray-600 text-base">
                   Gestion et administration {activeTabData?.label.toLowerCase()}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6 bg-white">
                 {activeTabData && <activeTabData.component />}
               </CardContent>
             </Card>
