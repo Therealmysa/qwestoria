@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -6,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { useTheme } from "@/components/theme/theme-provider";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -34,9 +34,6 @@ import {
   MessageSquare,
   BookOpen,
   Shield,
-  Sun,
-  Moon,
-  Monitor,
 } from "lucide-react";
 import {
   Drawer,
@@ -51,7 +48,6 @@ const MainNavigation = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { setTheme } = useTheme();
 
   useEffect(() => {
     const {
@@ -122,14 +118,14 @@ const MainNavigation = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden text-gray-700 dark:text-gray-200 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-300 rounded-full"
+          className="md:hidden text-gray-700 hover:bg-primary/10 hover:text-primary rounded-full"
         >
           <Menu />
           <span className="sr-only">Menu</span>
         </Button>
       </DrawerTrigger>
-      <DrawerContent className="bg-white dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 border-t border-slate-400/20">
-        <div className="flex justify-between items-center px-4 pt-4 border-b border-gray-200 dark:border-slate-400/20 pb-3">
+      <DrawerContent className="bg-white border-t border-slate-400/20">
+        <div className="flex justify-between items-center px-4 pt-4 border-b border-gray-200 pb-3">
           <div className="flex items-center">
             <BradHubLogo size="md" />
           </div>
@@ -137,7 +133,7 @@ const MainNavigation = () => {
             <Button
               size="icon"
               variant="ghost"
-              className="text-gray-700 dark:text-gray-200 rounded-full"
+              className="text-gray-700 rounded-full"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -153,8 +149,8 @@ const MainNavigation = () => {
                     className={cn(
                       "px-4 py-3 rounded-md transition-all",
                       location.pathname === item.path
-                        ? "bg-primary/10 text-primary dark:bg-slate-500/20 dark:text-slate-300"
-                        : "text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300"
+                        ? "bg-primary/10 text-primary"
+                        : "text-gray-700 hover:bg-primary/10 hover:text-primary"
                     )}
                   >
                     {item.name}
@@ -169,8 +165,8 @@ const MainNavigation = () => {
                   className={cn(
                     "px-4 py-3 rounded-md transition-all",
                     location.pathname === "/shop"
-                      ? "bg-primary/10 text-primary dark:bg-slate-500/20 dark:text-slate-300"
-                      : "text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300"
+                      ? "bg-primary/10 text-primary"
+                      : "text-gray-700 hover:bg-primary/10 hover:text-primary"
                   )}
                 >
                   Boutique
@@ -184,51 +180,14 @@ const MainNavigation = () => {
                   className={cn(
                     "px-4 py-3 rounded-md transition-all",
                     location.pathname === "/leaderboard"
-                      ? "bg-primary/10 text-primary dark:bg-slate-500/20 dark:text-slate-300"
-                      : "text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300"
+                      ? "bg-primary/10 text-primary"
+                      : "text-gray-700 hover:bg-primary/10 hover:text-primary"
                   )}
                 >
                   Classement
                 </motion.div>
               </Link>
             </DrawerClose>
-            
-            {/* Theme options in mobile menu */}
-            <div className="border-t border-gray-200 dark:border-slate-400/20 pt-2 mt-2">
-              <div className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                Thème
-              </div>
-              <DrawerClose asChild>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setTheme("light")}
-                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 flex items-center"
-                >
-                  <Sun className="h-4 w-4 mr-3 text-amber-500" />
-                  Clair
-                </motion.button>
-              </DrawerClose>
-              <DrawerClose asChild>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setTheme("dark")}
-                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 flex items-center"
-                >
-                  <Moon className="h-4 w-4 mr-3 text-slate-400" />
-                  Sombre
-                </motion.button>
-              </DrawerClose>
-              <DrawerClose asChild>
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => setTheme("system")}
-                  className="w-full text-left px-4 py-3 rounded-md transition-all text-gray-700 hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 flex items-center"
-                >
-                  <Monitor className="h-4 w-4 mr-3 text-gray-500" />
-                  Système
-                </motion.button>
-              </DrawerClose>
-            </div>
           </nav>
         </div>
       </DrawerContent>
@@ -236,7 +195,7 @@ const MainNavigation = () => {
   );
 
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-800 backdrop-blur-lg bg-opacity-90 px-4 py-3 shadow-lg border-b border-gray-200 dark:border-gray-800">
+    <nav className="sticky top-0 z-50 bg-white backdrop-blur-lg bg-opacity-90 px-4 py-3 shadow-lg border-b border-gray-200">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center">
           <BradHubLogo size="md" />
@@ -253,10 +212,10 @@ const MainNavigation = () => {
                     <Link to={item.path}>
                       <NavigationMenuLink
                         className={cn(
-                          "px-3 py-2 text-sm rounded-full transition-colors hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-300",
+                          "px-3 py-2 text-sm rounded-full transition-colors hover:bg-primary/10 hover:text-primary",
                           location.pathname === item.path
-                            ? "bg-primary/10 text-primary font-medium dark:bg-slate-500/20 dark:text-slate-300"
-                            : "text-gray-700 dark:text-gray-200"
+                            ? "bg-primary/10 text-primary font-medium"
+                            : "text-gray-700"
                         )}
                       >
                         {item.name}
@@ -267,25 +226,23 @@ const MainNavigation = () => {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger
                     className="px-3 py-2 text-sm rounded-full text-gray-700 hover:bg-primary/10 hover:text-primary 
-                             data-[state=open]:bg-primary/10 data-[state=open]:text-primary 
-                             dark:text-gray-200 dark:hover:bg-slate-500/20 dark:hover:text-slate-300 
-                             dark:data-[state=open]:bg-slate-500/20 dark:data-[state=open]:text-slate-300"
+                             data-[state=open]:bg-primary/10 data-[state=open]:text-primary"
                   >
                     Plus
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 w-[240px] bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-400/20 rounded-lg">
+                    <ul className="grid gap-3 p-4 w-[240px] bg-white border border-gray-200 rounded-lg">
                       <li>
                         <NavigationMenuLink asChild>
                           <Link
                             to="/fortnite-shop"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 dark:text-gray-200"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700"
                           >
                             <div className="text-sm font-medium flex items-center">
                               <BookOpen className="mr-2 h-4 w-4" />
                               Boutique Fortnite
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-gray-500">
                               Accédez à la boutique Fortnite du jour!
                             </p>
                           </Link>
@@ -295,49 +252,17 @@ const MainNavigation = () => {
                         <NavigationMenuLink asChild>
                           <Link
                             to="/leaderboard"
-                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 dark:text-gray-200"
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700"
                           >
                             <div className="text-sm font-medium flex items-center">
                               <MessageSquare className="mr-2 h-4 w-4" />
                               Classement
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                            <p className="text-xs text-gray-500">
                               Top joueurs de la communauté
                             </p>
                           </Link>
                         </NavigationMenuLink>
-                      </li>
-                      <li className="border-t border-gray-200 dark:border-slate-400/20 pt-2">
-                        <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                          Thème
-                        </div>
-                        <button
-                          onClick={() => setTheme("light")}
-                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 dark:text-gray-200"
-                        >
-                          <div className="text-sm flex items-center">
-                            <Sun className="mr-2 h-4 w-4 text-amber-500" />
-                            Clair
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => setTheme("dark")}
-                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 dark:text-gray-200"
-                        >
-                          <div className="text-sm flex items-center">
-                            <Moon className="mr-2 h-4 w-4 text-slate-400" />
-                            Sombre
-                          </div>
-                        </button>
-                        <button
-                          onClick={() => setTheme("system")}
-                          className="w-full text-left block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary/10 hover:text-primary text-gray-700 dark:hover:bg-slate-500/10 dark:hover:text-slate-300 dark:text-gray-200"
-                        >
-                          <div className="text-sm flex items-center">
-                            <Monitor className="mr-2 h-4 w-4 text-gray-500" />
-                            Système
-                          </div>
-                        </button>
                       </li>
                     </ul>
                   </NavigationMenuContent>
@@ -353,11 +278,11 @@ const MainNavigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="rounded-full flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/30 text-gray-700 dark:text-white hover:from-primary/20 hover:to-primary/40 dark:hover:from-slate-500/20 dark:hover:to-slate-500/40 transition-all duration-300"
+                    className="rounded-full flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/30 text-gray-700 hover:from-primary/20 hover:to-primary/40 transition-all duration-300"
                   >
                     <Avatar className="w-6 h-6">
                       <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
-                      <AvatarFallback className="bg-gradient-to-r from-primary to-primary/80 dark:from-slate-500 dark:to-slate-600 text-white text-xs">
+                      <AvatarFallback className="bg-gradient-to-r from-primary to-primary/80 text-white text-xs">
                         {profile?.username?.charAt(0)?.toUpperCase() || <UserIcon className="h-4 w-4" />}
                       </AvatarFallback>
                     </Avatar>
@@ -367,26 +292,26 @@ const MainNavigation = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-56 bg-white dark:bg-slate-800 text-gray-700 dark:text-white border-gray-200 dark:border-slate-400/20"
+                  className="w-56 bg-white text-gray-700 border-gray-200"
                 >
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium">{profile?.username || "Mon compte"}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         {user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-slate-400/20" />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
-                    className="hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-300 cursor-pointer"
+                    className="hover:bg-primary/10 hover:text-primary cursor-pointer"
                     onClick={() => navigate("/dashboard")}
                   >
                     Dashboard
                   </DropdownMenuItem>
                   {(profile?.is_admin || profile?.is_owner) && (
                     <DropdownMenuItem
-                      className="hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-300 cursor-pointer"
+                      className="hover:bg-primary/10 hover:text-primary cursor-pointer"
                       onClick={() => navigate("/admin")}
                     >
                       <Shield className="h-4 w-4 mr-2" />
@@ -394,14 +319,14 @@ const MainNavigation = () => {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
-                    className="hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-300 cursor-pointer"
+                    className="hover:bg-primary/10 hover:text-primary cursor-pointer"
                     onClick={() => navigate("/profile")}
                   >
                     Mon profil
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-slate-400/20" />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
-                    className="text-red-500 hover:bg-red-500/10 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-500/20 dark:hover:text-red-300 cursor-pointer"
+                    className="text-red-500 hover:bg-red-500/10 hover:text-red-600 cursor-pointer"
                     onClick={handleLogout}
                   >
                     <LogOut className="h-4 w-4 mr-2" /> Déconnexion
@@ -410,7 +335,7 @@ const MainNavigation = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-slate-500 dark:to-slate-600 dark:hover:opacity-90 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-full">
+                <Button className="bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-full">
                   Connexion
                 </Button>
               </Link>

@@ -1,10 +1,10 @@
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useTheme } from "@/components/theme/theme-provider";
 import {
   Menu,
   ChevronDown,
@@ -18,9 +18,6 @@ import {
   ShoppingBag,
   Users,
   Bell,
-  Sun,
-  Moon,
-  Monitor,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,7 +34,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { setTheme, theme } = useTheme();
 
   const handleLogout = async () => {
     console.log("Navbar: Logout button clicked");
@@ -57,22 +53,11 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const getThemeIcon = () => {
-    switch (theme) {
-      case "light":
-        return <Sun className="h-4 w-4" />;
-      case "dark":
-        return <Moon className="h-4 w-4" />;
-      default:
-        return <Monitor className="h-4 w-4" />;
-    }
-  };
-
   return (
-    <nav className="sticky top-0 z-50 bg-white dark:bg-slate-900/80 dark:backdrop-blur-xl dark:border-b dark:border-slate-700/30 px-4 py-3 shadow-md border-b border-gray-100">
+    <nav className="sticky top-0 z-50 bg-white px-4 py-3 shadow-md border-b border-gray-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-primary dark:text-slate-400">
+          <span className="text-2xl font-bold text-primary">
             Qwestoria
           </span>
         </Link>
@@ -83,8 +68,8 @@ const Navbar = () => {
             to="/"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Accueil
@@ -93,8 +78,8 @@ const Navbar = () => {
             to="/missions"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/missions")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Missions
@@ -104,8 +89,8 @@ const Navbar = () => {
             to="/teammates"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/teammates")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Coéquipiers
@@ -114,8 +99,8 @@ const Navbar = () => {
             to="/messages"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/messages")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Messagerie
@@ -124,8 +109,8 @@ const Navbar = () => {
             to="/shop"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/shop")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Boutique
@@ -134,8 +119,8 @@ const Navbar = () => {
             to="/blog"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/blog")
-                ? "text-primary font-medium dark:text-slate-400"
-                : "text-gray-600 hover:text-primary dark:text-gray-200 dark:hover:text-slate-400"
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Blog
@@ -149,98 +134,71 @@ const Navbar = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary dark:hover:border-slate-500 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="bg-white dark:bg-slate-900/90 dark:backdrop-blur-xl border-gray-200 dark:border-slate-700 text-gray-600 dark:text-white w-56 mr-4"
+              className="bg-white border-gray-200 text-gray-600 w-56 mr-4"
               align="end"
               sideOffset={8}
             >
               <DropdownMenuLabel className="flex items-center">
-                <span className="font-bold text-primary dark:text-slate-400">
+                <span className="font-bold text-primary">
                   Navigation
                 </span>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
                 onClick={() => navigate("/")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Accueil
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/missions")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Missions
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Blog
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/teammates")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Coéquipiers
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/messages")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Messagerie
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Boutique
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+              <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/leaderboard")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 <Trophy className="h-4 w-4 mr-2" /> Classement
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
-              <DropdownMenuLabel className="flex items-center">
-                <span className="font-medium text-gray-700 dark:text-gray-200">
-                  Thème
-                </span>
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => setTheme("light")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
-              >
-                <Sun className="h-4 w-4 mr-2 text-amber-500" />
-                Clair
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setTheme("dark")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
-              >
-                <Moon className="h-4 w-4 mr-2 text-slate-400" />
-                Sombre
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setTheme("system")}
-                className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer"
-              >
-                <Monitor className="h-4 w-4 mr-2 text-gray-500" />
-                Système
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -252,54 +210,12 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="rounded-full hover:bg-gray-100"
               onClick={() => navigate("/notifications")}
             >
-              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+              <Bell className="h-5 w-5 text-gray-600" />
             </Button>
           )}
-
-          {/* Desktop Theme Toggle */}
-          <div className="hidden md:block">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="rounded-full border-gray-300 dark:border-gray-600 hover:border-primary dark:hover:border-slate-500 transition-all duration-200"
-                >
-                  {getThemeIcon()}
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="bg-white dark:bg-slate-900/90 dark:backdrop-blur-xl border-gray-200 dark:border-slate-700"
-              >
-                <DropdownMenuItem 
-                  onClick={() => setTheme("light")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
-                >
-                  <Sun className="mr-2 h-4 w-4 text-amber-500" />
-                  <span>Clair</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setTheme("dark")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
-                >
-                  <Moon className="mr-2 h-4 w-4 text-slate-400" />
-                  <span>Sombre</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => setTheme("system")} 
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-500/20 dark:hover:text-slate-400"
-                >
-                  <Monitor className="mr-2 h-4 w-4 text-gray-500" />
-                  <span>Système</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
 
           {/* User Authentication Section */}
           {!loading &&
@@ -308,16 +224,16 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-primary dark:text-slate-400 hover:bg-primary/10 dark:hover:bg-slate-500/20 flex items-center rounded-full gap-2 p-2 pr-3"
+                    className="text-primary hover:bg-primary/10 flex items-center rounded-full gap-2 p-2 pr-3"
                   >
-                    <Avatar className="h-8 w-8 border border-primary/20 dark:border-slate-500/30">
+                    <Avatar className="h-8 w-8 border border-primary/20">
                       {profile?.avatar_url ? (
                         <AvatarImage
                           src={profile.avatar_url}
                           alt={profile?.username || "User"}
                         />
                       ) : (
-                        <AvatarFallback className="bg-primary/10 dark:bg-slate-500/20 text-primary dark:text-slate-400">
+                        <AvatarFallback className="bg-primary/10 text-primary">
                           {profile?.username
                             ? profile.username.substring(0, 2).toUpperCase()
                             : "U"}
@@ -334,7 +250,7 @@ const Navbar = () => {
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white dark:bg-slate-900/90 dark:backdrop-blur-xl border-gray-200 dark:border-slate-700 text-gray-600 dark:text-white">
+                <DropdownMenuContent className="bg-white border-gray-200 text-gray-600">
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
                       <span className="font-medium">
@@ -347,39 +263,39 @@ const Navbar = () => {
                       </span>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={() => navigate("/profile")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/missions")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/friends")}
-                    className="focus:bg-primary/10 focus:text-primary dark:focus:bg-slate-500/20 dark:focus:text-slate-400 cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Amis
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-500 focus:bg-red-500/10 focus:text-red-600 dark:text-red-400 dark:focus:bg-red-500/10 dark:focus:text-red-300 cursor-pointer flex items-center"
+                    className="text-red-500 focus:bg-red-500/10 focus:text-red-600 cursor-pointer flex items-center"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Déconnexion
@@ -388,7 +304,7 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-primary hover:bg-primary/90 dark:bg-slate-500 dark:hover:bg-slate-600 text-white rounded-full">
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full">
                   Connexion
                 </Button>
               </Link>
