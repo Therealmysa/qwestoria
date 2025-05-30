@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -136,8 +135,11 @@ const Messages = () => {
 
   if (!user || loading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="h-screen flex justify-center items-center bg-gray-50">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-600">Chargement...</p>
+        </div>
       </div>
     );
   }
@@ -234,14 +236,13 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Background particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute w-40 h-40 bg-blue-500/10 dark:bg-blue-500/10 bg-blue-400/5 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
-        <div className="absolute w-32 h-32 bg-cyan-500/10 dark:bg-cyan-500/10 bg-cyan-400/5 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
-        <div className="absolute w-48 h-48 bg-indigo-500/8 dark:bg-indigo-500/8 bg-indigo-400/4 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
-        <div className="absolute w-24 h-24 bg-blue-600/12 dark:bg-blue-600/12 bg-blue-500/6 rounded-full blur-2xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
-        <div className="absolute w-36 h-36 bg-cyan-600/8 dark:bg-cyan-600/8 bg-cyan-500/4 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
+    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      {/* Background decoration */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute w-32 h-32 bg-blue-100 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
+        <div className="absolute w-24 h-24 bg-cyan-100 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
+        <div className="absolute w-40 h-40 bg-blue-50 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
+        <div className="absolute w-20 h-20 bg-cyan-50 rounded-full blur-2xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
       </div>
 
       {/* Header fixe */}
@@ -252,32 +253,32 @@ const Messages = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           {/* Navigation des tabs - hauteur fixe */}
           <div className="flex-shrink-0 p-4">
-            <div className="bg-card backdrop-blur-2xl border border-border rounded-2xl p-4 shadow-2xl hover:shadow-primary/20 transition-all duration-300">
-              <TabsList className="grid w-full grid-cols-4 bg-transparent">
+            <div className="bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl p-4 shadow-lg">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-50/50">
                 <TabsTrigger 
                   value="messages" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600/40 data-[state=active]:to-cyan-600/40 data-[state=active]:border-blue-500/60 data-[state=active]:text-white transition-all duration-300"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white transition-all duration-300 rounded-lg"
                 >
                   <MessageSquare className="h-4 w-4" />
                   Messages
                 </TabsTrigger>
                 <TabsTrigger 
                   value="friends" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600/40 data-[state=active]:to-cyan-600/40 data-[state=active]:border-blue-500/60 data-[state=active]:text-white transition-all duration-300"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white transition-all duration-300 rounded-lg"
                 >
                   <Users className="h-4 w-4" />
                   Amis ({friends.length})
                 </TabsTrigger>
                 <TabsTrigger 
                   value="requests" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600/40 data-[state=active]:to-cyan-600/40 data-[state=active]:border-blue-500/60 data-[state=active]:text-white transition-all duration-300"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white transition-all duration-300 rounded-lg"
                 >
                   <UserPlus className="h-4 w-4" />
                   Demandes
                 </TabsTrigger>
                 <TabsTrigger 
                   value="add-friend" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600/40 data-[state=active]:to-cyan-600/40 data-[state=active]:border-blue-500/60 data-[state=active]:text-white transition-all duration-300"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white transition-all duration-300 rounded-lg"
                 >
                   <Search className="h-4 w-4" />
                   Ajouter
