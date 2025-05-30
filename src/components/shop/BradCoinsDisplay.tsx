@@ -1,14 +1,16 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Coins, RefreshCw } from "lucide-react";
+import { Coins, RefreshCw, ShoppingCart } from "lucide-react";
 import { useBradCoins } from "@/hooks/useBradCoins";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const BradCoinsDisplay = () => {
   const { balance: bradCoinsBalance, refetch, isLoading, error } = useBradCoins();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Log à chaque changement
   useEffect(() => {
@@ -30,6 +32,16 @@ const BradCoinsDisplay = () => {
     }
   };
 
+  const handleBuyBradCoins = () => {
+    // Navigate to the BradCoins tab in the shop
+    navigate('/shop');
+    // Trigger a custom event to switch to bradcoins tab
+    setTimeout(() => {
+      const event = new CustomEvent('switchToBradCoinsTab');
+      window.dispatchEvent(event);
+    }, 100);
+  };
+
   return (
     <Card className="dark:bg-purple-800/20 dark:backdrop-blur-xl dark:border dark:border-purple-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-purple-500/20 transform hover:scale-[1.02] transition-all duration-300">
       <CardHeader>
@@ -42,7 +54,7 @@ const BradCoinsDisplay = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold flex items-center gap-1 text-gray-900 dark:text-white">
+        <div className="text-2xl font-bold flex items-center gap-1 text-gray-900 dark:text-white mb-4">
           {isLoading ? (
             <span className="flex items-center gap-2">
               <RefreshCw className="h-5 w-5 animate-spin" />
@@ -59,10 +71,20 @@ const BradCoinsDisplay = () => {
             </>
           )}
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+        
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
           Utilisez vos BradCoins pour acheter des articles exclusifs dans la boutique.
         </p>
-        <div className="flex gap-2 mt-3">
+        
+        <div className="flex flex-col gap-2">
+          <Button 
+            onClick={handleBuyBradCoins}
+            className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            Acheter des BradCoins
+          </Button>
+          
           <Button 
             variant="outline" 
             size="sm" 
@@ -74,8 +96,9 @@ const BradCoinsDisplay = () => {
             Actualiser
           </Button>
         </div>
+        
         {user && (
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <p>User ID: {user.id.slice(0, 8)}...</p>
             <p>Balance affiché: {bradCoinsBalance}</p>
             <p>État: {isLoading ? 'Chargement' : error ? 'Erreur' : 'Chargé'}</p>
