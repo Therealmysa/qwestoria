@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -135,10 +136,10 @@ const Messages = () => {
 
   if (!user || loading) {
     return (
-      <div className="h-screen flex justify-center items-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="h-screen flex justify-center items-center bg-gradient-to-br from-blue-50 via-white to-cyan-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-400 mx-auto mb-4" />
-          <p className="text-slate-300">Chargement...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-700">Chargement...</p>
         </div>
       </div>
     );
@@ -236,13 +237,13 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute w-32 h-32 bg-blue-500/20 rounded-full blur-3xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
-        <div className="absolute w-24 h-24 bg-purple-500/20 rounded-full blur-3xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
-        <div className="absolute w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
-        <div className="absolute w-20 h-20 bg-indigo-500/20 rounded-full blur-3xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
+        <div className="absolute w-32 h-32 bg-blue-200/40 rounded-full blur-3xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
+        <div className="absolute w-24 h-24 bg-cyan-200/40 rounded-full blur-3xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
+        <div className="absolute w-40 h-40 bg-blue-100/60 rounded-full blur-3xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
+        <div className="absolute w-20 h-20 bg-cyan-100/50 rounded-full blur-3xl animate-float" style={{ top: '30%', right: '25%', animationDelay: '2s' }}></div>
       </div>
 
       {/* Header fixe */}
@@ -253,32 +254,32 @@ const Messages = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           {/* Navigation des tabs - hauteur fixe */}
           <div className="flex-shrink-0 p-4">
-            <div className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-4 shadow-2xl">
-              <TabsList className="grid w-full grid-cols-4 bg-slate-700/50 border border-slate-600/50">
+            <div className="bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-4 shadow-xl">
+              <TabsList className="grid w-full grid-cols-4 bg-gray-100/80 border border-gray-200/50">
                 <TabsTrigger 
                   value="messages" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-slate-300 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-gray-700 hover:text-blue-600"
                 >
                   <MessageSquare className="h-4 w-4" />
                   Messages
                 </TabsTrigger>
                 <TabsTrigger 
                   value="friends" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-slate-300 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-gray-700 hover:text-blue-600"
                 >
                   <Users className="h-4 w-4" />
                   Amis ({friends.length})
                 </TabsTrigger>
                 <TabsTrigger 
                   value="requests" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-slate-300 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-gray-700 hover:text-blue-600"
                 >
                   <UserPlus className="h-4 w-4" />
                   Demandes
                 </TabsTrigger>
                 <TabsTrigger 
                   value="add-friend" 
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-slate-300 hover:text-white"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white transition-all duration-300 rounded-lg text-gray-700 hover:text-blue-600"
                 >
                   <Search className="h-4 w-4" />
                   Ajouter
