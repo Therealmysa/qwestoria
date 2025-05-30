@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen, Coins } from "lucide-react";
+import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -50,10 +50,10 @@ const Admin = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
-        <div className="text-center bg-white/10 backdrop-blur-lg rounded-3xl p-12 border border-white/20">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
-          <p className="text-white font-semibold text-lg">Vérification des permissions...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Vérification des permissions...</p>
         </div>
       </div>
     );
@@ -68,57 +68,49 @@ const Admin = () => {
       id: "dashboard",
       label: "Tableau de bord",
       icon: BarChart3,
-      component: AdminDashboard,
-      color: "from-blue-500 to-cyan-500"
+      component: AdminDashboard
     },
     {
       id: "users",
       label: "Utilisateurs",
       icon: Users,
-      component: () => <AdminUsers isOwner={profile?.is_owner || false} />,
-      color: "from-green-500 to-emerald-500"
+      component: () => <AdminUsers isOwner={profile?.is_owner || false} />
     },
     {
       id: "missions",
       label: "Missions",
       icon: Shield,
-      component: AdminMissions,
-      color: "from-purple-500 to-indigo-500"
+      component: AdminMissions
     },
     {
       id: "shop",
       label: "Boutique",
       icon: ShoppingBag,
-      component: AdminShop,
-      color: "from-orange-500 to-red-500"
+      component: AdminShop
     },
     {
       id: "bradcoins",
       label: "BradCoins",
-      icon: Coins,
-      component: AdminBradCoins,
-      color: "from-yellow-500 to-amber-500"
+      icon: Settings,
+      component: AdminBradCoins
     },
     {
       id: "subscriptions",
       label: "Abonnements",
       icon: Settings,
-      component: AdminSubscriptions,
-      color: "from-pink-500 to-rose-500"
+      component: AdminSubscriptions
     },
     {
       id: "advertisements",
       label: "Publicités",
       icon: Megaphone,
-      component: AdminAdvertisements,
-      color: "from-teal-500 to-cyan-500"
+      component: AdminAdvertisements
     },
     {
       id: "blog",
       label: "Blog",
       icon: BookOpen,
-      component: AdminBlog,
-      color: "from-violet-500 to-purple-500"
+      component: AdminBlog
     }
   ];
 
@@ -126,43 +118,34 @@ const Admin = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800">
-        <Sidebar className="border-r-0 bg-white/10 backdrop-blur-xl shadow-2xl">
-          <SidebarHeader className="border-b border-white/20 p-6 bg-gradient-to-r from-blue-600/80 to-purple-600/80 backdrop-blur-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  Administration
-                </h2>
-                {profile?.is_owner && (
-                  <span className="text-xs bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 px-3 py-1 rounded-full font-bold shadow-lg">
-                    👑 Propriétaire
-                  </span>
-                )}
-              </div>
+      <div className="min-h-screen flex w-full bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+        <Sidebar className="border-r border-gray-200 dark:border-slate-700">
+          <SidebarHeader className="border-b border-gray-200 dark:border-slate-700 p-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                Administration
+              </h2>
+              {profile?.is_owner && (
+                <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded-full">
+                  Propriétaire
+                </span>
+              )}
             </div>
-            <p className="text-white/80 mt-2 text-sm font-medium">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               Panneau de contrôle Qwestoria
             </p>
           </SidebarHeader>
-          <SidebarContent className="bg-transparent">
-            <SidebarMenu className="p-4 space-y-2">
+          <SidebarContent>
+            <SidebarMenu className="p-2">
               {tabs.map((tab) => (
                 <SidebarMenuItem key={tab.id}>
                   <SidebarMenuButton
                     onClick={() => setActiveTab(tab.id)}
                     isActive={activeTab === tab.id}
-                    className={`flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 backdrop-blur-sm ${
-                      activeTab === tab.id
-                        ? `bg-gradient-to-r ${tab.color} text-white shadow-2xl scale-105 border border-white/20`
-                        : "text-white/90 hover:bg-white/10 hover:text-white hover:scale-102 border border-transparent"
-                    }`}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
                   >
-                    <tab.icon className="h-6 w-6" />
-                    <span className="font-semibold text-sm">{tab.label}</span>
+                    <tab.icon className="h-4 w-4" />
+                    <span className="text-sm">{tab.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -171,41 +154,27 @@ const Admin = () => {
         </Sidebar>
 
         <SidebarInset className="flex-1">
-          <header className="flex h-20 shrink-0 items-center gap-4 border-b border-white/20 px-8 bg-white/10 backdrop-blur-xl shadow-lg">
-            <SidebarTrigger className="-ml-1 text-white hover:text-white/80 hover:bg-white/10 rounded-xl p-2" />
-            <div className="ml-auto flex items-center gap-4">
-              <div className="text-right">
-                <h1 className="text-2xl font-bold text-white">
-                  {activeTabData?.label}
-                </h1>
-                <p className="text-sm text-white/70">
-                  Gestion et administration avancée
-                </p>
-              </div>
-              {activeTabData && (
-                <div className={`p-3 bg-gradient-to-r ${activeTabData.color} rounded-2xl shadow-xl`}>
-                  <activeTabData.icon className="h-7 w-7 text-white" />
-                </div>
-              )}
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <div className="ml-auto">
+              <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                {activeTabData?.label}
+              </h1>
             </div>
           </header>
 
-          <main className="flex-1 p-8">
-            <Card className="bg-white/95 backdrop-blur-xl shadow-2xl border border-white/20 rounded-3xl overflow-hidden">
-              <CardHeader className={`bg-gradient-to-r ${activeTabData?.color || 'from-blue-500 to-purple-500'} border-b-0 p-8`}>
-                <CardTitle className="flex items-center gap-4 text-3xl font-bold text-white">
-                  {activeTabData && (
-                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
-                      <activeTabData.icon className="h-8 w-8 text-white" />
-                    </div>
-                  )}
+          <main className="flex-1 p-6">
+            <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                  {activeTabData && <activeTabData.icon className="h-5 w-5" />}
                   {activeTabData?.label}
                 </CardTitle>
-                <CardDescription className="text-white/90 text-lg font-medium">
-                  Interface de gestion pour {activeTabData?.label.toLowerCase()}
+                <CardDescription className="dark:text-gray-300">
+                  Gestion et administration {activeTabData?.label.toLowerCase()}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-8 bg-white">
+              <CardContent>
                 {activeTabData && <activeTabData.component />}
               </CardContent>
             </Card>
