@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Search, Plus, Edit, Trash2, ShoppingBag, Coins, Package } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Coins, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ShopItemFormFields from "./shop/ShopItemFormFields";
 
 interface ShopItem {
   id: string;
@@ -27,9 +25,9 @@ interface ShopItem {
 
 const AdminShop = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -61,6 +59,7 @@ const AdminShop = () => {
 
   const createItemMutation = useMutation({
     mutationFn: async (itemData: any) => {
+      console.log('Creating item with data:', itemData);
       const { error } = await supabase
         .from('shop_items')
         .insert([{
@@ -73,8 +72,7 @@ const AdminShop = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
       toast.success("Article créé avec succès");
-      setShowCreateDialog(false);
-      resetForm();
+      handleCloseDialogs();
     },
     onError: (error) => {
       console.error('Error creating item:', error);
@@ -84,6 +82,7 @@ const AdminShop = () => {
 
   const updateItemMutation = useMutation({
     mutationFn: async ({ id, ...itemData }: any) => {
+      console.log('Updating item with ID:', id, 'Data:', itemData);
       const { error } = await supabase
         .from('shop_items')
         .update({
@@ -97,9 +96,7 @@ const AdminShop = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-shop-items'] });
       toast.success("Article mis à jour avec succès");
-      setShowEditDialog(false);
-      setSelectedItem(null);
-      resetForm();
+      handleCloseDialogs();
     },
     onError: (error) => {
       console.error('Error updating item:', error);
@@ -109,6 +106,7 @@ const AdminShop = () => {
 
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: string) => {
+      console.log('Deleting item with ID:', itemId);
       const { error } = await supabase
         .from('shop_items')
         .delete()
@@ -126,7 +124,7 @@ const AdminShop = () => {
     }
   });
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({
       name: "",
       description: "",
@@ -136,9 +134,17 @@ const AdminShop = () => {
       is_vip_only: false,
       available_until: ""
     });
-  };
+  }, []);
 
-  const handleEdit = (item: ShopItem) => {
+  const handleCloseDialogs = useCallback(() => {
+    setShowCreateDialog(false);
+    setShowEditDialog(false);
+    setSelectedItem(null);
+    resetForm();
+  }, [resetForm]);
+
+  const handleEdit = useCallback((item: ShopItem) => {
+    console.log('Editing item:', item);
     setSelectedItem(item);
     setFormData({
       name: item.name,
@@ -150,97 +156,27 @@ const AdminShop = () => {
       available_until: item.available_until ? new Date(item.available_until).toISOString().slice(0, 16) : ""
     });
     setShowEditDialog(true);
-  };
+  }, []);
 
-  const handleSubmit = () => {
+  const handleDelete = useCallback((itemId: string) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
+      deleteItemMutation.mutate(itemId);
+    }
+  }, [deleteItemMutation]);
+
+  const handleSubmit = useCallback(() => {
+    console.log('Submitting form with data:', formData);
     if (selectedItem) {
       updateItemMutation.mutate({ id: selectedItem.id, ...formData });
     } else {
       createItemMutation.mutate(formData);
     }
-  };
+  }, [formData, selectedItem, updateItemMutation, createItemMutation]);
 
-  const ShopItemForm = () => (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nom</Label>
-        <Input
-          id="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Nom de l'article"
-        />
-      </div>
-      <div>
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="Description de l'article"
-          rows={3}
-        />
-      </div>
-      <div>
-        <Label htmlFor="price">Prix (BradCoins)</Label>
-        <Input
-          id="price"
-          type="number"
-          value={formData.price}
-          onChange={(e) => setFormData({ ...formData, price: parseInt(e.target.value) || 0 })}
-          placeholder="Prix en BradCoins"
-        />
-      </div>
-      <div>
-        <Label htmlFor="category">Catégorie</Label>
-        <Input
-          id="category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-          placeholder="Catégorie"
-        />
-      </div>
-      <div>
-        <Label htmlFor="image_url">URL de l'image</Label>
-        <Input
-          id="image_url"
-          value={formData.image_url}
-          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-          placeholder="https://..."
-        />
-      </div>
-      <div>
-        <Label htmlFor="available_until">Disponible jusqu'à (optionnel)</Label>
-        <Input
-          id="available_until"
-          type="datetime-local"
-          value={formData.available_until}
-          onChange={(e) => setFormData({ ...formData, available_until: e.target.value })}
-        />
-      </div>
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="is_vip_only"
-          checked={formData.is_vip_only}
-          onCheckedChange={(checked) => setFormData({ ...formData, is_vip_only: checked })}
-        />
-        <Label htmlFor="is_vip_only">Réservé aux VIP</Label>
-      </div>
-      <div className="flex justify-end space-x-2">
-        <Button variant="outline" onClick={() => {
-          setShowCreateDialog(false);
-          setShowEditDialog(false);
-          resetForm();
-          setSelectedItem(null);
-        }}>
-          Annuler
-        </Button>
-        <Button onClick={handleSubmit}>
-          {selectedItem ? 'Mettre à jour' : 'Créer'}
-        </Button>
-      </div>
-    </div>
-  );
+  const handleOpenCreate = useCallback(() => {
+    resetForm();
+    setShowCreateDialog(true);
+  }, [resetForm]);
 
   return (
     <div className="space-y-3 sm:space-y-6">
@@ -261,10 +197,7 @@ const AdminShop = () => {
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
                   <Button 
-                    onClick={() => {
-                      resetForm();
-                      setShowCreateDialog(true);
-                    }}
+                    onClick={handleOpenCreate}
                     className="bg-green-600 hover:bg-green-700 text-white"
                     size="sm"
                   >
@@ -276,7 +209,14 @@ const AdminShop = () => {
                   <DialogHeader>
                     <DialogTitle>Créer un nouvel article</DialogTitle>
                   </DialogHeader>
-                  <ShopItemForm />
+                  <ShopItemFormFields
+                    formData={formData}
+                    onFormDataChange={setFormData}
+                    onSubmit={handleSubmit}
+                    onCancel={handleCloseDialogs}
+                    isSubmitting={createItemMutation.isPending}
+                    submitText="Créer"
+                  />
                 </DialogContent>
               </Dialog>
             </div>
@@ -335,7 +275,7 @@ const AdminShop = () => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => deleteItemMutation.mutate(item.id)}
+                          onClick={() => handleDelete(item.id)}
                           className="h-8 w-8 p-0"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -404,7 +344,7 @@ const AdminShop = () => {
                             <Button
                               variant="destructive"
                               size="sm"
-                              onClick={() => deleteItemMutation.mutate(item.id)}
+                              onClick={() => handleDelete(item.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -421,7 +361,14 @@ const AdminShop = () => {
                   <DialogHeader>
                     <DialogTitle>Modifier l'article</DialogTitle>
                   </DialogHeader>
-                  <ShopItemForm />
+                  <ShopItemFormFields
+                    formData={formData}
+                    onFormDataChange={setFormData}
+                    onSubmit={handleSubmit}
+                    onCancel={handleCloseDialogs}
+                    isSubmitting={updateItemMutation.isPending}
+                    submitText="Mettre à jour"
+                  />
                 </DialogContent>
               </Dialog>
             </>
