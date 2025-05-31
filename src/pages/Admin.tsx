@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen } from "lucide-react";
+import { Shield, Users, Settings, BarChart3, ShoppingBag, Megaphone, BookOpen, CheckSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { Navigate } from "react-router-dom";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import AdminUsers from "@/components/admin/AdminUsers";
 import AdminMissions from "@/components/admin/AdminMissions";
+import AdminMissionSubmissions from "@/components/admin/AdminMissionSubmissions";
 import AdminShop from "@/components/admin/AdminShop";
 import AdminSubscriptions from "@/components/admin/AdminSubscriptions";
 import AdminAdvertisements from "@/components/admin/AdminAdvertisements";
@@ -81,6 +82,12 @@ const Admin = () => {
       label: "Missions",
       icon: Shield,
       component: AdminMissions
+    },
+    {
+      id: "mission-submissions",
+      label: "Validation Missions",
+      icon: CheckSquare,
+      component: AdminMissionSubmissions
     },
     {
       id: "shop",
