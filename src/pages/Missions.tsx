@@ -192,9 +192,9 @@ const Missions = () => {
                               </p>
                               <Button 
                                 className="dark:bg-amber-700/50 dark:hover:bg-amber-700/70 bg-amber-100/70 hover:bg-amber-200/90 backdrop-blur-sm border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-300"
-                                onClick={() => handleCompleteMission(mission.id)}
+                                onClick={() => navigate(`/missions/${mission.id}`)}
                               >
-                                Accomplir la mission
+                                Voir la mission
                               </Button>
                             </CardContent>
                           </Card>
