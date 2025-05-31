@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Upload, Coins, Calendar, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,15 +21,25 @@ const MissionDetail = () => {
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log('MissionDetail - user:', user);
+  console.log('MissionDetail - mission id:', id);
+
   const { data: mission, isLoading: isLoadingMission } = useQuery({
     queryKey: ['mission', id],
     queryFn: async () => {
+      console.log('Fetching mission with id:', id);
       const { data, error } = await supabase
         .from('missions')
         .select('*')
         .eq('id', id)
         .single();
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error fetching mission:', error);
+        throw error;
+      }
+      
+      console.log('Mission data:', data);
       return data;
     }
   });
@@ -39,13 +48,21 @@ const MissionDetail = () => {
     queryKey: ['mission-submission', id, user?.id],
     queryFn: async () => {
       if (!user?.id || !id) return null;
+      
+      console.log('Checking existing submission for user:', user.id, 'mission:', id);
       const { data, error } = await supabase
         .from('mission_submissions')
         .select('*')
         .eq('mission_id', id)
         .eq('user_id', user.id)
         .maybeSingle();
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error fetching existing submission:', error);
+        throw error;
+      }
+      
+      console.log('Existing submission:', data);
       return data;
     },
     enabled: !!user?.id && !!id
@@ -57,68 +74,113 @@ const MissionDetail = () => {
       fortniteUsername: string, 
       proofFile: File | null 
     }) => {
+      console.log('Starting mission submission...');
+      console.log('Mission ID:', missionId);
+      console.log('Fortnite Username:', fortniteUsername);
+      console.log('Proof File:', proofFile);
+      console.log('User ID:', user?.id);
+
       let screenshotUrl = null;
 
       // Upload proof file if provided
       if (proofFile) {
-        const fileExt = proofFile.name.split('.').pop();
-        const fileName = `${user?.id}-${missionId}-${Date.now()}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('mission-proofs')
-          .upload(fileName, proofFile);
+        try {
+          console.log('Uploading proof file...');
+          const fileExt = proofFile.name.split('.').pop();
+          const fileName = `${user?.id}-${missionId}-${Date.now()}.${fileExt}`;
+          
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('mission-proofs')
+            .upload(fileName, proofFile);
 
-        if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw uploadError;
+          }
 
-        const { data: urlData } = supabase.storage
-          .from('mission-proofs')
-          .getPublicUrl(uploadData.path);
+          console.log('Upload successful:', uploadData);
 
-        screenshotUrl = urlData.publicUrl;
+          const { data: urlData } = supabase.storage
+            .from('mission-proofs')
+            .getPublicUrl(uploadData.path);
+
+          screenshotUrl = urlData.publicUrl;
+          console.log('Screenshot URL:', screenshotUrl);
+        } catch (error) {
+          console.error('Error during file upload:', error);
+          throw error;
+        }
       }
 
       // Submit the mission
-      const { data, error } = await supabase
-        .from('mission_submissions')
-        .insert([{
+      try {
+        console.log('Inserting mission submission...');
+        const submissionData = {
           user_id: user?.id,
           mission_id: missionId,
           fortnite_username: fortniteUsername,
           screenshot_url: screenshotUrl,
           status: 'pending'
-        }]);
+        };
+        
+        console.log('Submission data:', submissionData);
 
-      if (error) throw error;
-      return data;
+        const { data, error } = await supabase
+          .from('mission_submissions')
+          .insert([submissionData]);
+
+        if (error) {
+          console.error('Submission error:', error);
+          throw error;
+        }
+
+        console.log('Submission successful:', data);
+        return data;
+      } catch (error) {
+        console.error('Error during mission submission:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
+      console.log('Mission submission completed successfully');
       queryClient.invalidateQueries({ queryKey: ['mission-submission'] });
       queryClient.invalidateQueries({ queryKey: ['missions'] });
       toast.success("Mission soumise avec succès ! En attente de validation.");
       navigate('/missions');
     },
     onError: (error) => {
-      console.error('Error submitting mission:', error);
-      toast.error("Erreur lors de la soumission de la mission.");
+      console.error('Mission submission failed:', error);
+      toast.error(`Erreur lors de la soumission de la mission: ${error.message}`);
     }
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mission || !user) return;
+    console.log('Form submitted');
+    
+    if (!mission || !user) {
+      console.error('Missing mission or user data');
+      toast.error("Données manquantes pour la soumission.");
+      return;
+    }
 
     if (!fortniteUsername.trim()) {
+      console.error('Missing Fortnite username');
       toast.error("Veuillez entrer votre pseudo Fortnite.");
       return;
     }
 
+    console.log('Starting submission process...');
     setIsSubmitting(true);
+    
     try {
       await submitMissionMutation.mutateAsync({
         missionId: mission.id,
         fortniteUsername: fortniteUsername.trim(),
         proofFile
       });
+    } catch (error) {
+      console.error('Error in handleSubmit:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,13 +188,17 @@ const MissionDetail = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('File selected:', file);
+    
     if (file) {
       // Validate file size (10MB max)
       if (file.size > 10 * 1024 * 1024) {
+        console.error('File too large:', file.size);
         toast.error("Le fichier ne doit pas dépasser 10MB.");
         return;
       }
       setProofFile(file);
+      console.log('Proof file set:', file.name);
     }
   };
 
