@@ -80,6 +80,10 @@ const MissionDetail = () => {
       console.log('Proof File:', proofFile);
       console.log('User ID:', user?.id);
 
+      if (!user?.id) {
+        throw new Error('Utilisateur non connecté');
+      }
+
       let screenshotUrl = null;
 
       // Upload proof file if provided
@@ -87,15 +91,20 @@ const MissionDetail = () => {
         try {
           console.log('Uploading proof file...');
           const fileExt = proofFile.name.split('.').pop();
-          const fileName = `${user?.id}-${missionId}-${Date.now()}.${fileExt}`;
+          const fileName = `${user.id}/${missionId}-${Date.now()}.${fileExt}`;
+          
+          console.log('Uploading to path:', fileName);
           
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('mission-proofs')
-            .upload(fileName, proofFile);
+            .upload(fileName, proofFile, {
+              cacheControl: '3600',
+              upsert: false
+            });
 
           if (uploadError) {
             console.error('Upload error:', uploadError);
-            throw uploadError;
+            throw new Error(`Erreur lors de l'upload: ${uploadError.message}`);
           }
 
           console.log('Upload successful:', uploadData);
@@ -116,7 +125,7 @@ const MissionDetail = () => {
       try {
         console.log('Inserting mission submission...');
         const submissionData = {
-          user_id: user?.id,
+          user_id: user.id,
           mission_id: missionId,
           fortnite_username: fortniteUsername,
           screenshot_url: screenshotUrl,
@@ -127,11 +136,12 @@ const MissionDetail = () => {
 
         const { data, error } = await supabase
           .from('mission_submissions')
-          .insert([submissionData]);
+          .insert([submissionData])
+          .select();
 
         if (error) {
           console.error('Submission error:', error);
-          throw error;
+          throw new Error(`Erreur lors de la soumission: ${error.message}`);
         }
 
         console.log('Submission successful:', data);
@@ -146,11 +156,12 @@ const MissionDetail = () => {
       queryClient.invalidateQueries({ queryKey: ['mission-submission'] });
       queryClient.invalidateQueries({ queryKey: ['missions'] });
       toast.success("Mission soumise avec succès ! En attente de validation.");
-      navigate('/missions');
+      setFortniteUsername("");
+      setProofFile(null);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Mission submission failed:', error);
-      toast.error(`Erreur lors de la soumission de la mission: ${error.message}`);
+      toast.error(error.message || "Erreur lors de la soumission de la mission");
     }
   });
 
@@ -197,6 +208,15 @@ const MissionDetail = () => {
         toast.error("Le fichier ne doit pas dépasser 10MB.");
         return;
       }
+      
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        console.error('Invalid file type:', file.type);
+        toast.error("Type de fichier non supporté. Utilisez une image, PDF ou document Word.");
+        return;
+      }
+      
       setProofFile(file);
       console.log('Proof file set:', file.name);
     }
