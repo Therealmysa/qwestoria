@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,13 +63,13 @@ const Missions = () => {
     }
   });
 
-  const { data: userMissions, isLoading: isLoadingUserMissions } = useQuery({
-    queryKey: ['user-missions', user?.id],
+  const { data: userSubmissions, isLoading: isLoadingUserSubmissions } = useQuery({
+    queryKey: ['user-mission-submissions', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
       const { data, error } = await supabase
-        .from('user_missions')
+        .from('mission_submissions')
         .select('*')
         .eq('user_id', user.id);
 
@@ -79,36 +80,15 @@ const Missions = () => {
   });
 
   useEffect(() => {
-    if (missions && userMissions) {
-      const completedMissionIds = userMissions.map(um => um.mission_id);
-      setAvailableMissions(missions.filter(mission => !completedMissionIds.includes(mission.id)));
-      setCompletedMissions(missions.filter(mission => completedMissionIds.includes(mission.id)));
+    if (missions && userSubmissions) {
+      const submittedMissionIds = userSubmissions.map(sub => sub.mission_id);
+      setAvailableMissions(missions.filter(mission => !submittedMissionIds.includes(mission.id)));
+      setCompletedMissions(missions.filter(mission => submittedMissionIds.includes(mission.id)));
     }
-  }, [missions, userMissions]);
+  }, [missions, userSubmissions]);
 
-  const completeMissionMutation = useMutation({
-    mutationFn: async (missionId: string) => {
-      const { data, error } = await supabase
-        .from('user_missions')
-        .insert([{ user_id: user?.id, mission_id: missionId }]);
-
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      toast.success("Mission accomplie !");
-    },
-    onError: (error) => {
-      toast.error("Erreur lors de la validation de la mission.");
-      console.error("Error completing mission:", error);
-    }
-  });
-
-  const handleCompleteMission = async (missionId: string) => {
-    completeMissionMutation.mutate(missionId);
-  };
-
-  const isLoading = isLoadingMissions || isLoadingUserMissions;
+  // Remove the old completeMissionMutation since we're now using mission_submissions
+  const isLoading = isLoadingMissions || isLoadingUserSubmissions;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-amber-50 to-amber-100 dark:from-amber-900 dark:via-amber-800 dark:to-amber-900">
@@ -176,6 +156,7 @@ const Missions = () => {
                 </div>
               ) : (
                 <>
+                  {/* Available Missions */}
                   {availableMissions.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {availableMissions.map((mission) => (
@@ -208,26 +189,50 @@ const Missions = () => {
                     </div>
                   )}
 
+                  {/* Completed Missions Section */}
                   {completedMissions.length > 0 && (
                     <>
-                      <h3 className="text-lg font-semibold mt-8 mb-4 text-amber-700 dark:text-amber-300">Missions Accomplies</h3>
+                      <h3 className="text-lg font-semibold mt-8 mb-4 text-amber-700 dark:text-amber-300">Missions Soumises</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {completedMissions.map((mission) => (
-                          <div key={mission.id} className="dark:bg-green-900/20 bg-green-50/70 backdrop-blur-md border border-green-200/50 dark:border-green-500/30 rounded-lg p-4">
-                            <div className="mb-4">
-                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mission.title}</h3>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-                                {mission.description}
-                              </p>
+                        {completedMissions.map((mission) => {
+                          const submission = userSubmissions?.find(sub => sub.mission_id === mission.id);
+                          return (
+                            <div key={mission.id} className="dark:bg-blue-900/20 bg-blue-50/70 backdrop-blur-md border border-blue-200/50 dark:border-blue-500/30 rounded-lg p-4">
+                              <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{mission.title}</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                                  {mission.description}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                                  Récompense: {mission.reward_coins} BradCoins
+                                </p>
+                                {submission && (
+                                  <div className="mb-4">
+                                    {submission.status === 'pending' && (
+                                      <Badge variant="outline">En attente de validation</Badge>
+                                    )}
+                                    {submission.status === 'verified' && (
+                                      <Badge className="bg-green-500">Validée</Badge>
+                                    )}
+                                    {submission.status === 'rejected' && (
+                                      <Badge variant="destructive">Rejetée</Badge>
+                                    )}
+                                  </div>
+                                )}
+                                <Button 
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full"
+                                  onClick={() => navigate(`/missions/${mission.id}`)}
+                                >
+                                  Voir les détails
+                                </Button>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                                Récompense: {mission.reward_coins} BradCoins
-                              </p>
-                              <Badge className="bg-green-500 text-white">Mission Accomplie</Badge>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </>
                   )}
