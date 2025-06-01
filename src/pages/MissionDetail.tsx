@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Upload, Coins, Calendar, ExternalLink } from "lucide-react";
+import { ArrowLeft, Coins, Calendar, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
+import MissionProofUpload from "@/components/missions/MissionProofUpload";
 
 const MissionDetail = () => {
   const { id } = useParams();
@@ -18,7 +18,7 @@ const MissionDetail = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [fortniteUsername, setFortniteUsername] = useState("");
-  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofFileUrl, setProofFileUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   console.log('MissionDetail - user:', user);
@@ -69,56 +69,19 @@ const MissionDetail = () => {
   });
 
   const submitMissionMutation = useMutation({
-    mutationFn: async ({ missionId, fortniteUsername, proofFile }: { 
+    mutationFn: async ({ missionId, fortniteUsername, proofFileUrl }: { 
       missionId: string, 
       fortniteUsername: string, 
-      proofFile: File | null 
+      proofFileUrl: string | null 
     }) => {
       console.log('Starting mission submission...');
       console.log('Mission ID:', missionId);
       console.log('Fortnite Username:', fortniteUsername);
-      console.log('Proof File:', proofFile);
+      console.log('Proof File URL:', proofFileUrl);
       console.log('User ID:', user?.id);
 
       if (!user?.id) {
         throw new Error('Utilisateur non connecté');
-      }
-
-      let screenshotUrl = null;
-
-      // Upload proof file if provided
-      if (proofFile) {
-        try {
-          console.log('Uploading proof file...');
-          const fileExt = proofFile.name.split('.').pop();
-          const fileName = `${user.id}/${missionId}-${Date.now()}.${fileExt}`;
-          
-          console.log('Uploading to path:', fileName);
-          
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('mission-proofs')
-            .upload(fileName, proofFile, {
-              cacheControl: '3600',
-              upsert: false
-            });
-
-          if (uploadError) {
-            console.error('Upload error:', uploadError);
-            throw new Error(`Erreur lors de l'upload: ${uploadError.message}`);
-          }
-
-          console.log('Upload successful:', uploadData);
-
-          const { data: urlData } = supabase.storage
-            .from('mission-proofs')
-            .getPublicUrl(uploadData.path);
-
-          screenshotUrl = urlData.publicUrl;
-          console.log('Screenshot URL:', screenshotUrl);
-        } catch (error) {
-          console.error('Error during file upload:', error);
-          throw error;
-        }
       }
 
       // Submit the mission
@@ -128,7 +91,7 @@ const MissionDetail = () => {
           user_id: user.id,
           mission_id: missionId,
           fortnite_username: fortniteUsername,
-          screenshot_url: screenshotUrl,
+          screenshot_url: proofFileUrl,
           status: 'pending'
         };
         
@@ -157,7 +120,7 @@ const MissionDetail = () => {
       queryClient.invalidateQueries({ queryKey: ['missions'] });
       toast.success("Mission soumise avec succès ! En attente de validation.");
       setFortniteUsername("");
-      setProofFile(null);
+      setProofFileUrl(null);
     },
     onError: (error: any) => {
       console.error('Mission submission failed:', error);
@@ -181,6 +144,12 @@ const MissionDetail = () => {
       return;
     }
 
+    if (!proofFileUrl) {
+      console.error('Missing proof file');
+      toast.error("Veuillez uploader un fichier de preuve.");
+      return;
+    }
+
     console.log('Starting submission process...');
     setIsSubmitting(true);
     
@@ -188,7 +157,7 @@ const MissionDetail = () => {
       await submitMissionMutation.mutateAsync({
         missionId: mission.id,
         fortniteUsername: fortniteUsername.trim(),
-        proofFile
+        proofFileUrl
       });
     } catch (error) {
       console.error('Error in handleSubmit:', error);
@@ -197,29 +166,14 @@ const MissionDetail = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    console.log('File selected:', file);
-    
-    if (file) {
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        console.error('File too large:', file.size);
-        toast.error("Le fichier ne doit pas dépasser 10MB.");
-        return;
-      }
-      
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!allowedTypes.includes(file.type)) {
-        console.error('Invalid file type:', file.type);
-        toast.error("Type de fichier non supporté. Utilisez une image, PDF ou document Word.");
-        return;
-      }
-      
-      setProofFile(file);
-      console.log('Proof file set:', file.name);
-    }
+  const handleUploadSuccess = (fileUrl: string) => {
+    console.log('Upload successful, file URL:', fileUrl);
+    setProofFileUrl(fileUrl);
+  };
+
+  const handleUploadError = (error: string) => {
+    console.error('Upload error:', error);
+    setProofFileUrl(null);
   };
 
   if (isLoadingMission) {
@@ -386,31 +340,15 @@ const MissionDetail = () => {
                         />
                       </div>
 
-                      <div>
-                        <Label htmlFor="proof-file">Preuve (optionnel)</Label>
-                        <Input
-                          id="proof-file"
-                          type="file"
-                          onChange={handleFileChange}
-                          accept="image/*,.pdf,.doc,.docx"
-                          className="dark:bg-amber-900/20 bg-amber-50/70 backdrop-blur-sm border-amber-200 dark:border-amber-500/30"
-                        />
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Images, PDF ou documents (max 10MB)
-                        </p>
-                      </div>
-
-                      {proofFile && (
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md border border-green-200 dark:border-green-500/30">
-                          <p className="text-sm text-green-700 dark:text-green-300">
-                            Fichier sélectionné: {proofFile.name}
-                          </p>
-                        </div>
-                      )}
+                      <MissionProofUpload
+                        onUploadSuccess={handleUploadSuccess}
+                        onUploadError={handleUploadError}
+                        disabled={isSubmitting}
+                      />
 
                       <Button 
                         type="submit" 
-                        disabled={isSubmitting || !fortniteUsername.trim()}
+                        disabled={isSubmitting || !fortniteUsername.trim() || !proofFileUrl}
                         className="w-full dark:bg-amber-700/50 dark:hover:bg-amber-700/70 bg-amber-100/70 hover:bg-amber-200/90 backdrop-blur-sm border-amber-300 dark:border-amber-500/30 text-amber-700 dark:text-amber-300"
                       >
                         {isSubmitting ? (
@@ -419,10 +357,7 @@ const MissionDetail = () => {
                             Soumission...
                           </div>
                         ) : (
-                          <>
-                            <Upload className="h-4 w-4 mr-2" />
-                            Soumettre la Mission
-                          </>
+                          "Valider la mission"
                         )}
                       </Button>
                     </form>
