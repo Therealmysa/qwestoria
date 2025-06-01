@@ -98,24 +98,12 @@ const MissionProofUpload = ({ onUploadSuccess, onUploadError, disabled = false }
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
-      const result = await response.text();
-      console.log('Upload result:', result);
-
       // Simuler la progression (puisque fetch ne donne pas la progression réelle)
       setUploadProgress(100);
 
-      // Assumer que le résultat est l'URL du fichier ou un JSON contenant l'URL
-      let fileUrl = result.trim();
-      try {
-        const jsonResult = JSON.parse(result);
-        if (jsonResult.url) {
-          fileUrl = jsonResult.url;
-        } else if (jsonResult.file_url) {
-          fileUrl = jsonResult.file_url;
-        }
-      } catch {
-        // Si ce n'est pas du JSON, utiliser la réponse telle quelle
-      }
+      // Construire l'URL du fichier côté client
+      const fileName = encodeURIComponent(selectedFile.name).replace(/\+/g, '%20');
+      const fileUrl = `https://qwestoria.com/uploads/${fileName}`;
 
       console.log('File uploaded successfully, URL:', fileUrl);
       setUploadedFileUrl(fileUrl);
