@@ -29,22 +29,26 @@ const ShopItems = () => {
   const { isVip, isPremium } = useUserStatus();
   const { balance: userCoins } = useBradCoins();
 
-  const { data: shopItems, isLoading } = useQuery<ShopItem[]>({
+  const { data: shopItems, isLoading, error } = useQuery<ShopItem[]>({
     queryKey: ['shop-items'],
     queryFn: async (): Promise<ShopItem[]> => {
+      console.log('Fetching shop items...');
       const { data, error } = await supabase
         .from('shop_items')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching shop items:', error);
+        throw error;
+      }
       
       // Sanitize data on the client side for extra security
       return (data || []).map(item => ({
         ...item,
-        name: sanitizeText(item.name),
-        description: sanitizeText(item.description),
-        category: sanitizeText(item.category)
+        name: sanitizeText(item.name || ''),
+        description: sanitizeText(item.description || ''),
+        category: sanitizeText(item.category || '')
       }));
     }
   });
@@ -60,7 +64,10 @@ const ShopItems = () => {
         .select('item_id')
         .eq('user_id', user.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user purchases:', error);
+        return [];
+      }
       return data?.map(p => p.item_id) || [];
     }
   });
@@ -68,8 +75,10 @@ const ShopItems = () => {
   const handlePurchaseItem = (item: ShopItem) => {
     // Client-side validation before making the purchase
     if (!canPurchase(item)) {
+      console.log('Purchase not allowed for item:', item.id);
       return;
     }
+    console.log('Purchasing item:', item.id);
     purchaseItem({ itemId: item.id });
   };
 
@@ -103,6 +112,21 @@ const ShopItems = () => {
     if (userCoins < item.price) return "Solde insuffisant";
     return "Acheter";
   };
+
+  if (error) {
+    console.error('Shop items error:', error);
+    return (
+      <div className="text-center py-12 px-4">
+        <Package className="h-12 sm:h-16 w-12 sm:w-16 mx-auto text-red-400 mb-4" />
+        <h3 className="text-base sm:text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+          Erreur de chargement
+        </h3>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+          Impossible de charger les articles de la boutique
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -162,6 +186,10 @@ const ShopItems = () => {
                       src={item.image_url} 
                       alt={item.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Image failed to load:', item.image_url);
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
                   </div>
                 ) : (

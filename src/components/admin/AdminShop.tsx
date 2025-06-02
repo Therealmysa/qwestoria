@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Search, Plus, Edit, Trash2, Coins, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { validateShopItemData } from "@/utils/inputSanitization";
 import ShopItemFormFields from "./shop/ShopItemFormFields";
 
 interface ShopItem {
@@ -60,11 +60,17 @@ const AdminShop = () => {
   const createItemMutation = useMutation({
     mutationFn: async (itemData: any) => {
       console.log('Creating item with data:', itemData);
+      
+      const validation = validateShopItemData(itemData);
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
       const { error } = await supabase
         .from('shop_items')
         .insert([{
-          ...itemData,
-          available_until: itemData.available_until || null
+          ...validation.sanitizedData,
+          available_until: validation.sanitizedData.available_until || null
         }]);
       
       if (error) throw error;
@@ -74,20 +80,26 @@ const AdminShop = () => {
       toast.success("Article créé avec succès");
       handleCloseDialogs();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating item:', error);
-      toast.error("Erreur lors de la création");
+      toast.error(error.message || "Erreur lors de la création");
     }
   });
 
   const updateItemMutation = useMutation({
     mutationFn: async ({ id, ...itemData }: any) => {
       console.log('Updating item with ID:', id, 'Data:', itemData);
+      
+      const validation = validateShopItemData(itemData);
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+      
       const { error } = await supabase
         .from('shop_items')
         .update({
-          ...itemData,
-          available_until: itemData.available_until || null
+          ...validation.sanitizedData,
+          available_until: validation.sanitizedData.available_until || null
         })
         .eq('id', id);
       
@@ -98,9 +110,9 @@ const AdminShop = () => {
       toast.success("Article mis à jour avec succès");
       handleCloseDialogs();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating item:', error);
-      toast.error("Erreur lors de la mise à jour");
+      toast.error(error.message || "Erreur lors de la mise à jour");
     }
   });
 

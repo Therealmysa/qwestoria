@@ -16,13 +16,18 @@ export const useAdminOperations = () => {
       isAdmin?: boolean; 
       isVip?: boolean; 
     }) => {
+      console.log('Updating user status:', { userId, isAdmin, isVip });
+      
       const { data, error } = await supabase.rpc('admin_update_user_status', {
         target_user_id: userId,
         new_is_admin: isAdmin,
         new_is_vip: isVip
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RPC error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -45,11 +50,16 @@ export const useAdminOperations = () => {
 
   const deleteMissionMutation = useMutation({
     mutationFn: async (missionId: string) => {
+      console.log('Deleting mission:', missionId);
+      
       const { data, error } = await supabase.rpc('admin_delete_mission', {
         mission_id: missionId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RPC error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
