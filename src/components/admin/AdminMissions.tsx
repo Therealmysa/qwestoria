@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Plus, Edit, Trash2, Coins, Broom } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Coins, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import MissionFormFields from "./MissionFormFields";
@@ -222,7 +222,7 @@ const AdminMissions = () => {
                 variant="outline"
                 className="text-orange-600 border-orange-600 hover:bg-orange-50"
               >
-                <Broom className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-4 w-4 mr-2" />
                 Nettoyer expirées
               </Button>
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
