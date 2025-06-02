@@ -15,8 +15,8 @@ const Layout = ({ children }: LayoutProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative">
-      {/* Light mode background decoration - moved to absolute positioning to avoid scroll issues */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Light mode background decoration - fixed positioning to avoid scroll interference */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute w-40 h-40 bg-blue-100/30 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
         <div className="absolute w-32 h-32 bg-cyan-100/30 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
         <div className="absolute w-48 h-48 bg-blue-50/50 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
@@ -24,14 +24,19 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="absolute w-36 h-36 bg-blue-100/20 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
-      {/* Main content with proper scroll behavior for mobile */}
-      <div className="relative z-10 flex flex-col">
+      {/* Main content - remove all potential scroll blocking */}
+      <div className="relative z-10">
         <MainNavigation />
         <motion.main 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex-1 w-full"
+          className="w-full"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'auto',
+            touchAction: 'auto'
+          }}
         >
           {children}
         </motion.main>

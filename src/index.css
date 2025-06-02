@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -89,19 +90,49 @@
     @apply border-border;
   }
 
+  /* SCROLL FIX MOBILE - BASE */
+  html, body {
+    height: auto !important;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: auto !important;
+    touch-action: auto !important;
+    position: relative !important;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Mobile scroll fix - autorise le scroll naturel */
-    -webkit-overflow-scrolling: touch;
   }
 
-  /* Fix fondamental pour le scroll mobile */
-  html, body {
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: auto !important;
-    position: relative;
+  /* MOBILE SCROLL FIXES - COMPLETE OVERRIDE */
+  @media (max-width: 768px) {
+    * {
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: auto !important;
+      touch-action: auto !important;
+    }
+
+    html, body, #root, main, .container {
+      height: auto !important;
+      min-height: auto !important;
+      overflow: auto !important;
+      position: relative !important;
+      transform: none !important;
+    }
+
+    /* Force all containers to be scrollable */
+    [class*="min-h-"], [class*="h-screen"], .min-h-screen {
+      min-height: auto !important;
+      height: auto !important;
+    }
+
+    /* Eliminate all blocking scroll properties */
+    [style*="overflow:"], [style*="overscroll-behavior:"], [style*="touch-action:"] {
+      overflow: auto !important;
+      overscroll-behavior: auto !important;
+      touch-action: auto !important;
+    }
   }
 
   /* Dark theme with professional design */
@@ -388,44 +419,6 @@
     .blog-content img {
       max-width: 100%;
       break-inside: avoid;
-    }
-  }
-
-  /* Mobile-specific scroll fixes - Force fixes */
-  @media (max-width: 768px) {
-    * {
-      /* Force natural scroll on all elements */
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: auto !important;
-    }
-
-    html, body {
-      /* Force height auto on mobile */
-      height: auto !important;
-      min-height: 100vh !important;
-      overflow: auto !important;
-      position: relative !important;
-    }
-
-    /* Force scroll containers to work */
-    .min-h-screen {
-      min-height: auto !important;
-      height: auto !important;
-    }
-
-    /* Force all pages to be scrollable */
-    main, .container, [class*="min-h-"] {
-      min-height: auto !important;
-      height: auto !important;
-      overflow: visible !important;
-    }
-
-    /* Remove any blocking properties */
-    body, html, main, .container {
-      touch-action: auto !important;
-      overscroll-behavior: auto !important;
-      overflow-x: auto !important;
-      overflow-y: auto !important;
     }
   }
 }

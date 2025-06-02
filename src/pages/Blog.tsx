@@ -87,7 +87,15 @@ const Blog = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
+    <div 
+      className="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900"
+      style={{
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'auto',
+        touchAction: 'auto',
+        overflow: 'auto'
+      }}
+    >
       {/* Banner Ad */}
       <div className="container mx-auto px-4 pt-6">
         <AdBanner position="banner" maxAds={1} />
