@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,18 +92,17 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Amélioration du scroll mobile - suppression des propriétés problématiques */
+    /* Mobile scroll fix - autorise le scroll naturel */
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Amélioration du scroll mobile */
+  /* Fix fondamental pour le scroll mobile */
   html, body {
-    height: 100%;
-    /* Suppression de overflow-x: hidden qui peut causer des problèmes de scroll */
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: auto !important;
     position: relative;
   }
-
-  /* Suppression de overscroll-behavior-y qui peut bloquer le scroll sur mobile */
 
   /* Dark theme with professional design */
   .dark {
@@ -393,43 +391,41 @@
     }
   }
 
-  /* Mobile-specific scroll fixes - Améliorés */
+  /* Mobile-specific scroll fixes - Force fixes */
   @media (max-width: 768px) {
+    * {
+      /* Force natural scroll on all elements */
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: auto !important;
+    }
+
     html, body {
-      /* Suppression des propriétés qui peuvent bloquer le scroll */
-      height: auto;
-      min-height: 100vh;
-      overflow: auto;
+      /* Force height auto on mobile */
+      height: auto !important;
+      min-height: 100vh !important;
+      overflow: auto !important;
+      position: relative !important;
     }
 
-    body {
-      /* Autoriser le scroll naturel sur mobile */
-      -webkit-overflow-scrolling: touch;
-      /* Suppression de overscroll-behavior qui peut causer des problèmes */
-    }
-
-    /* Ensure all scrollable containers work properly on mobile */
-    .scroll-container {
-      -webkit-overflow-scrolling: touch;
-      /* Modification pour permettre le scroll naturel */
-      overscroll-behavior: auto;
-    }
-
-    /* Fix for viewport issues on mobile - Ajusté pour éviter les problèmes de scroll */
-    html {
-      height: auto;
-      min-height: 100vh;
-    }
-
-    body {
-      min-height: 100vh;
-      height: auto;
-    }
-
-    /* Assurer que les conteneurs principaux permettent le scroll */
-    main, .container, .min-h-screen {
+    /* Force scroll containers to work */
+    .min-h-screen {
       min-height: auto !important;
       height: auto !important;
+    }
+
+    /* Force all pages to be scrollable */
+    main, .container, [class*="min-h-"] {
+      min-height: auto !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    /* Remove any blocking properties */
+    body, html, main, .container {
+      touch-action: auto !important;
+      overscroll-behavior: auto !important;
+      overflow-x: auto !important;
+      overflow-y: auto !important;
     }
   }
 }

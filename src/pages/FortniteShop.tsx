@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   getFortniteShop,
@@ -98,7 +97,7 @@ const FortniteShop = () => {
 
   if (isLoading || isChecking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center" style={{ minHeight: '100vh' }}>
         <div className="text-center">
           <Loader2 className="animate-spin text-6xl text-white mb-4 mx-auto" />
           <p className="text-white text-xl font-semibold">Chargement de la boutique...</p>
@@ -110,7 +109,7 @@ const FortniteShop = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center" style={{ minHeight: '100vh' }}>
         <div className="bg-red-900/30 backdrop-blur-md p-8 rounded-2xl border border-red-500/30 max-w-md text-center">
           <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Erreur de chargement</h2>
@@ -128,7 +127,7 @@ const FortniteShop = () => {
 
   if (!payload || !payload.data || !payload.data.entries) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center">
+      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 flex items-center justify-center" style={{ minHeight: '100vh' }}>
         <div className="bg-yellow-900/30 backdrop-blur-md p-8 rounded-2xl border border-yellow-500/30 max-w-md text-center">
           <AlertCircle className="h-16 w-16 text-yellow-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-4">Aucune donnée disponible</h2>
@@ -176,7 +175,7 @@ const FortniteShop = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 p-8">
+    <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-blue-800 p-8">
       {/* Container détaché avec arrière-plan animé inclus */}
       <div className="max-w-7xl mx-auto bg-black/20 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative">
         
@@ -191,7 +190,7 @@ const FortniteShop = () => {
         </div>
 
         {/* Main Container content */}
-        <div className="relative z-10 min-h-screen">
+        <div className="relative z-10">
           
           {/* Header */}
           <header className="bg-gradient-to-r from-blue-600/90 via-purple-600/90 to-orange-500/90 backdrop-blur-md border-b border-white/20">
