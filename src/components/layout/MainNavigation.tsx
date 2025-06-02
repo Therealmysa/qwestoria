@@ -159,17 +159,17 @@ const MainNavigation = () => {
               </DrawerClose>
             ))}
             <DrawerClose asChild>
-              <Link to="/shop">
+              <Link to="/fortnite-shop">
                 <motion.div
                   whileTap={{ scale: 0.97 }}
                   className={cn(
                     "px-4 py-3 rounded-md transition-all",
-                    location.pathname === "/shop"
+                    location.pathname === "/fortnite-shop"
                       ? "bg-primary/10 text-primary"
                       : "text-gray-700 hover:bg-primary/10 hover:text-primary"
                   )}
                 >
-                  Boutique
+                  Boutique Fortnite
                 </motion.div>
               </Link>
             </DrawerClose>
