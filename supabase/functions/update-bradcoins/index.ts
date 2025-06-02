@@ -49,13 +49,30 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Utiliser UPSERT pour éviter les doublons - soit mettre à jour, soit insérer
+    // Récupérer le solde actuel d'abord
+    const { data: currentAccount, error: fetchError } = await supabaseClient
+      .from('brad_coins')
+      .select('balance')
+      .eq('user_id', user_id)
+      .single()
+
+    let currentBalance = 0
+    if (!fetchError && currentAccount) {
+      currentBalance = currentAccount.balance || 0
+    }
+
+    // Calculer le nouveau solde en ajoutant le montant au solde actuel
+    const newBalance = currentBalance + amount
+
+    console.log('Current balance:', currentBalance, 'Amount to add:', amount, 'New balance:', newBalance)
+
+    // Utiliser UPSERT avec le nouveau solde calculé
     const { data: updatedAccount, error: upsertError } = await supabaseClient
       .from('brad_coins')
       .upsert(
         { 
           user_id,
-          balance: amount,
+          balance: Math.max(0, newBalance), // S'assurer que le solde ne soit jamais négatif
           last_updated: new Date().toISOString()
         },
         { 
@@ -68,63 +85,24 @@ Deno.serve(async (req) => {
 
     if (upsertError) {
       console.error('Error upserting BradCoins balance:', upsertError)
-      
-      // Si c'est un problème d'addition/soustraction, essayons de récupérer le solde actuel et faire l'opération
-      const { data: currentAccount, error: fetchError } = await supabaseClient
-        .from('brad_coins')
-        .select('balance')
-        .eq('user_id', user_id)
-        .single()
-
-      if (fetchError) {
-        console.error('Error fetching current balance:', fetchError)
-        return new Response(
-          JSON.stringify({ error: 'Failed to update BradCoins balance' }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-
-      // Calculer le nouveau solde
-      const newBalance = (currentAccount?.balance || 0) + amount
-
-      // Mettre à jour avec le nouveau solde calculé
-      const { data: finalAccount, error: updateError } = await supabaseClient
-        .from('brad_coins')
-        .update({ 
-          balance: Math.max(0, newBalance), // S'assurer que le solde ne soit jamais négatif
-          last_updated: new Date().toISOString()
-        })
-        .eq('user_id', user_id)
-        .select('balance')
-        .single()
-
-      if (updateError) {
-        console.error('Error updating BradCoins balance:', updateError)
-        return new Response(
-          JSON.stringify({ error: updateError.message }),
-          { 
-            status: 500, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-
-      console.log('BradCoins update successful (via update):', { user_id, new_balance: finalAccount.balance })
       return new Response(
-        JSON.stringify({ success: true, new_balance: finalAccount.balance }),
+        JSON.stringify({ error: upsertError.message }),
         { 
+          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    console.log('BradCoins update successful (via upsert):', { user_id, new_balance: updatedAccount.balance })
+    console.log('BradCoins update successful:', { user_id, previous_balance: currentBalance, amount_added: amount, new_balance: updatedAccount.balance })
 
     return new Response(
-      JSON.stringify({ success: true, new_balance: updatedAccount.balance }),
+      JSON.stringify({ 
+        success: true, 
+        new_balance: updatedAccount.balance,
+        amount_added: amount,
+        previous_balance: currentBalance
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
