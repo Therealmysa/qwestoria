@@ -93,6 +93,22 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Fix mobile scroll issues */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation;
+  }
+
+  /* Ensure proper scrolling on mobile devices */
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Fix for iOS Safari scroll bounce */
+  body {
+    overscroll-behavior-y: none;
   }
 
   /* Dark theme with professional design */
@@ -379,6 +395,30 @@
     .blog-content img {
       max-width: 100%;
       break-inside: avoid;
+    }
+  }
+
+  /* Mobile-specific scroll fixes */
+  @media (max-width: 768px) {
+    body {
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
+    }
+
+    /* Ensure all scrollable containers work properly on mobile */
+    .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* Fix for viewport issues on mobile */
+    html {
+      height: -webkit-fill-available;
+    }
+
+    body {
+      min-height: -webkit-fill-available;
     }
   }
 }

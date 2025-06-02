@@ -14,9 +14,9 @@ const Layout = ({ children }: LayoutProps) => {
   const hideFooter = location.pathname === "/messages";
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 via-white to-blue-50">
-      {/* Light mode background decoration */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 relative">
+      {/* Light mode background decoration - moved to absolute positioning to avoid scroll issues */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute w-40 h-40 bg-blue-100/30 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
         <div className="absolute w-32 h-32 bg-cyan-100/30 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
         <div className="absolute w-48 h-48 bg-blue-50/50 rounded-full blur-2xl animate-float" style={{ bottom: '15%', left: '15%', animationDelay: '6s' }}></div>
@@ -24,13 +24,15 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="absolute w-36 h-36 bg-blue-100/20 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
-      <div className="relative z-10">
+      {/* Main content with proper z-index and touch-action for mobile scroll */}
+      <div className="relative z-10 min-h-screen flex flex-col touch-auto">
         <MainNavigation />
         <motion.main 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex-1 w-full"
+          className="flex-1 w-full overflow-auto"
+          style={{ touchAction: 'pan-y' }}
         >
           {children}
         </motion.main>
