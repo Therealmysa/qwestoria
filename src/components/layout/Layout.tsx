@@ -24,15 +24,14 @@ const Layout = ({ children }: LayoutProps) => {
         <div className="absolute w-36 h-36 bg-blue-100/20 rounded-full blur-2xl animate-float" style={{ bottom: '40%', right: '5%', animationDelay: '4s' }}></div>
       </div>
 
-      {/* Main content with proper z-index and touch-action for mobile scroll */}
-      <div className="relative z-10 min-h-screen flex flex-col touch-auto">
+      {/* Main content with proper scroll behavior for mobile */}
+      <div className="relative z-10 flex flex-col">
         <MainNavigation />
         <motion.main 
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="flex-1 w-full overflow-auto"
-          style={{ touchAction: 'pan-y' }}
+          className="flex-1 w-full"
         >
           {children}
         </motion.main>

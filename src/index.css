@@ -93,23 +93,18 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Fix mobile scroll issues */
-    overscroll-behavior: none;
+    /* Amélioration du scroll mobile - suppression des propriétés problématiques */
     -webkit-overflow-scrolling: touch;
-    touch-action: manipulation;
   }
 
-  /* Ensure proper scrolling on mobile devices */
+  /* Amélioration du scroll mobile */
   html, body {
     height: 100%;
-    overflow-x: hidden;
+    /* Suppression de overflow-x: hidden qui peut causer des problèmes de scroll */
     position: relative;
   }
 
-  /* Fix for iOS Safari scroll bounce */
-  body {
-    overscroll-behavior-y: none;
-  }
+  /* Suppression de overscroll-behavior-y qui peut bloquer le scroll sur mobile */
 
   /* Dark theme with professional design */
   .dark {
@@ -398,27 +393,43 @@
     }
   }
 
-  /* Mobile-specific scroll fixes */
+  /* Mobile-specific scroll fixes - Améliorés */
   @media (max-width: 768px) {
+    html, body {
+      /* Suppression des propriétés qui peuvent bloquer le scroll */
+      height: auto;
+      min-height: 100vh;
+      overflow: auto;
+    }
+
     body {
-      overflow-x: hidden;
+      /* Autoriser le scroll naturel sur mobile */
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: none;
+      /* Suppression de overscroll-behavior qui peut causer des problèmes */
     }
 
     /* Ensure all scrollable containers work properly on mobile */
     .scroll-container {
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
+      /* Modification pour permettre le scroll naturel */
+      overscroll-behavior: auto;
     }
 
-    /* Fix for viewport issues on mobile */
+    /* Fix for viewport issues on mobile - Ajusté pour éviter les problèmes de scroll */
     html {
-      height: -webkit-fill-available;
+      height: auto;
+      min-height: 100vh;
     }
 
     body {
-      min-height: -webkit-fill-available;
+      min-height: 100vh;
+      height: auto;
+    }
+
+    /* Assurer que les conteneurs principaux permettent le scroll */
+    main, .container, .min-h-screen {
+      min-height: auto !important;
+      height: auto !important;
     }
   }
 }
