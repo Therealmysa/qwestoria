@@ -20,13 +20,18 @@ interface UserProfile {
   created_at: string;
 }
 
-const AdminUsers = () => {
+interface AdminUsersProps {
+  isOwner: boolean;
+}
+
+const AdminUsers = ({ isOwner }: AdminUsersProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { updateUserStatus, isUpdatingUserStatus } = useAdminOperations();
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users', searchTerm],
     queryFn: async (): Promise<UserProfile[]> => {
+      console.log('Fetching users for admin panel...');
       let query = supabase
         .from('profiles')
         .select('*')
@@ -37,19 +42,25 @@ const AdminUsers = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
+      console.log('Successfully fetched users:', data?.length || 0);
       return data || [];
     }
   });
 
   const handleToggleAdmin = (userId: string, currentStatus: boolean) => {
     if (confirm(`${currentStatus ? 'Retirer' : 'Accorder'} les droits administrateur à cet utilisateur ?`)) {
+      console.log('Toggling admin status for user:', userId, 'new status:', !currentStatus);
       updateUserStatus({ userId, isAdmin: !currentStatus });
     }
   };
 
   const handleToggleVip = (userId: string, currentStatus: boolean) => {
     if (confirm(`${currentStatus ? 'Retirer' : 'Accorder'} le statut VIP à cet utilisateur ?`)) {
+      console.log('Toggling VIP status for user:', userId, 'new status:', !currentStatus);
       updateUserStatus({ userId, isVip: !currentStatus });
     }
   };
@@ -145,14 +156,16 @@ const AdminUsers = () => {
                         <div className="flex gap-2">
                           {!user.is_owner && (
                             <>
-                              <Button
-                                variant={user.is_admin ? "destructive" : "outline"}
-                                size="sm"
-                                onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                                disabled={isUpdatingUserStatus}
-                              >
-                                {user.is_admin ? "Retirer Admin" : "Faire Admin"}
-                              </Button>
+                              {isOwner && (
+                                <Button
+                                  variant={user.is_admin ? "destructive" : "outline"}
+                                  size="sm"
+                                  onClick={() => handleToggleAdmin(user.id, user.is_admin)}
+                                  disabled={isUpdatingUserStatus}
+                                >
+                                  {user.is_admin ? "Retirer Admin" : "Faire Admin"}
+                                </Button>
+                              )}
                               <Button
                                 variant={user.is_vip ? "destructive" : "outline"}
                                 size="sm"
