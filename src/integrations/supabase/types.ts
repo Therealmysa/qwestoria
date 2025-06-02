@@ -878,6 +878,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_missions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_blog_post_comment_count: {
         Args: { post_id: string }
         Returns: number

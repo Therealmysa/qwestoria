@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Plus, Edit, Trash2, Coins } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Coins, Broom } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import MissionFormFields from "./MissionFormFields";
@@ -52,6 +51,9 @@ const AdminMissions = () => {
   const { data: missions, isLoading } = useQuery({
     queryKey: ['admin-missions', searchTerm],
     queryFn: async () => {
+      // Nettoyer automatiquement les missions expirées avant de récupérer la liste
+      await cleanupExpiredMissions();
+      
       let query = supabase
         .from('missions')
         .select('*')
@@ -64,6 +66,31 @@ const AdminMissions = () => {
       const { data, error } = await query;
       if (error) throw error;
       return data;
+    }
+  });
+
+  const cleanupExpiredMissions = async () => {
+    try {
+      const { error } = await supabase.rpc('cleanup_expired_missions');
+      if (error) {
+        console.error('Error cleaning up expired missions:', error);
+      } else {
+        console.log('Expired missions cleaned up successfully');
+      }
+    } catch (error) {
+      console.error('Error calling cleanup function:', error);
+    }
+  };
+
+  const cleanupMutation = useMutation({
+    mutationFn: cleanupExpiredMissions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
+      toast.success("Missions expirées supprimées avec succès");
+    },
+    onError: (error) => {
+      console.error('Error cleaning up missions:', error);
+      toast.error("Erreur lors du nettoyage");
     }
   });
 
@@ -190,6 +217,14 @@ const AdminMissions = () => {
                   className="pl-10"
                 />
               </div>
+              <Button
+                onClick={() => cleanupMutation.mutate()}
+                variant="outline"
+                className="text-orange-600 border-orange-600 hover:bg-orange-50"
+              >
+                <Broom className="h-4 w-4 mr-2" />
+                Nettoyer expirées
+              </Button>
               <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
                 <DialogTrigger asChild>
                   <Button 
