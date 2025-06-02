@@ -878,6 +878,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_mission: {
+        Args: { mission_id: string }
+        Returns: boolean
+      }
+      admin_update_user_status: {
+        Args: {
+          target_user_id: string
+          new_is_admin?: boolean
+          new_is_vip?: boolean
+        }
+        Returns: boolean
+      }
       cleanup_expired_missions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -889,6 +901,10 @@ export type Database = {
       get_blog_post_like_count: {
         Args: { post_id: string }
         Returns: number
+      }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
       get_leaderboard: {
         Args: { sort_by: string }

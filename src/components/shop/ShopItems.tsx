@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { useShopPurchase } from "@/hooks/useShopPurchase";
 import { useUserStatus } from "@/hooks/useUserStatus";
 import { useBradCoins } from "@/hooks/useBradCoins";
 import PremiumBadge from "@/components/vip/PremiumBadge";
+import { sanitizeText } from "@/utils/inputSanitization";
 
 interface ShopItem {
   id: string;
@@ -36,7 +38,14 @@ const ShopItems = () => {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      
+      // Sanitize data on the client side for extra security
+      return (data || []).map(item => ({
+        ...item,
+        name: sanitizeText(item.name),
+        description: sanitizeText(item.description),
+        category: sanitizeText(item.category)
+      }));
     }
   });
 
@@ -57,6 +66,10 @@ const ShopItems = () => {
   });
 
   const handlePurchaseItem = (item: ShopItem) => {
+    // Client-side validation before making the purchase
+    if (!canPurchase(item)) {
+      return;
+    }
     purchaseItem({ itemId: item.id });
   };
 

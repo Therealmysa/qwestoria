@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Search, Plus, Edit, Trash2, Coins, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAdminOperations } from "@/hooks/useAdminOperations";
+import { validateMissionData } from "@/utils/inputSanitization";
 import MissionFormFields from "./MissionFormFields";
 
 interface Mission {
@@ -47,6 +50,7 @@ const AdminMissions = () => {
     external_link: ""
   });
   const queryClient = useQueryClient();
+  const { deleteMission, isDeletingMission } = useAdminOperations();
 
   const { data: missions, isLoading } = useQuery({
     queryKey: ['admin-missions', searchTerm],
@@ -96,12 +100,18 @@ const AdminMissions = () => {
 
   const createMissionMutation = useMutation({
     mutationFn: async (missionData: MissionFormData) => {
+      const validation = validateMissionData(missionData);
+      
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+
       const { error } = await supabase
         .from('missions')
         .insert([{
-          ...missionData,
-          starts_at: missionData.starts_at || new Date().toISOString(),
-          ends_at: missionData.ends_at || null
+          ...validation.sanitizedData,
+          starts_at: validation.sanitizedData.starts_at || new Date().toISOString(),
+          ends_at: validation.sanitizedData.ends_at || null
         }]);
       
       if (error) throw error;
@@ -112,19 +122,25 @@ const AdminMissions = () => {
       setShowCreateDialog(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating mission:', error);
-      toast.error("Erreur lors de la création");
+      toast.error(error.message || "Erreur lors de la création");
     }
   });
 
   const updateMissionMutation = useMutation({
     mutationFn: async ({ id, ...missionData }: { id: string } & MissionFormData) => {
+      const validation = validateMissionData(missionData);
+      
+      if (!validation.isValid) {
+        throw new Error(validation.errors.join(', '));
+      }
+
       const { error } = await supabase
         .from('missions')
         .update({
-          ...missionData,
-          ends_at: missionData.ends_at || null,
+          ...validation.sanitizedData,
+          ends_at: validation.sanitizedData.ends_at || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', id);
@@ -138,28 +154,9 @@ const AdminMissions = () => {
       setSelectedMission(null);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error updating mission:', error);
-      toast.error("Erreur lors de la mise à jour");
-    }
-  });
-
-  const deleteMissionMutation = useMutation({
-    mutationFn: async (missionId: string) => {
-      const { error } = await supabase
-        .from('missions')
-        .delete()
-        .eq('id', missionId);
-      
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-missions'] });
-      toast.success("Mission supprimée avec succès");
-    },
-    onError: (error) => {
-      console.error('Error deleting mission:', error);
-      toast.error("Erreur lors de la suppression");
+      toast.error(error.message || "Erreur lors de la mise à jour");
     }
   });
 
@@ -197,6 +194,12 @@ const AdminMissions = () => {
     }
   };
 
+  const handleDelete = (missionId: string) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette mission ?')) {
+      deleteMission(missionId);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
@@ -221,6 +224,7 @@ const AdminMissions = () => {
                 onClick={() => cleanupMutation.mutate()}
                 variant="outline"
                 className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                disabled={cleanupMutation.isPending}
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Nettoyer expirées
@@ -253,8 +257,11 @@ const AdminMissions = () => {
                     }}>
                       Annuler
                     </Button>
-                    <Button onClick={handleSubmit}>
-                      Créer
+                    <Button 
+                      onClick={handleSubmit}
+                      disabled={createMissionMutation.isPending}
+                    >
+                      {createMissionMutation.isPending ? "Création..." : "Créer"}
                     </Button>
                   </div>
                 </DialogContent>
@@ -324,7 +331,8 @@ const AdminMissions = () => {
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() => deleteMissionMutation.mutate(mission.id)}
+                            onClick={() => handleDelete(mission.id)}
+                            disabled={isDeletingMission}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -352,8 +360,11 @@ const AdminMissions = () => {
                     }}>
                       Annuler
                     </Button>
-                    <Button onClick={handleSubmit}>
-                      Mettre à jour
+                    <Button 
+                      onClick={handleSubmit}
+                      disabled={updateMissionMutation.isPending}
+                    >
+                      {updateMissionMutation.isPending ? "Mise à jour..." : "Mettre à jour"}
                     </Button>
                   </div>
                 </DialogContent>
