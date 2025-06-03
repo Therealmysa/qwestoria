@@ -4,48 +4,55 @@ import { useLocation } from 'react-router-dom';
 
 export const useMobileScroll = () => {
   const location = useLocation();
-  const resetScrollRef = useRef<boolean>(false);
+  const isInitialLoad = useRef(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile && isInitialLoad.current) {
+      // Only reset scroll on initial page load or route change
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // Reset any problematic styles only on route change
+      document.body.style.transform = 'none';
+      document.documentElement.style.transform = 'none';
+      
+      isInitialLoad.current = false;
+      
+      console.log('Mobile scroll reset for route change:', location.pathname);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const isMobile = window.innerWidth <= 768;
     
     if (isMobile) {
-      // Force reset scroll position
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      const handleScroll = () => {
+        const currentScrollY = window.scrollY;
+        lastScrollY.current = currentScrollY;
+      };
+
+      // Add scroll listener to track position
+      window.addEventListener('scroll', handleScroll, { passive: true });
       
-      // Reset any transform that might interfere
-      document.body.style.transform = 'none';
-      document.documentElement.style.transform = 'none';
-      
-      // Ensure proper scroll behavior
-      document.body.style.overflowY = 'auto';
-      document.documentElement.style.overflowY = 'auto';
-      
-      // Reset any height constraints
-      document.body.style.height = 'auto';
-      document.documentElement.style.height = 'auto';
-      
-      // Force a reflow
-      resetScrollRef.current = true;
-      setTimeout(() => {
-        if (resetScrollRef.current) {
-          window.scrollTo(0, 0);
-          resetScrollRef.current = false;
-        }
-      }, 50);
-      
-      console.log('Mobile scroll reset triggered for:', location.pathname);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
     }
-  }, [location.pathname]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 768;
       if (isMobile) {
-        // Reset scroll on resize
-        window.scrollTo(0, 0);
+        // Only reset on significant resize, not minor ones
+        const resizeThreshold = 50;
+        if (Math.abs(window.innerHeight - screen.height) > resizeThreshold) {
+          window.scrollTo(0, 0);
+        }
       }
     };
 

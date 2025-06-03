@@ -1,32 +1,27 @@
 
-/* MOBILE SCROLL FIX - COMPLETE SYSTEM REWRITE */
+/* MOBILE SCROLL FIX - SIMPLIFIED VERSION */
 
 /* Global mobile body and html fixes */
 @media (max-width: 768px) {
   html.mobile-html, 
   body.mobile-body {
     height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
+    min-height: 100vh !important;
     overflow-x: hidden !important;
     overflow-y: auto !important;
     position: static !important;
     transform: none !important;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
-    overscroll-behavior: auto !important;
-    scroll-behavior: auto !important;
     opacity: 1 !important;
   }
 
-  /* Mobile wrapper - ensures proper scroll context */
+  /* Mobile wrapper - simplified */
   .mobile-wrapper {
     position: static !important;
     height: auto !important;
-    min-height: auto !important;
+    min-height: 100vh !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     opacity: 1 !important;
   }
 
@@ -34,11 +29,9 @@
   .layout-container {
     position: static !important;
     height: auto !important;
-    min-height: auto !important;
+    min-height: 100vh !important;
     overflow: visible !important;
     background: #f8fafc;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     opacity: 1 !important;
   }
 
@@ -47,8 +40,6 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     opacity: 1 !important;
   }
 
@@ -57,31 +48,34 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     opacity: 1 !important;
   }
 
-  /* Page containers - unified approach */
+  /* Page containers - ensure proper initial display */
   .page-container,
   .mobile-page-container,
   [class*="page-"] {
     position: static !important;
     height: auto !important;
-    min-height: auto !important;
+    min-height: calc(100vh - 80px) !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     background: #f8fafc !important;
     opacity: 1 !important;
   }
 
-  /* Remove all height constraints that might interfere */
-  .min-h-screen,
-  .h-screen,
-  [class*="min-h-"],
-  [class*="h-screen"] {
+  /* Force opacity on initial viewport content */
+  .page-container > *,
+  .main-content > *,
+  .content-wrapper > * {
+    opacity: 1 !important;
+  }
+
+  /* Remove height constraints that cause viewport issues */
+  .min-h-screen {
     min-height: auto !important;
+  }
+  
+  .h-screen {
     height: auto !important;
   }
 
@@ -90,8 +84,6 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
     opacity: 1 !important;
   }
 
@@ -104,42 +96,13 @@
     opacity: 1 !important;
   }
 
-  /* Grid and layout fixes */
-  .grid {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Remove transforms that might interfere */
-  [style*="transform"],
-  [class*="transform"] {
+  /* Remove transforms that might interfere with initial display */
+  [style*="transform"] {
     transform: none !important;
   }
 
-  /* Motion component fixes - IMPORTANT FOR OPACITY */
-  [data-framer-motion],
-  [data-framer-motion] * {
-    transform: none !important;
-    position: static !important;
-    opacity: 1 !important;
-  }
-
-  /* Framer Motion overrides - CRITICAL FIX */
-  .main-content,
-  .main-content > div,
-  .main-content > div[style*="transform"],
-  .main-content > div[style*="opacity"] {
-    transform: none !important;
-    opacity: 1 !important;
-  }
-
-  /* Force full opacity on all content */
-  .page-container *,
-  .mobile-page-container *,
-  .main-content *,
-  .content-wrapper * {
+  /* Motion component fixes - prevent opacity interference */
+  [data-framer-motion] {
     opacity: 1 !important;
   }
 
@@ -164,29 +127,13 @@
     max-height: 300px !important;
   }
 
-  /* Dialog and modal fixes */
+  /* Dialog fixes */
   [data-radix-dialog-overlay] {
     position: fixed !important;
   }
 
   /* Tab content fixes */
   [data-radix-tabs-content] {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Force scroll reset class */
-  .force-scroll-reset {
-    scroll-behavior: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  /* Emergency scroll fix for stuck elements */
-  .scroll-emergency-fix * {
-    position: static !important;
-    transform: none !important;
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
@@ -204,7 +151,7 @@
   }
 }
 
-/* Debug utility - remove in production */
+/* Debug utility */
 @media (max-width: 768px) {
   .debug-mobile-scroll {
     position: fixed !important;
