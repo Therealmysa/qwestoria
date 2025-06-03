@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const Shop = () => {
   }, []);
 
   return (
-    <div className="mobile-page-container bg-gradient-to-br from-purple-50 via-purple-50 to-purple-100 dark:from-purple-900 dark:via-purple-800 dark:to-purple-900">
+    <div className="page-container bg-gradient-to-br from-purple-50 via-purple-50 to-purple-100 dark:from-purple-900 dark:via-purple-800 dark:to-purple-900">
       {/* Banner Ad */}
       <div className="container mx-auto px-4 pt-6">
         <AdBanner position="banner" maxAds={1} />

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,7 +83,7 @@ const Leaderboard = () => {
   };
 
   return (
-    <div className="mobile-page-container container mx-auto px-4 py-8">
+    <div className="page-container container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold text-[#9b87f5] text-gradient-modern">Classement</h1>
 
       <div className="flex space-x-2 mb-6">

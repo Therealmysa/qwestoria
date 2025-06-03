@@ -7,34 +7,24 @@
   :root {
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 220 70% 50%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 218 20% 96%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
     --accent: 220 70% 55%;
     --accent-foreground: 220 70% 95%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 220 70% 50%;
-
     --radius: 1rem;
-
     --sidebar-background: 210 40% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -48,32 +38,23 @@
   .dark {
     --background: 222 15% 7%;
     --foreground: 210 40% 95%;
-
     --card: 222 15% 9%;
     --card-foreground: 210 40% 95%;
-
     --popover: 222 15% 9%;
     --popover-foreground: 210 40% 95%;
-
     --primary: 220 70% 50%;
     --primary-foreground: 222 15% 7%;
-
     --secondary: 222 15% 11%;
     --secondary-foreground: 210 40% 95%;
-
     --muted: 222 15% 11%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 220 70% 55%;
     --accent-foreground: 222 15% 7%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 222 15% 15%;
     --input: 222 15% 12%;
     --ring: 220 70% 50%;
-    
     --sidebar-background: 222 15% 6%;
     --sidebar-foreground: 210 40% 95%;
     --sidebar-primary: 220 70% 50%;
@@ -95,10 +76,27 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* App root - simplified */
+  .app-root {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+  }
+
+  /* Page containers - unified */
+  .page-container {
+    min-height: calc(100vh - 80px);
+    width: 100%;
+    position: relative;
+  }
+
   /* Dark theme with professional design */
   .dark {
     background: linear-gradient(135deg, #0f1419 0%, #1a202c 25%, #2d3748 50%, #1a202c 75%, #0f1419 100%);
     background-attachment: fixed;
+  }
+
+  .dark .app-root {
+    background: linear-gradient(135deg, #0f1419 0%, #1a202c 25%, #2d3748 50%, #1a202c 75%, #0f1419 100%);
   }
 
   /* Professional glass cards */
@@ -202,83 +200,6 @@
     box-shadow: 0 4px 15px rgba(71, 85, 105, 0.15);
   }
 
-  /* Floating particles background - more subtle */
-  .dark .bg-particles::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(1px 1px at 20px 30px, rgba(71, 85, 105, 0.2), transparent),
-      radial-gradient(1px 1px at 40px 70px, rgba(100, 116, 139, 0.2), transparent),
-      radial-gradient(1px 1px at 90px 40px, rgba(71, 85, 105, 0.15), transparent),
-      radial-gradient(1px 1px at 130px 80px, rgba(100, 116, 139, 0.15), transparent);
-    background-repeat: repeat;
-    background-size: 150px 150px;
-    animation: float 20s linear infinite;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Scrollbar improvements - professional */
-  .dark ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .dark ::-webkit-scrollbar-track {
-    @apply bg-slate-900/30;
-    border-radius: 4px;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-slate-600/50 to-gray-600/50 rounded-full;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    @apply from-slate-500/70 to-gray-500/70;
-  }
-
-  /* Modern section backgrounds */
-  .dark .section-bg-modern {
-    background: linear-gradient(135deg, rgba(71, 85, 105, 0.08) 0%, rgba(100, 116, 139, 0.04) 50%, rgba(71, 85, 105, 0.08) 100%);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(25px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Message bubble improvements */
-  .dark .message-bubble-sent {
-    @apply bg-gradient-to-r from-slate-600 to-gray-600 text-white;
-    box-shadow: 0 8px 25px rgba(71, 85, 105, 0.25);
-  }
-
-  .dark .message-bubble-received {
-    @apply bg-slate-900/30 border border-slate-700/30 text-gray-100;
-    backdrop-filter: blur(15px);
-  }
-
-  /* Tab enhancements */
-  .dark .tab-enhanced {
-    @apply bg-slate-900/20 border border-slate-700/20 text-gray-300;
-    backdrop-filter: blur(15px);
-  }
-
-  .dark .tab-enhanced[data-state="active"] {
-    @apply bg-gradient-to-r from-slate-600/30 to-gray-600/30 border-slate-500/40 text-white;
-    box-shadow: 0 8px 25px rgba(71, 85, 105, 0.15);
-  }
-
-  /* Dropdown improvements */
-  .dark .dropdown-enhanced {
-    @apply bg-slate-900/80 backdrop-blur-2xl border border-slate-700/30;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-  }
-
   /* Animation keyframes */
   @keyframes float {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -301,43 +222,6 @@
 
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  @keyframes shine {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    50% { transform: translateX(100%) rotate(45deg); }
-    100% { transform: translateX(-100%) rotate(45deg); }
-  }
-  
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-  
-  .animate-bounce-slow {
-    animation: bounce 4s ease-in-out infinite;
-  }
-  
-  @keyframes glow {
-    0%, 100% { filter: drop-shadow(0 0 8px rgba(71, 85, 105, 0.5)); }
-    50% { filter: drop-shadow(0 0 20px rgba(71, 85, 105, 0.7)); }
-  }
-  
-  .animate-glow {
-    animation: glow 4s ease-in-out infinite;
-  }
-
-  /* Floating glass effect utilities */
-  .glass-float {
-    @apply bg-slate-900/30 backdrop-blur-2xl border border-slate-700/30;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-  }
-
-  .glass-card {
-    @apply bg-slate-900/20 backdrop-blur-xl border border-slate-700/25;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
   }
 
   /* Light theme improvements */
