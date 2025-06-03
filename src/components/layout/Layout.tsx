@@ -31,15 +31,9 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Main content wrapper */}
         <div className="content-wrapper">
           <MainNavigation />
-          <motion.main 
-            key={location.pathname}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="main-content"
-          >
+          <main className="main-content">
             {children}
-          </motion.main>
+          </main>
           {!hideFooter && <Footer />}
         </div>
       </div>

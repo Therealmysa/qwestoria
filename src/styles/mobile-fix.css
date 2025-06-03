@@ -16,6 +16,7 @@
     touch-action: pan-y !important;
     overscroll-behavior: auto !important;
     scroll-behavior: auto !important;
+    opacity: 1 !important;
   }
 
   /* Mobile wrapper - ensures proper scroll context */
@@ -26,6 +27,7 @@
     overflow: visible !important;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
+    opacity: 1 !important;
   }
 
   /* Layout containers - simplified for mobile */
@@ -37,6 +39,7 @@
     background: #f8fafc;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
+    opacity: 1 !important;
   }
 
   .content-wrapper {
@@ -46,6 +49,7 @@
     overflow: visible !important;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
+    opacity: 1 !important;
   }
 
   .main-content {
@@ -55,6 +59,7 @@
     overflow: visible !important;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
+    opacity: 1 !important;
   }
 
   /* Page containers - unified approach */
@@ -68,6 +73,7 @@
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
     background: #f8fafc !important;
+    opacity: 1 !important;
   }
 
   /* Remove all height constraints that might interfere */
@@ -86,6 +92,7 @@
     overflow: visible !important;
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y !important;
+    opacity: 1 !important;
   }
 
   /* Card and component fixes */
@@ -94,6 +101,7 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
+    opacity: 1 !important;
   }
 
   /* Grid and layout fixes */
@@ -101,6 +109,7 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
+    opacity: 1 !important;
   }
 
   /* Remove transforms that might interfere */
@@ -109,15 +118,29 @@
     transform: none !important;
   }
 
-  /* Motion component fixes */
-  [data-framer-motion] {
+  /* Motion component fixes - IMPORTANT FOR OPACITY */
+  [data-framer-motion],
+  [data-framer-motion] * {
     transform: none !important;
     position: static !important;
+    opacity: 1 !important;
   }
 
-  /* Framer Motion overrides */
-  .main-content > div[style*="transform"] {
+  /* Framer Motion overrides - CRITICAL FIX */
+  .main-content,
+  .main-content > div,
+  .main-content > div[style*="transform"],
+  .main-content > div[style*="opacity"] {
     transform: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Force full opacity on all content */
+  .page-container *,
+  .mobile-page-container *,
+  .main-content *,
+  .content-wrapper * {
+    opacity: 1 !important;
   }
 
   /* Navigation fixes */
@@ -125,12 +148,14 @@
   [role="navigation"] {
     position: relative !important;
     z-index: 50;
+    opacity: 1 !important;
   }
 
   /* Footer fixes */
   footer {
     position: static !important;
     margin-top: auto;
+    opacity: 1 !important;
   }
 
   /* Scroll area fixes */
@@ -149,6 +174,7 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
+    opacity: 1 !important;
   }
 
   /* Force scroll reset class */
@@ -164,6 +190,7 @@
     height: auto !important;
     min-height: auto !important;
     overflow: visible !important;
+    opacity: 1 !important;
   }
 }
 
@@ -173,6 +200,7 @@
   .dark .page-container,
   .dark .mobile-page-container {
     background: #0f172a !important;
+    opacity: 1 !important;
   }
 }
 
@@ -188,5 +216,6 @@
     font-size: 12px;
     z-index: 9999;
     border-radius: 3px;
+    opacity: 1 !important;
   }
 }
