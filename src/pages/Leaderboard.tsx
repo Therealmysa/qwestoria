@@ -84,15 +84,7 @@ const Leaderboard = () => {
   };
 
   return (
-    <div 
-      className="container mx-auto px-4 py-8"
-      style={{
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'auto',
-        touchAction: 'auto',
-        overflow: 'auto'
-      }}
-    >
+    <div className="mobile-page-container container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold text-[#9b87f5] text-gradient-modern">Classement</h1>
 
       <div className="flex space-x-2 mb-6">

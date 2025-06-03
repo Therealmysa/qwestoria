@@ -90,49 +90,9 @@
     @apply border-border;
   }
 
-  /* SCROLL FIX MOBILE - BASE */
-  html, body {
-    height: auto !important;
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: auto !important;
-    touch-action: auto !important;
-    position: relative !important;
-  }
-
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-  }
-
-  /* MOBILE SCROLL FIXES - COMPLETE OVERRIDE */
-  @media (max-width: 768px) {
-    * {
-      -webkit-overflow-scrolling: touch !important;
-      overscroll-behavior: auto !important;
-      touch-action: auto !important;
-    }
-
-    html, body, #root, main, .container {
-      height: auto !important;
-      min-height: auto !important;
-      overflow: auto !important;
-      position: relative !important;
-      transform: none !important;
-    }
-
-    /* Force all containers to be scrollable */
-    [class*="min-h-"], [class*="h-screen"], .min-h-screen {
-      min-height: auto !important;
-      height: auto !important;
-    }
-
-    /* Eliminate all blocking scroll properties */
-    [style*="overflow:"], [style*="overscroll-behavior:"], [style*="touch-action:"] {
-      overflow: auto !important;
-      overscroll-behavior: auto !important;
-      touch-action: auto !important;
-    }
   }
 
   /* Dark theme with professional design */

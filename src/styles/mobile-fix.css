@@ -1,0 +1,130 @@
+
+/* MOBILE SCROLL FIX - COMPLETE OVERRIDE */
+
+/* Base mobile layout */
+.mobile-layout-container {
+  /* Desktop styles */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+  position: relative;
+}
+
+.mobile-content-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.mobile-main-content {
+  width: 100%;
+  position: relative;
+}
+
+/* Mobile-specific overrides */
+@media (max-width: 768px) {
+  .mobile-layout-container {
+    min-height: auto !important;
+    height: auto !important;
+    background: #f8fafc;
+    overflow: visible !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  .mobile-content-wrapper {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  .mobile-main-content {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  /* Force all containers to be scrollable on mobile */
+  * {
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  /* Remove all height constraints on mobile */
+  [class*="min-h-"], 
+  [class*="h-screen"], 
+  .min-h-screen,
+  .h-screen {
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  /* Page-specific mobile fixes */
+  .mobile-page-container {
+    background: #f8fafc !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    position: static !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  /* Container mobile fixes */
+  .container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+
+  /* Card mobile fixes */
+  .card, [class*="card"] {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Grid mobile fixes */
+  .grid {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Remove any transform that might block scroll */
+  [style*="transform"], [class*="transform"] {
+    transform: none !important;
+  }
+
+  /* Body and html mobile fixes */
+  html, body, #root {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: auto !important;
+    position: relative !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: auto !important;
+  }
+}
+
+/* Dark mode mobile fixes */
+@media (max-width: 768px) {
+  .dark .mobile-layout-container {
+    background: #0f172a !important;
+  }
+}
