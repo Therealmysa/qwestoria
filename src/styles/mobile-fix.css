@@ -1,168 +1,83 @@
 
-/* MOBILE SCROLL FIX - SIMPLIFIED VERSION */
+/* MOBILE FIXES - SIMPLIFIED VERSION */
 
-/* Global mobile body and html fixes */
+/* Global mobile fixes */
 @media (max-width: 768px) {
-  html.mobile-html, 
-  body.mobile-body {
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    position: static !important;
-    transform: none !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-y !important;
-    opacity: 1 !important;
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    position: static;
+    transform: none;
   }
 
-  /* Mobile wrapper - simplified */
-  .mobile-wrapper {
-    position: static !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: visible !important;
-    opacity: 1 !important;
+  /* Remove all opacity interference */
+  html, body, #root, .app-root {
+    opacity: 1;
   }
 
-  /* Layout containers - simplified for mobile */
+  /* Layout containers - keep simple */
   .layout-container {
-    position: static !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: visible !important;
+    min-height: 100vh;
     background: #f8fafc;
-    opacity: 1 !important;
+    position: relative;
+  }
+
+  .dark .layout-container {
+    background: #0f172a;
   }
 
   .content-wrapper {
-    position: static !important;
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
+    position: relative;
+    min-height: 100vh;
   }
 
   .main-content {
-    position: static !important;
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
+    position: relative;
+    min-height: calc(100vh - 80px);
   }
 
-  /* Page containers - ensure proper initial display */
-  .page-container,
-  .mobile-page-container,
-  [class*="page-"] {
-    position: static !important;
-    height: auto !important;
-    min-height: calc(100vh - 80px) !important;
-    overflow: visible !important;
-    background: #f8fafc !important;
-    opacity: 1 !important;
+  /* Page containers */
+  .page-container {
+    min-height: calc(100vh - 80px);
+    position: relative;
+    background: inherit;
   }
 
-  /* Force opacity on initial viewport content */
-  .page-container > *,
-  .main-content > *,
-  .content-wrapper > * {
-    opacity: 1 !important;
-  }
-
-  /* Remove height constraints that cause viewport issues */
+  /* Remove problematic transforms and heights */
   .min-h-screen {
-    min-height: auto !important;
+    min-height: auto;
   }
   
   .h-screen {
-    height: auto !important;
-  }
-
-  /* Container fixes */
-  .container {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Card and component fixes */
-  .card,
-  [class*="card"] {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-  }
-
-  /* Remove transforms that might interfere with initial display */
-  [style*="transform"] {
-    transform: none !important;
-  }
-
-  /* Motion component fixes - prevent opacity interference */
-  [data-framer-motion] {
-    opacity: 1 !important;
+    height: auto;
   }
 
   /* Navigation fixes */
-  nav, 
-  [role="navigation"] {
-    position: relative !important;
+  nav {
+    position: relative;
     z-index: 50;
-    opacity: 1 !important;
   }
 
-  /* Footer fixes */
-  footer {
-    position: static !important;
-    margin-top: auto;
-    opacity: 1 !important;
+  /* Card and component fixes */
+  .card, [class*="card"] {
+    position: relative;
+  }
+
+  /* Remove all motion interference */
+  [data-framer-motion] {
+    opacity: 1;
   }
 
   /* Scroll area fixes */
   [data-radix-scroll-area-viewport] {
-    height: auto !important;
-    max-height: 300px !important;
+    max-height: 300px;
   }
 
   /* Dialog fixes */
   [data-radix-dialog-overlay] {
-    position: fixed !important;
-  }
-
-  /* Tab content fixes */
-  [data-radix-tabs-content] {
-    height: auto !important;
-    min-height: auto !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-  }
-}
-
-/* Dark mode mobile fixes */
-@media (max-width: 768px) {
-  .dark .layout-container,
-  .dark .page-container,
-  .dark .mobile-page-container {
-    background: #0f172a !important;
-    opacity: 1 !important;
-  }
-}
-
-/* Debug utility */
-@media (max-width: 768px) {
-  .debug-mobile-scroll {
-    position: fixed !important;
-    top: 10px;
-    right: 10px;
-    background: red;
-    color: white;
-    padding: 5px;
-    font-size: 12px;
-    z-index: 9999;
-    border-radius: 3px;
-    opacity: 1 !important;
+    position: fixed;
   }
 }

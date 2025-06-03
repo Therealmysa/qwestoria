@@ -4,8 +4,6 @@ import { useLocation } from "react-router-dom";
 import MainNavigation from "./MainNavigation";
 import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
-import MobileLayoutWrapper from "./MobileLayoutWrapper";
-import { motion } from "framer-motion";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
   const hideFooter = location.pathname === "/messages";
 
   return (
-    <MobileLayoutWrapper>
+    <>
       <ScrollToTop />
       <div className="layout-container">
         {/* Background decoration - hidden on mobile */}
@@ -37,7 +35,7 @@ const Layout = ({ children }: LayoutProps) => {
           {!hideFooter && <Footer />}
         </div>
       </div>
-    </MobileLayoutWrapper>
+    </>
   );
 };
 
