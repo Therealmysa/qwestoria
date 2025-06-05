@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,15 +82,21 @@ const MessageArea = ({
             </div>
           </CardHeader>
           
-          {/* Zone de messages avec scroll */}
+          {/* Zone de messages avec padding mais sans scroll sur le parent */}
           <div className="flex-1 min-h-0 flex flex-col">
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 p-4 relative">
               {messagesLoading ? (
                 <div className="flex justify-center items-center h-full">
                   <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div 
+                  className="space-y-6 h-full overflow-y-auto pr-2"
+                  style={{ 
+                    WebkitOverflowScrolling: 'touch',
+                    overscrollBehavior: 'contain'
+                  }}
+                >
                   {messages.map((message) => {
                     const isMyMessage = message.sender_id === user?.id;
                     const senderProfile = userProfiles[message.sender_id];
