@@ -131,6 +131,35 @@
     position: relative;
     overflow: visible;
   }
+
+  /* NOUVELLES RÈGLES POUR TRANSITIONS DE ROUTE */
+  
+  /* Empêcher les problèmes lors des changements de route */
+  .layout-container,
+  .content-wrapper,
+  .main-content {
+    will-change: auto;
+    transform: translateZ(0);
+  }
+
+  /* Stabiliser le scroll pendant les transitions */
+  body.route-changing {
+    overflow-y: auto !important;
+    position: relative !important;
+  }
+
+  /* Assurer la continuité du scroll */
+  [data-reactrouter] {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  /* Éviter les sauts de scroll */
+  .page-transition {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Media query pour très petits écrans */
@@ -142,5 +171,12 @@
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  /* Stabilité accrue sur petits écrans */
+  body {
+    position: relative;
+    overflow-y: auto;
+    height: 100vh;
   }
 }

@@ -1,5 +1,5 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import MainNavigation from "./MainNavigation";
 import Footer from "./Footer";
@@ -12,6 +12,23 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const hideFooter = location.pathname === "/messages";
+
+  // Gérer les transitions de route sur mobile
+  useEffect(() => {
+    // Ajouter une classe pendant le changement de route sur mobile
+    if (window.innerWidth <= 768) {
+      document.body.classList.add('route-changing');
+      
+      const timer = setTimeout(() => {
+        document.body.classList.remove('route-changing');
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        document.body.classList.remove('route-changing');
+      };
+    }
+  }, [location.pathname]);
 
   return (
     <>
@@ -29,7 +46,7 @@ const Layout = ({ children }: LayoutProps) => {
         {/* Main content wrapper */}
         <div className="content-wrapper">
           <MainNavigation />
-          <main className="main-content">
+          <main className="main-content page-transition">
             {children}
           </main>
           {!hideFooter && <Footer />}
