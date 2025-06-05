@@ -10,7 +10,7 @@ export const useSimplifiedMobile = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       
-      // Sur mobile, toujours réduire les animations pour éviter les conflits de scroll
+      // Sur mobile, réduire les animations mais GARDER la visibilité
       setShouldReduceMotion(mobile);
     };
 
@@ -32,5 +32,8 @@ export const useSimplifiedMobile = () => {
     };
   }, [isMobile]);
 
-  return { isMobile, shouldReduceMotion };
+  return { 
+    isMobile, 
+    shouldReduceMotion: shouldReduceMotion && isMobile // Seulement sur mobile
+  };
 };

@@ -12,7 +12,6 @@
     touch-action: pan-y;
     position: relative !important;
     transform: none !important;
-    opacity: 1 !important;
     margin: 0;
     padding: 0;
   }
@@ -29,7 +28,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
-    opacity: 1;
     will-change: auto;
   }
 
@@ -37,32 +35,25 @@
   .app-root {
     min-height: 100vh;
     position: relative;
-    opacity: 1;
-    transform: none;
+    will-change: auto;
   }
 
   /* Layout containers - optimisés pour le scroll */
   .layout-container {
     min-height: 100vh;
     position: relative;
-    opacity: 1;
-    transform: none;
     will-change: auto;
   }
 
   .content-wrapper {
     position: relative;
     min-height: 100vh;
-    opacity: 1;
-    transform: none;
     will-change: auto;
   }
 
   .main-content {
     position: relative;
     min-height: calc(100vh - 80px);
-    opacity: 1;
-    transform: none;
     will-change: auto;
   }
 
@@ -70,8 +61,6 @@
   .page-container {
     min-height: calc(100vh - 80px);
     position: relative;
-    opacity: 1;
-    transform: none;
   }
 
   /* Éliminer les hauteurs problématiques */
@@ -88,8 +77,6 @@
   nav {
     position: relative;
     z-index: 50;
-    opacity: 1;
-    transform: none;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -97,16 +84,12 @@
   /* Cards et composants - simplifiés */
   .card, [class*="card"] {
     position: relative;
-    opacity: 1;
-    transform: none;
   }
 
-  /* Suppression complète des animations problématiques */
-  [data-framer-motion] {
-    opacity: 1 !important;
-    transform: none !important;
+  /* Suppression SÉLECTIVE des animations problématiques - ÉVITER LES SÉLECTEURS GLOBAUX */
+  [data-framer-motion]:not(.keep-animation) {
     animation: none !important;
-    transition: none !important;
+    transition: opacity 0.2s ease !important;
   }
 
   /* Optimisation des scroll areas Radix */
@@ -119,30 +102,21 @@
   /* Dialogs et overlays mobiles - simplifiés */
   [data-radix-dialog-overlay] {
     position: fixed;
-    opacity: 1;
     backdrop-filter: none;
   }
 
   [data-radix-dropdown-menu-content] {
-    transform: none !important;
     animation: none !important;
   }
 
   [data-vaul-drawer] {
-    transform: none !important;
     animation: none !important;
   }
 
-  /* Force la visibilité et la simplicité */
-  * {
-    opacity: 1 !important;
-  }
-
-  /* Suppression de toutes les transforms problématiques */
+  /* Suppression SÉLECTIVE des transforms problématiques - ÉVITER * */
   .motion-reduce, 
-  [class*="animate-"],
-  [class*="transition-"] {
-    transform: none !important;
+  [class*="animate-"]:not(.keep-animation),
+  [class*="transition-"]:not(.keep-animation) {
     animation: none !important;
     transition: opacity 0.2s ease !important;
   }
@@ -159,7 +133,6 @@
   section {
     position: relative;
     overflow: visible;
-    transform: none;
   }
 
   /* OPTIMISATIONS POUR TRANSITIONS DE ROUTE */
@@ -169,7 +142,6 @@
   .content-wrapper,
   .main-content {
     will-change: auto !important;
-    transform: none !important;
     animation: none !important;
     transition: none !important;
   }
@@ -178,13 +150,11 @@
   body.route-changing {
     overflow-y: auto !important;
     position: relative !important;
-    transform: none !important;
     height: 100vh !important;
   }
 
-  body.route-changing * {
+  body.route-changing [data-framer-motion]:not(.keep-animation) {
     animation: none !important;
-    transform: none !important;
     transition: none !important;
   }
 
@@ -193,13 +163,10 @@
     height: auto;
     min-height: 100vh;
     overflow: visible;
-    transform: none;
   }
 
   /* Éviter complètement les sauts de scroll */
   .page-transition {
-    opacity: 1 !important;
-    transform: none !important;
     animation: none !important;
     transition: none !important;
   }
@@ -227,9 +194,48 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Simplification des gradients */
-  .bg-gradient-to-r {
-    background: var(--primary) !important;
+  /* PRÉSERVER LES ÉLÉMENTS IMPORTANTS */
+  
+  /* Logo et éléments de navigation - toujours visibles */
+  nav [class*="logo"],
+  nav .brand,
+  nav h1,
+  nav span,
+  .navigation-brand,
+  .site-title {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+
+  /* Titres et contenus principaux - toujours visibles */
+  h1, h2, h3, h4, h5, h6 {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Textes et contenus - toujours visibles */
+  p, span, div {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Boutons et liens - toujours visibles */
+  button, a {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Avatars et images - toujours visibles */
+  img, svg, [role="img"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Formulaires - toujours visibles */
+  input, textarea, select {
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 }
 
@@ -249,12 +255,11 @@
     position: relative !important;
     overflow-y: auto !important;
     height: 100vh !important;
-    transform: none !important;
   }
 
-  /* Force la simplicité absolue */
+  /* S'assurer que tous les éléments restent visibles */
   * {
-    animation: none !important;
-    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 }
