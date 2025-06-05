@@ -237,7 +237,7 @@ const Messages = () => {
   const selectedUser = conversations.find(conv => conv.user_id === selectedConversation);
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-50 via-white to-cyan-50 overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute w-32 h-32 bg-blue-200/40 rounded-full blur-3xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
@@ -249,8 +249,8 @@ const Messages = () => {
       {/* Header fixe */}
       <MessagesHeader />
 
-      {/* Contenu principal avec scroll */}
-      <div className="flex-1 min-h-0 relative z-10">
+      {/* Contenu principal SANS scroll */}
+      <div className="flex-1 min-h-0 relative z-10 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
           {/* Navigation des tabs - hauteur fixe */}
           <div className="flex-shrink-0 p-4">
@@ -288,8 +288,8 @@ const Messages = () => {
             </div>
           </div>
 
-          {/* Zone de contenu avec scroll */}
-          <div className="flex-1 min-h-0 px-4 pb-4">
+          {/* Zone de contenu SANS scroll au niveau page */}
+          <div className="flex-1 min-h-0 px-4 pb-4 overflow-hidden">
             <TabsContent value="messages" className="h-full m-0">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
                 <div className="lg:col-span-1">
@@ -319,7 +319,7 @@ const Messages = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="friends" className="h-full m-0">
+            <TabsContent value="friends" className="h-full m-0 overflow-hidden">
               <FriendsList 
                 friends={friends}
                 onStartConversation={startConversationWithFriend}
@@ -327,11 +327,11 @@ const Messages = () => {
               />
             </TabsContent>
 
-            <TabsContent value="requests" className="h-full m-0">
+            <TabsContent value="requests" className="h-full m-0 overflow-hidden">
               <FriendRequests />
             </TabsContent>
 
-            <TabsContent value="add-friend" className="h-full m-0">
+            <TabsContent value="add-friend" className="h-full m-0 overflow-hidden">
               <AddFriend />
             </TabsContent>
           </div>
