@@ -1,61 +1,69 @@
 
-/* MOBILE FIXES - VERSION DEFINITIVE */
+/* MOBILE FIXES - VERSION OPTIMISÉE POUR SCROLL */
 
 /* Reset et base mobile */
 @media (max-width: 768px) {
-  /* Reset global mobile */
+  /* Reset global mobile - ultra simplifié */
   html, body {
     height: 100vh;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
-    position: relative;
-    transform: none;
-    opacity: 1;
+    position: relative !important;
+    transform: none !important;
+    opacity: 1 !important;
     margin: 0;
     padding: 0;
   }
 
-  /* Force le scroll natif mobile */
+  /* Force le scroll natif mobile - priorité absolue */
   body {
-    scroll-behavior: smooth;
+    scroll-behavior: auto !important;
     overscroll-behavior: contain;
   }
 
-  /* Conteneur racine */
+  /* Conteneur racine - stabilisé */
   #root {
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
     opacity: 1;
+    will-change: auto;
   }
 
-  /* App root - simplifié */
+  /* App root - simplifié au maximum */
   .app-root {
     min-height: 100vh;
     position: relative;
     opacity: 1;
+    transform: none;
   }
 
-  /* Layout containers */
+  /* Layout containers - optimisés pour le scroll */
   .layout-container {
     min-height: 100vh;
     position: relative;
     opacity: 1;
+    transform: none;
+    will-change: auto;
   }
 
   .content-wrapper {
     position: relative;
     min-height: 100vh;
     opacity: 1;
+    transform: none;
+    will-change: auto;
   }
 
   .main-content {
     position: relative;
     min-height: calc(100vh - 80px);
     opacity: 1;
+    transform: none;
+    will-change: auto;
   }
 
   /* Page containers */
@@ -63,6 +71,7 @@
     min-height: calc(100vh - 80px);
     position: relative;
     opacity: 1;
+    transform: none;
   }
 
   /* Éliminer les hauteurs problématiques */
@@ -75,47 +84,67 @@
     min-height: 100vh;
   }
 
-  /* Navigation mobile optimisée */
+  /* Navigation mobile optimisée - sans backdrop-blur */
   nav {
     position: relative;
     z-index: 50;
     opacity: 1;
+    transform: none;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
-  /* Cards et composants */
+  /* Cards et composants - simplifiés */
   .card, [class*="card"] {
     position: relative;
     opacity: 1;
+    transform: none;
   }
 
-  /* Suppression des interférences d'animation */
+  /* Suppression complète des animations problématiques */
   [data-framer-motion] {
-    opacity: 1;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
   }
 
-  /* Optimisation des scroll areas */
+  /* Optimisation des scroll areas Radix */
   [data-radix-scroll-area-viewport] {
     max-height: 300px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Dialogs mobiles */
+  /* Dialogs et overlays mobiles - simplifiés */
   [data-radix-dialog-overlay] {
     position: fixed;
     opacity: 1;
+    backdrop-filter: none;
   }
 
-  /* Force la visibilité immédiate */
+  [data-radix-dropdown-menu-content] {
+    transform: none !important;
+    animation: none !important;
+  }
+
+  [data-vaul-drawer] {
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /* Force la visibilité et la simplicité */
   * {
-    opacity: 1;
+    opacity: 1 !important;
   }
 
-  /* Suppression des transforms problématiques */
-  .motion-reduce {
-    transform: none;
-    animation: none;
-    transition: none;
+  /* Suppression de toutes les transforms problématiques */
+  .motion-reduce, 
+  [class*="animate-"],
+  [class*="transition-"] {
+    transform: none !important;
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
   }
 
   /* Layout Index spécifique */
@@ -130,22 +159,33 @@
   section {
     position: relative;
     overflow: visible;
+    transform: none;
   }
 
-  /* NOUVELLES RÈGLES POUR TRANSITIONS DE ROUTE */
+  /* OPTIMISATIONS POUR TRANSITIONS DE ROUTE */
   
-  /* Empêcher les problèmes lors des changements de route */
+  /* Empêcher tous les conflits lors des changements de route */
   .layout-container,
   .content-wrapper,
   .main-content {
-    will-change: auto;
-    transform: translateZ(0);
+    will-change: auto !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
   }
 
-  /* Stabiliser le scroll pendant les transitions */
+  /* Stabiliser le scroll pendant les transitions - priorité absolue */
   body.route-changing {
     overflow-y: auto !important;
     position: relative !important;
+    transform: none !important;
+    height: 100vh !important;
+  }
+
+  body.route-changing * {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
   }
 
   /* Assurer la continuité du scroll */
@@ -153,12 +193,43 @@
     height: auto;
     min-height: 100vh;
     overflow: visible;
+    transform: none;
   }
 
-  /* Éviter les sauts de scroll */
+  /* Éviter complètement les sauts de scroll */
   .page-transition {
-    opacity: 1;
-    transform: none;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Overlays - fermeture forcée pendant les transitions */
+  body.route-changing [data-radix-popper-content-wrapper] {
+    display: none !important;
+  }
+
+  body.route-changing [data-vaul-drawer] {
+    display: none !important;
+  }
+
+  /* Navigation sticky simplifiée */
+  .sticky {
+    position: relative !important;
+  }
+
+  /* Suppression des effets de flou sur mobile */
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-md {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Simplification des gradients */
+  .bg-gradient-to-r {
+    background: var(--primary) !important;
   }
 }
 
@@ -173,10 +244,17 @@
     padding-right: 1rem;
   }
 
-  /* Stabilité accrue sur petits écrans */
+  /* Stabilité maximale sur petits écrans */
   body {
-    position: relative;
-    overflow-y: auto;
-    height: 100vh;
+    position: relative !important;
+    overflow-y: auto !important;
+    height: 100vh !important;
+    transform: none !important;
+  }
+
+  /* Force la simplicité absolue */
+  * {
+    animation: none !important;
+    transform: none !important;
   }
 }

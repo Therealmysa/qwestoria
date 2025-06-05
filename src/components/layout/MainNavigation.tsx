@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { useSimplifiedMobile } from "@/hooks/useSimplifiedMobile";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -46,6 +46,7 @@ const MainNavigation = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { isMobile, shouldReduceMotion } = useSimplifiedMobile();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -111,7 +112,22 @@ const MainNavigation = () => {
     { name: "Team Mates", path: "/teammates" },
   ];
 
-  // Mobile drawer menu component
+  // Version simplifiée pour mobile sans animations
+  const SimpleMobileMenuItem = ({ item, onClick }: { item: any, onClick?: () => void }) => (
+    <div
+      className={cn(
+        "px-4 py-3 rounded-md transition-colors cursor-pointer",
+        location.pathname === item.path
+          ? "bg-primary/10 text-primary"
+          : "text-gray-700 hover:bg-primary/10 hover:text-primary"
+      )}
+      onClick={onClick}
+    >
+      {item.name}
+    </div>
+  );
+
+  // Mobile drawer menu component simplifié
   const MobileMenu = () => (
     <Drawer>
       <DrawerTrigger asChild>
@@ -144,48 +160,22 @@ const MainNavigation = () => {
             {menuItems.map((item) => (
               <DrawerClose key={item.name} asChild>
                 <Link to={item.path}>
-                  <motion.div
-                    whileTap={{ scale: 0.97 }}
-                    className={cn(
-                      "px-4 py-3 rounded-md transition-all",
-                      location.pathname === item.path
-                        ? "bg-primary/10 text-primary"
-                        : "text-gray-700 hover:bg-primary/10 hover:text-primary"
-                    )}
-                  >
-                    {item.name}
-                  </motion.div>
+                  <SimpleMobileMenuItem item={item} />
                 </Link>
               </DrawerClose>
             ))}
             <DrawerClose asChild>
               <Link to="/fortnite-shop">
-                <motion.div
-                  whileTap={{ scale: 0.97 }}
-                  className={cn(
-                    "px-4 py-3 rounded-md transition-all",
-                    location.pathname === "/fortnite-shop"
-                      ? "bg-primary/10 text-primary"
-                      : "text-gray-700 hover:bg-primary/10 hover:text-primary"
-                  )}
-                >
-                  Boutique Fortnite
-                </motion.div>
+                <SimpleMobileMenuItem 
+                  item={{ name: "Boutique Fortnite", path: "/fortnite-shop" }} 
+                />
               </Link>
             </DrawerClose>
             <DrawerClose asChild>
               <Link to="/leaderboard">
-                <motion.div
-                  whileTap={{ scale: 0.97 }}
-                  className={cn(
-                    "px-4 py-3 rounded-md transition-all",
-                    location.pathname === "/leaderboard"
-                      ? "bg-primary/10 text-primary"
-                      : "text-gray-700 hover:bg-primary/10 hover:text-primary"
-                  )}
-                >
-                  Classement
-                </motion.div>
+                <SimpleMobileMenuItem 
+                  item={{ name: "Classement", path: "/leaderboard" }} 
+                />
               </Link>
             </DrawerClose>
           </nav>
@@ -195,7 +185,12 @@ const MainNavigation = () => {
   );
 
   return (
-    <nav className="sticky top-0 z-50 bg-white backdrop-blur-lg bg-opacity-90 px-4 py-3 shadow-lg border-b border-gray-200">
+    <nav className={cn(
+      "sticky top-0 z-50 px-4 py-3 shadow-lg border-b border-gray-200",
+      isMobile 
+        ? "bg-white" // Version simplifiée sur mobile
+        : "bg-white backdrop-blur-lg bg-opacity-90" // Version complète sur desktop
+    )}>
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <div className="flex items-center">
           <BradHubLogo size="md" />
@@ -278,7 +273,12 @@ const MainNavigation = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="rounded-full flex items-center gap-2 bg-gradient-to-r from-primary/10 to-primary/30 text-gray-700 hover:from-primary/20 hover:to-primary/40 transition-all duration-300"
+                    className={cn(
+                      "rounded-full flex items-center gap-2 text-gray-700 transition-all duration-300",
+                      isMobile 
+                        ? "bg-primary/10 hover:bg-primary/20" // Version simplifiée mobile
+                        : "bg-gradient-to-r from-primary/10 to-primary/30 hover:from-primary/20 hover:to-primary/40"
+                    )}
                   >
                     <Avatar className="w-6 h-6">
                       <AvatarImage src={profile?.avatar_url} alt={profile?.username} />
@@ -335,7 +335,12 @@ const MainNavigation = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all duration-300 rounded-full">
+                <Button className={cn(
+                  "text-white transition-all duration-300 rounded-full",
+                  isMobile 
+                    ? "bg-primary hover:bg-primary/90 shadow-md" // Version simplifiée mobile
+                    : "bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg"
+                )}>
                   Connexion
                 </Button>
               </Link>

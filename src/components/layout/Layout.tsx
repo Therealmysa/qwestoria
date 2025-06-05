@@ -1,6 +1,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useSimplifiedMobile } from "@/hooks/useSimplifiedMobile";
 import MainNavigation from "./MainNavigation";
 import Footer from "./Footer";
 import ScrollToTop from "./ScrollToTop";
@@ -11,30 +12,35 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const { isMobile } = useSimplifiedMobile();
   const hideFooter = location.pathname === "/messages";
 
-  // Gérer les transitions de route sur mobile
+  // Gérer les transitions de route de manière optimisée
   useEffect(() => {
-    // Ajouter une classe pendant le changement de route sur mobile
-    if (window.innerWidth <= 768) {
+    if (isMobile) {
+      // Ajouter une classe temporaire pour stabiliser le scroll
       document.body.classList.add('route-changing');
+      
+      // S'assurer que le scroll reste actif
+      document.body.style.overflowY = 'auto';
+      document.body.style.position = 'relative';
       
       const timer = setTimeout(() => {
         document.body.classList.remove('route-changing');
-      }, 100);
+      }, 150); // Délai légèrement augmenté pour plus de stabilité
 
       return () => {
         clearTimeout(timer);
         document.body.classList.remove('route-changing');
       };
     }
-  }, [location.pathname]);
+  }, [location.pathname, isMobile]);
 
   return (
     <>
       <ScrollToTop />
       <div className="layout-container">
-        {/* Background decoration - hidden on mobile */}
+        {/* Background decoration - hidden on mobile for performance */}
         <div className="hidden md:block fixed inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute w-40 h-40 bg-blue-100/30 rounded-full blur-2xl animate-float" style={{ top: '10%', left: '5%', animationDelay: '0s' }}></div>
           <div className="absolute w-32 h-32 bg-cyan-100/30 rounded-full blur-2xl animate-float" style={{ top: '60%', right: '10%', animationDelay: '3s' }}></div>
