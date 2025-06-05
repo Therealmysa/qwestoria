@@ -1,83 +1,146 @@
 
-/* MOBILE FIXES - SIMPLIFIED VERSION */
+/* MOBILE FIXES - VERSION DEFINITIVE */
 
-/* Global mobile fixes */
+/* Reset et base mobile */
 @media (max-width: 768px) {
+  /* Reset global mobile */
   html, body {
-    height: 100%;
+    height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
-    position: static;
+    position: relative;
     transform: none;
+    opacity: 1;
+    margin: 0;
+    padding: 0;
   }
 
-  /* Remove all opacity interference */
-  html, body, #root, .app-root {
+  /* Force le scroll natif mobile */
+  body {
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+  }
+
+  /* Conteneur racine */
+  #root {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
     opacity: 1;
   }
 
-  /* Layout containers - keep simple */
-  .layout-container {
+  /* App root - simplifié */
+  .app-root {
     min-height: 100vh;
-    background: #f8fafc;
     position: relative;
+    opacity: 1;
   }
 
-  .dark .layout-container {
-    background: #0f172a;
+  /* Layout containers */
+  .layout-container {
+    min-height: 100vh;
+    position: relative;
+    opacity: 1;
   }
 
   .content-wrapper {
     position: relative;
     min-height: 100vh;
+    opacity: 1;
   }
 
   .main-content {
     position: relative;
     min-height: calc(100vh - 80px);
+    opacity: 1;
   }
 
   /* Page containers */
   .page-container {
     min-height: calc(100vh - 80px);
     position: relative;
-    background: inherit;
+    opacity: 1;
   }
 
-  /* Remove problematic transforms and heights */
+  /* Éliminer les hauteurs problématiques */
   .min-h-screen {
-    min-height: auto;
+    min-height: 100vh;
   }
   
   .h-screen {
     height: auto;
+    min-height: 100vh;
   }
 
-  /* Navigation fixes */
+  /* Navigation mobile optimisée */
   nav {
     position: relative;
     z-index: 50;
+    opacity: 1;
   }
 
-  /* Card and component fixes */
+  /* Cards et composants */
   .card, [class*="card"] {
     position: relative;
+    opacity: 1;
   }
 
-  /* Remove all motion interference */
+  /* Suppression des interférences d'animation */
   [data-framer-motion] {
     opacity: 1;
   }
 
-  /* Scroll area fixes */
+  /* Optimisation des scroll areas */
   [data-radix-scroll-area-viewport] {
     max-height: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* Dialog fixes */
+  /* Dialogs mobiles */
   [data-radix-dialog-overlay] {
     position: fixed;
+    opacity: 1;
+  }
+
+  /* Force la visibilité immédiate */
+  * {
+    opacity: 1;
+  }
+
+  /* Suppression des transforms problématiques */
+  .motion-reduce {
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+
+  /* Layout Index spécifique */
+  .index-page {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Sections de la page d'accueil */
+  section {
+    position: relative;
+    overflow: visible;
+  }
+}
+
+/* Media query pour très petits écrans */
+@media (max-width: 480px) {
+  html, body, #root {
+    font-size: 14px;
+  }
+
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

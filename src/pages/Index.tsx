@@ -1,27 +1,32 @@
+
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import QwestoriaLogo from "@/components/BradHubLogo";
 import { Award, Users, ShoppingBag, Star } from "lucide-react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const Index = () => {
-  const containerVariants = {
+  const shouldReduceMotion = useReducedMotion();
+
+  // Variantes d'animation simplifiées pour mobile
+  const containerVariants = shouldReduceMotion ? {} : {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.1
       }
     }
   };
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+  const itemVariants = shouldReduceMotion ? {} : {
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.3 }
     }
   };
 
@@ -49,84 +54,84 @@ const Index = () => {
     }
   ];
 
+  const MotionComponent = shouldReduceMotion ? 'div' : motion.div;
+
   return (
     <Layout>
-      <div className="flex flex-col">
+      <div className="flex flex-col index-page">
         {/* Hero Section */}
         <section className="px-4 py-16 text-gray-700 dark:text-white overflow-hidden">
           <div className="container mx-auto flex flex-col items-center relative z-10">
-            {/* Background animated elements */}
-            <div className="absolute inset-0 z-0">
-              <motion.div
-                className="absolute top-10 right-10 w-72 h-72 rounded-full bg-purple-500/10 dark:bg-[#9b87f5]/10 blur-3xl"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.5, 0.3]
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              <motion.div
-                className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-amber-500/10 dark:bg-amber-400/10 blur-3xl"
-                animate={{
-                  scale: [1.2, 1, 1.2],
-                  opacity: [0.3, 0.5, 0.3]
-                }}
-                transition={{
-                  duration: 10,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              <motion.div
-                className="absolute top-40 left-20 w-64 h-64 rounded-full bg-teal-500/10 dark:bg-[#4ecdc4]/10 blur-3xl"
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.2, 0.4, 0.2]
-                }}
-                transition={{
-                  duration: 12,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </div>
+            {/* Background animated elements - simplifiés sur mobile */}
+            {!shouldReduceMotion && (
+              <div className="absolute inset-0 z-0">
+                <motion.div
+                  className="absolute top-10 right-10 w-72 h-72 rounded-full bg-purple-500/10 dark:bg-[#9b87f5]/10 blur-3xl"
+                  animate={{
+                    scale: [1, 1.1, 1],
+                    opacity: [0.3, 0.4, 0.3]
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+                <motion.div
+                  className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-amber-500/10 dark:bg-amber-400/10 blur-3xl"
+                  animate={{
+                    scale: [1.1, 1, 1.1],
+                    opacity: [0.3, 0.4, 0.3]
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
+              </div>
+            )}
             
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="mb-6 animate-bounce-slow"
+            <MotionComponent 
+              {...(!shouldReduceMotion && {
+                initial: { scale: 0.9, opacity: 0 },
+                animate: { scale: 1, opacity: 1 },
+                transition: { duration: 0.4 }
+              })}
+              className="mb-6"
             >
               <QwestoriaLogo size="lg" />
-            </motion.div>
+            </MotionComponent>
 
-            <motion.h1
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { y: -10, opacity: 0 },
+                animate: { y: 0, opacity: 1 },
+                transition: { duration: 0.5, delay: 0.1 }
+              })}
               className="mb-6 text-center text-4xl font-bold bg-gradient-to-br from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5] bg-clip-text text-transparent md:text-5xl lg:text-6xl"
             >
               La communauté Fortnite
-            </motion.h1>
+            </MotionComponent>
 
-            <motion.p
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { y: 10, opacity: 0 },
+                animate: { y: 0, opacity: 1 },
+                transition: { duration: 0.5, delay: 0.2 }
+              })}
               className="mb-8 max-w-2xl text-center text-lg text-gray-600 dark:text-gray-300"
             >
               La plateforme communautaire pour les fans de Fortnite avec missions,
               récompenses, boutique et recherche de coéquipiers.
-            </motion.p>
+            </MotionComponent>
             
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { y: 15, opacity: 0 },
+                animate: { y: 0, opacity: 1 },
+                transition: { duration: 0.5, delay: 0.3 }
+              })}
               className="flex flex-col space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 justify-center"
             >
               <Link to="/missions">
@@ -139,7 +144,7 @@ const Index = () => {
                   Rejoindre maintenant
                 </Button>
               </Link>
-            </motion.div>
+            </MotionComponent>
           </div>
         </section>
 
@@ -147,28 +152,34 @@ const Index = () => {
         <section className="px-4 py-16 relative overflow-hidden bg-white/70 dark:bg-transparent">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent dark:from-[#1A1F2C]/0 dark:via-[#1A1F2C] dark:to-[#1A1F2C]/0 pointer-events-none"></div>
           <div className="container mx-auto relative z-10">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { opacity: 0 },
+                whileInView: { opacity: 1 },
+                viewport: { once: true }
+              })}
               className="mb-12 text-center text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]"
             >
               Fonctionnalités principales
-            </motion.h2>
+            </MotionComponent>
             
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                variants: containerVariants,
+                initial: "hidden",
+                whileInView: "visible",
+                viewport: { once: true, amount: 0.2 }
+              })}
               className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
             >
               {featureItems.map((item, index) => (
-                <motion.div
+                <MotionComponent
                   key={index}
-                  variants={itemVariants}
-                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                  className={`rounded-2xl bg-gradient-to-br ${item.color} backdrop-blur-sm p-8 shadow-lg hover:shadow-xl ${item.glow} border border-gray-200 dark:border-white/10 transition-all duration-300 card-hover`}
+                  {...(!shouldReduceMotion && {
+                    variants: itemVariants,
+                    whileHover: { y: -3, transition: { duration: 0.2 } }
+                  })}
+                  className={`rounded-2xl bg-gradient-to-br ${item.color} backdrop-blur-sm p-8 shadow-lg hover:shadow-xl ${item.glow} border border-gray-200 dark:border-white/10 transition-all duration-300`}
                 >
                   <div className="mb-4 h-14 w-14 rounded-xl bg-white dark:bg-white/10 p-3 text-center shadow-inner flex items-center justify-center">
                     {item.icon}
@@ -177,32 +188,36 @@ const Index = () => {
                   <p className="text-gray-600 dark:text-gray-300">
                     {item.description}
                   </p>
-                </motion.div>
+                </MotionComponent>
               ))}
-            </motion.div>
+            </MotionComponent>
           </div>
         </section>
 
         {/* Testimonials Section */}
         <section className="px-4 py-16 bg-gray-50/50 dark:bg-transparent relative overflow-hidden">
           <div className="container mx-auto relative z-10">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { opacity: 0 },
+                whileInView: { opacity: 1 },
+                viewport: { once: true }
+              })}
               className="mb-12 text-center text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]"
             >
               Ils adorent Qwestoria
-            </motion.h2>
+            </MotionComponent>
             
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <motion.div
+                <MotionComponent
                   key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  viewport={{ once: true }}
+                  {...(!shouldReduceMotion && {
+                    initial: { opacity: 0, y: 10 },
+                    whileInView: { opacity: 1, y: 0 },
+                    transition: { delay: i * 0.1 },
+                    viewport: { once: true }
+                  })}
                   className="bg-white dark:bg-white/5 backdrop-blur-sm p-6 rounded-2xl shadow-md hover:shadow-lg border border-gray-100 dark:border-white/10 transition-all duration-300"
                 >
                   <div className="flex items-center mb-4">
@@ -225,7 +240,7 @@ const Index = () => {
                       "Les missions sont vraiment amusantes et me motivent à me connecter tous les jours. J'ai déjà gagné plein de QwestCoins !"
                     ][i-1]}
                   </p>
-                </motion.div>
+                </MotionComponent>
               ))}
             </div>
           </div>
@@ -233,55 +248,65 @@ const Index = () => {
 
         {/* CTA Section */}
         <section className="px-4 py-16 relative overflow-hidden">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-amber-500/20 dark:from-[#9b87f5]/20 dark:via-[#f1c40f]/20 dark:to-[#4ecdc4]/20 transform -translate-y-1/2 rounded-full blur-3xl"
-          />
-          <div className="container mx-auto flex flex-col items-center text-center relative z-10">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
+          {!shouldReduceMotion && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="mb-8 p-6 rounded-full bg-white/80 dark:bg-white/5 backdrop-blur-md shadow-xl animate-glow"
+              className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-amber-500/20 dark:from-[#9b87f5]/20 dark:via-[#f1c40f]/20 dark:to-[#4ecdc4]/20 transform -translate-y-1/2 rounded-full blur-3xl"
+            />
+          )}
+          <div className="container mx-auto flex flex-col items-center text-center relative z-10">
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { scale: 0.9, opacity: 0 },
+                whileInView: { scale: 1, opacity: 1 },
+                viewport: { once: true }
+              })}
+              className="mb-8 p-6 rounded-full bg-white/80 dark:bg-white/5 backdrop-blur-md shadow-xl"
             >
               <QwestoriaLogo size="lg" />
-            </motion.div>
+            </MotionComponent>
 
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { opacity: 0, y: 10 },
+                whileInView: { opacity: 1, y: 0 },
+                transition: { duration: 0.5 },
+                viewport: { once: true }
+              })}
               className="mb-4 text-3xl font-bold text-gray-800 dark:text-white"
             >
               Prêt à rejoindre la communauté ?
-            </motion.h2>
+            </MotionComponent>
             
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              viewport={{ once: true }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { opacity: 0, y: 10 },
+                whileInView: { opacity: 1, y: 0 },
+                transition: { duration: 0.5, delay: 0.1 },
+                viewport: { once: true }
+              })}
               className="mb-8 max-w-xl text-lg text-gray-600 dark:text-gray-300"
             >
               Inscrivez-vous dès maintenant pour commencer à accomplir des missions
               et gagner des récompenses exclusives.
-            </motion.p>
+            </MotionComponent>
             
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              viewport={{ once: true }}
+            <MotionComponent
+              {...(!shouldReduceMotion && {
+                initial: { opacity: 0, y: 10 },
+                whileInView: { opacity: 1, y: 0 },
+                transition: { duration: 0.5, delay: 0.2 },
+                viewport: { once: true }
+              })}
             >
               <Link to="/auth">
                 <Button className="bg-gradient-to-r from-purple-500 to-amber-500 dark:from-[#9b87f5] dark:to-amber-400 font-semibold text-white hover:from-purple-600 hover:to-amber-600 dark:hover:from-[#8976e4] dark:hover:to-amber-500 rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300">
                   Créer un compte
                 </Button>
               </Link>
-            </motion.div>
+            </MotionComponent>
           </div>
         </section>
       </div>

@@ -76,27 +76,41 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     margin: 0;
     padding: 0;
+  }
+
+  /* Mobile-first approach */
+  html {
     height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   #root {
     height: 100%;
+    overflow-x: hidden;
   }
 
-  /* App root - simplified */
+  /* App root - mobile optimisé */
   .app-root {
     min-height: 100vh;
     background: linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #eff6ff 100%);
+    overflow-x: hidden;
   }
 
-  /* Page containers - unified */
+  /* Page containers - mobile optimisé */
   .page-container {
     min-height: calc(100vh - 80px);
     width: 100%;
     position: relative;
+    overflow-x: hidden;
   }
 
-  /* Dark theme with professional design */
+  /* Dark theme avec design professionnel */
   .dark {
     background: linear-gradient(135deg, #0f1419 0%, #1a202c 25%, #2d3748 50%, #1a202c 75%, #0f1419 100%);
     background-attachment: fixed;
@@ -106,7 +120,7 @@
     background: linear-gradient(135deg, #0f1419 0%, #1a202c 25%, #2d3748 50%, #1a202c 75%, #0f1419 100%);
   }
 
-  /* Professional glass cards */
+  /* Glass cards professionnelles */
   .dark .card-float {
     @apply bg-slate-900/30 backdrop-blur-xl border border-slate-700/40 shadow-2xl;
     background: linear-gradient(135deg, rgba(71, 85, 105, 0.03) 0%, rgba(100, 116, 139, 0.02) 50%, rgba(71, 85, 105, 0.03) 100%);
@@ -137,7 +151,7 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   }
 
-  /* Modern button styles with professional accent */
+  /* Boutons modernes avec accent professionnel */
   .dark .button-primary {
     @apply bg-gradient-to-r from-slate-600 via-slate-500 to-gray-600 text-white;
     box-shadow: 0 8px 25px rgba(71, 85, 105, 0.25), 
@@ -152,7 +166,7 @@
     transform: translateY(-1px);
   }
 
-  /* Enhanced input styles */
+  /* Styles d'input améliorés */
   .dark .input-enhanced {
     @apply bg-slate-900/30 border border-slate-600/30 backdrop-blur-xl text-white placeholder-slate-400;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.01) 100%);
@@ -165,21 +179,21 @@
                 inset 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
-  /* Sidebar with modern glass effect */
+  /* Sidebar avec effet verre moderne */
   .dark .sidebar-enhanced {
     @apply bg-slate-900/40 backdrop-blur-2xl border-r border-slate-700/30;
     background: linear-gradient(180deg, rgba(71, 85, 105, 0.03) 0%, rgba(100, 116, 139, 0.02) 50%, rgba(71, 85, 105, 0.03) 100%);
     box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
   }
 
-  /* Navigation with floating effect */
+  /* Navigation avec effet flottant */
   .dark .nav-enhanced {
     @apply bg-slate-900/40 backdrop-blur-2xl border-b border-slate-700/30;
     background: linear-gradient(90deg, rgba(71, 85, 105, 0.05) 0%, rgba(100, 116, 139, 0.02) 50%, rgba(71, 85, 105, 0.05) 100%);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   }
 
-  /* Text gradients - more professional */
+  /* Dégradés de texte - plus professionnels */
   .text-gradient-modern {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-400 via-gray-300 to-slate-500;
   }
@@ -188,7 +202,7 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-400 to-gray-500;
   }
 
-  /* Enhanced hover effects */
+  /* Effets de survol améliorés */
   .card-hover-modern {
     @apply transition-all duration-300;
   }
@@ -200,14 +214,14 @@
     transform: translateY(-3px);
   }
 
-  /* Badge styles - professional */
+  /* Styles de badge - professionnels */
   .dark .badge-modern {
     @apply bg-gradient-to-r from-slate-600/25 to-gray-600/25 border border-slate-500/30 text-slate-300;
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 15px rgba(71, 85, 105, 0.15);
   }
 
-  /* Animation keyframes */
+  /* Keyframes d'animation */
   @keyframes float {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     33% { transform: translateY(-10px) rotate(1deg); }
@@ -231,7 +245,7 @@
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
-  /* Light theme improvements */
+  /* Améliorations thème clair */
   .light .button-primary {
     @apply bg-gradient-to-r from-slate-600 to-gray-600 text-white shadow-xl;
   }
@@ -252,7 +266,7 @@
     @apply bg-gradient-to-r from-slate-600 to-gray-600 text-white;
   }
 
-  /* Print styles */
+  /* Styles d'impression */
   @media print {
     .blog-content {
       font-size: 12pt;
@@ -270,6 +284,29 @@
     .blog-content img {
       max-width: 100%;
       break-inside: avoid;
+    }
+  }
+
+  /* Optimisations mobile spécifiques */
+  @media (max-width: 768px) {
+    /* Force la simplicité sur mobile */
+    .animate-float {
+      animation: none;
+    }
+    
+    .pulse-glow {
+      animation: none;
+    }
+    
+    /* Suppression des transformations complexes */
+    .card-hover-modern:hover {
+      transform: none;
+    }
+    
+    /* Scroll mobile optimisé */
+    body {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
   }
 }

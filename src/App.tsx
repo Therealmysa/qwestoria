@@ -21,6 +21,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Teammates from "@/pages/Teammates";
 import NotFound from "@/pages/NotFound";
 import "./App.css";
+import "./styles/mobile-fix.css";
 
 const queryClient = new QueryClient();
 
@@ -32,11 +33,11 @@ function App() {
           <Router>
             <div className="app-root">
               <Routes>
-                {/* Landing page without layout */}
+                {/* Landing page without layout - Index manages its own Layout */}
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 
-                {/* All other pages with layout - no nested routing */}
+                {/* All other pages with layout */}
                 <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
                 <Route path="/missions" element={<Layout><Missions /></Layout>} />
                 <Route path="/missions/:id" element={<Layout><MissionDetail /></Layout>} />
