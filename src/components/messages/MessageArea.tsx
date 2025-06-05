@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +58,7 @@ const MessageArea = ({
   };
 
   return (
-    <Card className="h-full bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-xl hover:shadow-cyan-200/50 transition-all duration-300 flex flex-col">
+    <Card className="h-full bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-xl hover:shadow-cyan-200/50 transition-all duration-300 flex flex-col max-h-[calc(100vh-200px)]">
       {selectedConversation && selectedUser ? (
         <>
           {/* Header de conversation - hauteur fixe */}
@@ -83,15 +82,15 @@ const MessageArea = ({
             </div>
           </CardHeader>
           
-          {/* Zone de messages - SCROLL ICI UNIQUEMENT */}
-          <div className="flex-1 min-h-0 p-4">
+          {/* Zone de messages - SCROLL UNIQUEMENT ICI */}
+          <div className="flex-1 overflow-hidden">
             {messagesLoading ? (
               <div className="flex justify-center items-center h-full">
                 <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
               </div>
             ) : (
               <div 
-                className="space-y-6 h-full overflow-y-auto pr-2"
+                className="space-y-6 h-full overflow-y-auto p-4 pr-2"
                 style={{ 
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain'
