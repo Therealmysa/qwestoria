@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light";
@@ -31,15 +32,21 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    // Force light mode only
+    // Force le thème clair moderne
     root.classList.remove("dark");
     root.classList.add("light");
+    
+    // Configuration CSS pour le nouveau design Qwestoria
+    root.style.setProperty('--background', '248 250 252'); // slate-50
+    root.style.setProperty('--foreground', '15 23 42'); // slate-900
+    root.style.setProperty('--primary', '37 99 235'); // blue-600
+    root.style.setProperty('--primary-foreground', '248 250 252'); // slate-50
   }, []);
 
   const value = {
     theme: "light" as Theme,
     setTheme: (theme: Theme) => {
-      // Always keep light theme
+      // Garder toujours le thème clair
       localStorage.setItem(storageKey, "light");
       setTheme("light");
     },
