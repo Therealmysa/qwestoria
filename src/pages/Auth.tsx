@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ArrowRight, Loader2, Mail, Lock, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import ReferralInput from "@/components/referral/ReferralInput";
 
 const formSchema = z.object({
   email: z.string().email("Entrez un email valide"),
@@ -22,8 +23,10 @@ const formSchema = z.object({
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [referrerId, setReferrerId] = useState<string>("");
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   
   // Rediriger si l'utilisateur est déjà connecté
   useEffect(() => {
@@ -31,6 +34,15 @@ const Auth = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
+
+  // Gérer le code de parrainage depuis l'URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode && !isLogin) {
+      // Pre-remplir le code de parrainage si on vient d'un lien
+      console.log('Code de parrainage détecté dans l\'URL:', refCode);
+    }
+  }, [searchParams, isLogin]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +60,7 @@ const Auth = () => {
       password: "",
       username: isLogin ? undefined : "",
     });
+    setReferrerId(""); // Reset du parrainage
   }, [isLogin, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -70,9 +83,10 @@ const Auth = () => {
         toast.success("Connexion réussie !");
         navigate("/dashboard");
       } else {
-        // Sign up
-        console.log("Tentative d'inscription avec email:", values.email);
-        const { data, error } = await supabase.auth.signUp({
+        // Sign up avec gestion du parrainage
+        console.log("Tentative d'inscription avec email:", values.email, "parrain:", referrerId);
+        
+        const signUpData: any = {
           email: values.email,
           password: values.password,
           options: {
@@ -80,11 +94,26 @@ const Auth = () => {
               username: values.username,
             },
           },
-        });
+        };
+
+        const { data, error } = await supabase.auth.signUp(signUpData);
 
         console.log("Résultat inscription:", { data, error });
 
         if (error) throw error;
+
+        // Si on a un parrain, on l'associe au profil après la création
+        if (referrerId && data.user) {
+          console.log("Association avec le parrain:", referrerId);
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ referred_by: referrerId })
+            .eq('id', data.user.id);
+          
+          if (profileError) {
+            console.error("Erreur lors de l'association avec le parrain:", profileError);
+          }
+        }
 
         toast.success(
           "Inscription réussie ! Vérifiez votre email pour confirmer."
@@ -199,6 +228,14 @@ const Auth = () => {
                     </FormItem>
                   )}
                 />
+
+                {/* Champ de parrainage uniquement lors de l'inscription */}
+                {!isLogin && (
+                  <ReferralInput
+                    onReferralValidated={setReferrerId}
+                    disabled={loading}
+                  />
+                )}
               </CardContent>
 
               <CardFooter className="flex flex-col space-y-4 pt-6">
