@@ -36,11 +36,15 @@ export function ThemeProvider({
     root.classList.remove("dark");
     root.classList.add("light");
     
-    // Configuration CSS pour le nouveau design Qwestoria
+    // Configuration CSS pour le nouveau design Qwestoria - sans affecter les éléments existants
     root.style.setProperty('--background', '248 250 252'); // slate-50
     root.style.setProperty('--foreground', '15 23 42'); // slate-900
     root.style.setProperty('--primary', '37 99 235'); // blue-600
     root.style.setProperty('--primary-foreground', '248 250 252'); // slate-50
+    
+    // S'assurer que tous les éléments restent visibles
+    root.style.setProperty('--nav-text', '15 23 42'); // text sombre pour navigation
+    root.style.setProperty('--nav-bg', '255 255 255'); // fond blanc pour navigation
   }, []);
 
   const value = {
