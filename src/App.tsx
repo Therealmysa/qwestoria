@@ -20,7 +20,7 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import Admin from "@/pages/Admin";
 import FortniteShop from "@/pages/FortniteShop";
-import Referral from "@/pages/Referral"; // Nouvelle page
+import Referral from "@/pages/Referral";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,7 +48,7 @@ function App() {
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/fortnite-shop" element={<FortniteShop />} />
-                  <Route path="/referral" element={<Referral />} /> {/* Nouvelle route */}
+                  <Route path="/referral" element={<Referral />} />
                   <Route path="/404" element={<NotFound />} />
                   <Route path="*" element={<Navigate to="/404" replace />} />
                 </Routes>

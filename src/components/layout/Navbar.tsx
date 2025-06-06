@@ -18,6 +18,7 @@ import {
   ShoppingBag,
   Users,
   Bell,
+  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -57,7 +58,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-white px-4 py-3 shadow-md border-b border-gray-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold text-primary">
+          <span className="text-2xl font-bold text-blue-600">
             Qwestoria
           </span>
         </Link>
@@ -68,8 +69,8 @@ const Navbar = () => {
             to="/"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Accueil
@@ -78,19 +79,18 @@ const Navbar = () => {
             to="/missions"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/missions")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Missions
           </Link>
-
           <Link
             to="/teammates"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/teammates")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Coéquipiers
@@ -99,8 +99,8 @@ const Navbar = () => {
             to="/messages"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/messages")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Messagerie
@@ -109,8 +109,8 @@ const Navbar = () => {
             to="/shop"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/shop")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Boutique
@@ -119,11 +119,21 @@ const Navbar = () => {
             to="/blog"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/blog")
-                ? "text-primary font-medium"
-                : "text-gray-600 hover:text-primary"
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
             }`}
           >
             Blog
+          </Link>
+          <Link
+            to="/referral"
+            className={`px-3 py-2 rounded-md transition-colors ${
+              isActive("/referral")
+                ? "text-blue-600 font-medium"
+                : "text-gray-700 hover:text-blue-600"
+            }`}
+          >
+            Parrainage
           </Link>
         </div>
 
@@ -134,69 +144,69 @@ const Navbar = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
+                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-blue-600 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="bg-white border-gray-200 text-gray-600 w-56 mr-4"
+              className="bg-white border-gray-200 text-gray-700 w-56 mr-4"
               align="end"
               sideOffset={8}
             >
               <DropdownMenuLabel className="flex items-center">
-                <span className="font-bold text-primary">
+                <span className="font-bold text-blue-600">
                   Navigation
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
                 onClick={() => navigate("/")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Accueil
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/missions")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Missions
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Blog
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/teammates")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Coéquipiers
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/messages")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Messagerie
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 Boutique
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate("/referral")}
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
+              >
+                <UserPlus className="h-4 w-4 mr-2" /> Parrainage
+              </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
-                onClick={() => navigate("/shop")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
-              >
-                <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
-              </DropdownMenuItem>
-              <DropdownMenuItem
                 onClick={() => navigate("/leaderboard")}
-                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+                className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer text-gray-700"
               >
                 <Trophy className="h-4 w-4 mr-2" /> Classement
               </DropdownMenuItem>
@@ -210,10 +220,10 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-gray-100"
+              className="rounded-full hover:bg-gray-100 text-gray-700"
               onClick={() => navigate("/notifications")}
             >
-              <Bell className="h-5 w-5 text-gray-600" />
+              <Bell className="h-5 w-5" />
             </Button>
           )}
 
@@ -224,16 +234,16 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="text-primary hover:bg-primary/10 flex items-center rounded-full gap-2 p-2 pr-3"
+                    className="text-blue-600 hover:bg-blue-50 flex items-center rounded-full gap-2 p-2 pr-3"
                   >
-                    <Avatar className="h-8 w-8 border border-primary/20">
+                    <Avatar className="h-8 w-8 border border-blue-200">
                       {profile?.avatar_url ? (
                         <AvatarImage
                           src={profile.avatar_url}
                           alt={profile?.username || "User"}
                         />
                       ) : (
-                        <AvatarFallback className="bg-primary/10 text-primary">
+                        <AvatarFallback className="bg-blue-100 text-blue-600">
                           {profile?.username
                             ? profile.username.substring(0, 2).toUpperCase()
                             : "U"}
@@ -241,24 +251,24 @@ const Navbar = () => {
                       )}
                     </Avatar>
                     {!isMobile && (
-                      <span className="font-medium">
+                      <span className="font-medium text-gray-900">
                         {profile?.username ||
                           user.email?.split("@")[0] ||
                           "User"}
                       </span>
                     )}
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white border-gray-200 text-gray-600">
+                <DropdownMenuContent className="bg-white border-gray-200 text-gray-700">
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
-                      <span className="font-medium">
+                      <span className="font-medium text-gray-900">
                         {profile?.username ||
                           user.email?.split("@")[0] ||
                           "User"}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-500">
                         {user.email}
                       </span>
                     </div>
@@ -266,28 +276,28 @@ const Navbar = () => {
                   <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={() => navigate("/profile")}
-                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
+                    className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer flex items-center text-gray-700"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard")}
-                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
+                    className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer flex items-center text-gray-700"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/missions")}
-                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
+                    className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer flex items-center text-gray-700"
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/friends")}
-                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
+                    className="focus:bg-blue-50 focus:text-blue-600 cursor-pointer flex items-center text-gray-700"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Amis
@@ -295,7 +305,7 @@ const Navbar = () => {
                   <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-500 focus:bg-red-500/10 focus:text-red-600 cursor-pointer flex items-center"
+                    className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer flex items-center"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Déconnexion
@@ -304,7 +314,7 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full">
                   Connexion
                 </Button>
               </Link>
