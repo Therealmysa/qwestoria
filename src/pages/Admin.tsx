@@ -129,7 +129,7 @@ const Admin = () => {
         <Sidebar className="border-r border-gray-200 dark:border-slate-700">
           <SidebarHeader className="border-b border-gray-200 dark:border-slate-700 p-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+              <h2 className="text-base lg:text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                 Administration
               </h2>
               {profile?.is_owner && (
@@ -138,7 +138,7 @@ const Admin = () => {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+            <p className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 mt-1">
               Panneau de contrôle Qwestoria
             </p>
           </SidebarHeader>
@@ -149,10 +149,10 @@ const Admin = () => {
                   <SidebarMenuButton
                     onClick={() => setActiveTab(tab.id)}
                     isActive={activeTab === tab.id}
-                    className="flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-slate-700"
+                    className="flex items-center gap-3 p-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-slate-700 text-sm"
                   >
-                    <tab.icon className="h-4 w-4" />
-                    <span className="text-sm">{tab.label}</span>
+                    <tab.icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="truncate">{tab.label}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -161,23 +161,23 @@ const Admin = () => {
         </Sidebar>
 
         <SidebarInset className="flex-1">
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
+          <header className="flex h-14 lg:h-16 shrink-0 items-center gap-2 border-b border-gray-200 dark:border-slate-700 px-4">
             <SidebarTrigger className="-ml-1" />
             <div className="ml-auto">
-              <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+              <h1 className="text-lg lg:text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
                 {activeTabData?.label}
               </h1>
             </div>
           </header>
 
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-4 lg:p-6">
             <Card className="dark:bg-slate-800/15 dark:backdrop-blur-xl dark:border dark:border-slate-600/15 bg-white/90 backdrop-blur-md shadow-2xl dark:shadow-slate-500/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
-                  {activeTabData && <activeTabData.icon className="h-5 w-5" />}
-                  {activeTabData?.label}
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg lg:text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 dark:from-white dark:via-[#f1c40f] dark:to-[#9b87f5]">
+                  {activeTabData && <activeTabData.icon className="h-5 w-5 flex-shrink-0" />}
+                  <span className="truncate">{activeTabData?.label}</span>
                 </CardTitle>
-                <CardDescription className="dark:text-gray-300">
+                <CardDescription className="dark:text-gray-300 text-sm">
                   Gestion et administration {activeTabData?.label.toLowerCase()}
                 </CardDescription>
               </CardHeader>
