@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -29,6 +30,8 @@ interface Mission {
   difficulty_level?: string;
   platform?: string;
   mission_type?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface MissionFormData {
@@ -54,11 +57,11 @@ const AdminMissions = () => {
   const [showFilters, setShowFilters] = useState(false);
   
   // Filtres
-  const [difficultyFilter, setDifficultyFilter] = useState("");
-  const [platformFilter, setPlatformFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [vipFilter, setVipFilter] = useState("");
-  const [dailyFilter, setDailyFilter] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("");
+  const [platformFilter, setPlatformFilter] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("");
+  const [vipFilter, setVipFilter] = useState<string>("");
+  const [dailyFilter, setDailyFilter] = useState<string>("");
 
   const [formData, setFormData] = useState<MissionFormData>({
     title: "",
@@ -111,7 +114,7 @@ const AdminMissions = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as Mission[];
     }
   });
 
