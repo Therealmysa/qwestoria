@@ -422,10 +422,15 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string
+          difficulty_level: string | null
           ends_at: string | null
           external_link: string | null
           id: string
+          is_daily: boolean | null
           is_vip_only: boolean | null
+          mission_type: string | null
+          platform: string | null
+          reset_hours: number | null
           reward_coins: number
           starts_at: string | null
           title: string
@@ -434,10 +439,15 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description: string
+          difficulty_level?: string | null
           ends_at?: string | null
           external_link?: string | null
           id?: string
+          is_daily?: boolean | null
           is_vip_only?: boolean | null
+          mission_type?: string | null
+          platform?: string | null
+          reset_hours?: number | null
           reward_coins: number
           starts_at?: string | null
           title: string
@@ -446,10 +456,15 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string
+          difficulty_level?: string | null
           ends_at?: string | null
           external_link?: string | null
           id?: string
+          is_daily?: boolean | null
           is_vip_only?: boolean | null
+          mission_type?: string | null
+          platform?: string | null
+          reset_hours?: number | null
           reward_coins?: number
           starts_at?: string | null
           title?: string
@@ -856,6 +871,44 @@ export type Database = {
           },
         ]
       }
+      user_daily_mission_progress: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_completion_at: string
+          mission_id: string
+          next_available_at: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_completion_at?: string
+          mission_id: string
+          next_available_at: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_completion_at?: string
+          mission_id?: string
+          next_available_at?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_daily_mission_progress_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_missions: {
         Row: {
           created_at: string
@@ -956,6 +1009,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      complete_daily_mission: {
+        Args: { p_user_id: string; p_mission_id: string }
+        Returns: undefined
+      }
       generate_unique_referral_code: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -993,6 +1050,10 @@ export type Database = {
       }
       is_admin_or_owner: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_daily_mission_available: {
+        Args: { p_user_id: string; p_mission_id: string }
         Returns: boolean
       }
       is_site_owner: {

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,19 +80,8 @@ const AdminMissions = () => {
   const queryClient = useQueryClient();
   const { deleteMission, isDeletingMission } = useAdminOperations();
 
-  // Create a stable query key to avoid type recursion
-  const queryKey = [
-    'admin-missions',
-    searchTerm || '',
-    difficultyFilter || '',
-    platformFilter || '',
-    typeFilter || '',
-    vipFilter || '',
-    dailyFilter || ''
-  ] as const;
-
   const { data: missions, isLoading } = useQuery({
-    queryKey,
+    queryKey: ['admin-missions', searchTerm, difficultyFilter, platformFilter, typeFilter, vipFilter, dailyFilter],
     queryFn: async () => {
       let query = supabase
         .from('missions')
