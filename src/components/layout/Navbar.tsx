@@ -18,7 +18,6 @@ import {
   ShoppingBag,
   Users,
   Bell,
-  UserPlus,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,7 +54,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background px-4 py-3 border-b border-border">
+    <nav className="sticky top-0 z-50 bg-white px-4 py-3 shadow-md border-b border-gray-100">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link to="/" className="flex items-center">
           <span className="text-2xl font-bold text-primary">
@@ -70,7 +69,7 @@ const Navbar = () => {
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Accueil
@@ -80,17 +79,18 @@ const Navbar = () => {
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/missions")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Missions
           </Link>
+
           <Link
             to="/teammates"
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/teammates")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Coéquipiers
@@ -100,7 +100,7 @@ const Navbar = () => {
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/messages")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Messagerie
@@ -110,7 +110,7 @@ const Navbar = () => {
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/shop")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Boutique
@@ -120,20 +120,10 @@ const Navbar = () => {
             className={`px-3 py-2 rounded-md transition-colors ${
               isActive("/blog")
                 ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
+                : "text-gray-600 hover:text-primary"
             }`}
           >
             Blog
-          </Link>
-          <Link
-            to="/referral"
-            className={`px-3 py-2 rounded-md transition-colors ${
-              isActive("/referral")
-                ? "text-primary font-medium"
-                : "text-muted-foreground hover:text-primary"
-            }`}
-          >
-            Parrainage
           </Link>
         </div>
 
@@ -144,14 +134,14 @@ const Navbar = () => {
               <Button
                 variant="outline"
                 size="icon"
-                className="relative h-10 w-10 rounded-lg"
+                className="relative h-10 w-10 rounded-lg border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-primary transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
-              className="w-56 mr-4"
+              className="bg-white border-gray-200 text-gray-600 w-56 mr-4"
               align="end"
               sideOffset={8}
             >
@@ -160,53 +150,53 @@ const Navbar = () => {
                   Navigation
                 </span>
               </DropdownMenuLabel>
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
                 onClick={() => navigate("/")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Accueil
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/missions")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Missions
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/blog")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Blog
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/teammates")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Coéquipiers
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/messages")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Messagerie
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigate("/shop")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Boutique
               </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem
-                onClick={() => navigate("/referral")}
-                className="cursor-pointer"
+                onClick={() => navigate("/shop")}
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
-                <UserPlus className="h-4 w-4 mr-2" /> Parrainage
+                <ShoppingBag className="h-4 w-4 mr-2" /> Boutique
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => navigate("/leaderboard")}
-                className="cursor-pointer"
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 <Trophy className="h-4 w-4 mr-2" /> Classement
               </DropdownMenuItem>
@@ -220,10 +210,10 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full"
+              className="rounded-full hover:bg-gray-100"
               onClick={() => navigate("/notifications")}
             >
-              <Bell className="h-5 w-5" />
+              <Bell className="h-5 w-5 text-gray-600" />
             </Button>
           )}
 
@@ -234,16 +224,16 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="hover:bg-accent flex items-center rounded-full gap-2 p-2 pr-3"
+                    className="text-primary hover:bg-primary/10 flex items-center rounded-full gap-2 p-2 pr-3"
                   >
-                    <Avatar className="h-8 w-8 border">
+                    <Avatar className="h-8 w-8 border border-primary/20">
                       {profile?.avatar_url ? (
                         <AvatarImage
                           src={profile.avatar_url}
                           alt={profile?.username || "User"}
                         />
                       ) : (
-                        <AvatarFallback className="bg-accent text-accent-foreground">
+                        <AvatarFallback className="bg-primary/10 text-primary">
                           {profile?.username
                             ? profile.username.substring(0, 2).toUpperCase()
                             : "U"}
@@ -251,61 +241,61 @@ const Navbar = () => {
                       )}
                     </Avatar>
                     {!isMobile && (
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium">
                         {profile?.username ||
                           user.email?.split("@")[0] ||
                           "User"}
                       </span>
                     )}
-                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="bg-white border-gray-200 text-gray-600">
                   <DropdownMenuLabel>
                     <div className="flex flex-col">
-                      <span className="font-medium text-foreground">
+                      <span className="font-medium">
                         {profile?.username ||
                           user.email?.split("@")[0] ||
                           "User"}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-gray-400">
                         {user.email}
                       </span>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={() => navigate("/profile")}
-                    className="cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/dashboard")}
-                    className="cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/missions")}
-                    className="cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <BadgeCheck className="mr-2 h-4 w-4" />
                     Missions
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => navigate("/friends")}
-                    className="cursor-pointer flex items-center"
+                    className="focus:bg-primary/10 focus:text-primary cursor-pointer flex items-center"
                   >
                     <Users className="mr-2 h-4 w-4" />
                     Amis
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-gray-200" />
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-destructive focus:text-destructive cursor-pointer flex items-center"
+                    className="text-red-500 focus:bg-red-500/10 focus:text-red-600 cursor-pointer flex items-center"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Déconnexion
@@ -314,7 +304,7 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <Link to="/auth">
-                <Button className="rounded-full">
+                <Button className="bg-primary hover:bg-primary/90 text-white rounded-full">
                   Connexion
                 </Button>
               </Link>

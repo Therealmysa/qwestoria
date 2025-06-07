@@ -1,62 +1,61 @@
 
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AuthProvider } from "@/context/AuthContext";
 import Layout from "@/components/layout/Layout";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard";
-import Profile from "@/pages/Profile";
 import Missions from "@/pages/Missions";
 import MissionDetail from "@/pages/MissionDetail";
-import Shop from "@/pages/Shop";
 import Messages from "@/pages/Messages";
-import Teammates from "@/pages/Teammates";
-import Leaderboard from "@/pages/Leaderboard";
-import Blog from "@/pages/Blog";
-import BlogPost from "@/pages/BlogPost";
+import Profile from "@/pages/Profile";
+import Shop from "@/pages/Shop";
 import Admin from "@/pages/Admin";
 import FortniteShop from "@/pages/FortniteShop";
-import Referral from "@/pages/Referral";
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
+import Leaderboard from "@/pages/Leaderboard";
+import Teammates from "@/pages/Teammates";
 import NotFound from "@/pages/NotFound";
+import "./App.css";
+import "./styles/mobile-fix.css";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/missions" element={<Missions />} />
-                  <Route path="/missions/:id" element={<MissionDetail />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/messages" element={<Messages />} />
-                  <Route path="/teammates" element={<Teammates />} />
-                  <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:slug" element={<BlogPost />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/fortnite-shop" element={<FortniteShop />} />
-                  <Route path="/referral" element={<Referral />} />
-                  <Route path="/404" element={<NotFound />} />
-                  <Route path="*" element={<Navigate to="/404" replace />} />
-                </Routes>
-              </Layout>
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <Router>
+            <div className="app-root">
+              <Routes>
+                {/* Landing page without layout - Index manages its own Layout */}
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                
+                {/* All other pages with layout */}
+                <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+                <Route path="/missions" element={<Layout><Missions /></Layout>} />
+                <Route path="/missions/:id" element={<Layout><MissionDetail /></Layout>} />
+                <Route path="/messages" element={<Layout><Messages /></Layout>} />
+                <Route path="/profile" element={<Layout><Profile /></Layout>} />
+                <Route path="/shop" element={<Layout><Shop /></Layout>} />
+                <Route path="/admin" element={<Layout><Admin /></Layout>} />
+                <Route path="/fortnite-shop" element={<Layout><FortniteShop /></Layout>} />
+                <Route path="/blog" element={<Layout><Blog /></Layout>} />
+                <Route path="/blog/:slug" element={<Layout><BlogPost /></Layout>} />
+                <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+                <Route path="/teammates" element={<Layout><Teammates /></Layout>} />
+                <Route path="*" element={<Layout><NotFound /></Layout>} />
+              </Routes>
               <Toaster />
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
+            </div>
+          </Router>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

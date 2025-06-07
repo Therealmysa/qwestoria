@@ -469,8 +469,6 @@ export type Database = {
           is_owner: boolean | null
           is_vip: boolean | null
           platform: string | null
-          referral_code: string | null
-          referred_by: string | null
           updated_at: string | null
           username: string
         }
@@ -485,8 +483,6 @@ export type Database = {
           is_owner?: boolean | null
           is_vip?: boolean | null
           platform?: string | null
-          referral_code?: string | null
-          referred_by?: string | null
           updated_at?: string | null
           username: string
         }
@@ -501,68 +497,10 @@ export type Database = {
           is_owner?: boolean | null
           is_vip?: boolean | null
           platform?: string | null
-          referral_code?: string | null
-          referred_by?: string | null
           updated_at?: string | null
           username?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_referred_by_fkey"
-            columns: ["referred_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      referrals: {
-        Row: {
-          completed_at: string | null
-          created_at: string
-          id: string
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-          reward_claimed: boolean
-          status: string
-        }
-        Insert: {
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          referral_code: string
-          referred_id: string
-          referrer_id: string
-          reward_claimed?: boolean
-          status?: string
-        }
-        Update: {
-          completed_at?: string | null
-          created_at?: string
-          id?: string
-          referral_code?: string
-          referred_id?: string
-          referrer_id?: string
-          reward_claimed?: boolean
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "referrals_referred_id_fkey"
-            columns: ["referred_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "referrals_referrer_id_fkey"
-            columns: ["referrer_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       reports: {
         Row: {
@@ -955,10 +893,6 @@ export type Database = {
       cleanup_expired_missions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
-      }
-      generate_unique_referral_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
       }
       get_blog_post_comment_count: {
         Args: { post_id: string }
