@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,11 +56,11 @@ const AdminMissions = () => {
   const [showFilters, setShowFilters] = useState(false);
   
   // Filtres
-  const [difficultyFilter, setDifficultyFilter] = useState<string>("");
-  const [platformFilter, setPlatformFilter] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [vipFilter, setVipFilter] = useState<string>("");
-  const [dailyFilter, setDailyFilter] = useState<string>("");
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [platformFilter, setPlatformFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [vipFilter, setVipFilter] = useState("");
+  const [dailyFilter, setDailyFilter] = useState("");
 
   const [formData, setFormData] = useState<MissionFormData>({
     title: "",
@@ -80,8 +79,19 @@ const AdminMissions = () => {
   const queryClient = useQueryClient();
   const { deleteMission, isDeletingMission } = useAdminOperations();
 
+  // Create a stable query key to avoid type recursion
+  const queryKey = [
+    'admin-missions',
+    searchTerm || '',
+    difficultyFilter || '',
+    platformFilter || '',
+    typeFilter || '',
+    vipFilter || '',
+    dailyFilter || ''
+  ] as const;
+
   const { data: missions, isLoading } = useQuery({
-    queryKey: ['admin-missions', searchTerm, difficultyFilter, platformFilter, typeFilter, vipFilter, dailyFilter],
+    queryKey,
     queryFn: async () => {
       let query = supabase
         .from('missions')
