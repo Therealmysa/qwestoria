@@ -125,6 +125,16 @@ const Navbar = () => {
           >
             Blog
           </Link>
+          <Link
+            to="/referral"
+            className={`px-3 py-2 rounded-md transition-colors ${
+              isActive("/referral")
+                ? "text-primary font-medium"
+                : "text-gray-600 hover:text-primary"
+            }`}
+          >
+            Parrainage
+          </Link>
         </div>
 
         {/* Mobile Navigation */}
@@ -186,6 +196,12 @@ const Navbar = () => {
                 className="focus:bg-primary/10 focus:text-primary cursor-pointer"
               >
                 Boutique
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate("/referral")}
+                className="focus:bg-primary/10 focus:text-primary cursor-pointer"
+              >
+                Parrainage
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-gray-200" />
               <DropdownMenuItem

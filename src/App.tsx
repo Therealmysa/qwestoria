@@ -19,6 +19,7 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import Leaderboard from "@/pages/Leaderboard";
 import Teammates from "@/pages/Teammates";
+import Referral from "@/pages/Referral";
 import NotFound from "@/pages/NotFound";
 import "./App.css";
 import "./styles/mobile-fix.css";
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/blog/:slug" element={<Layout><BlogPost /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/teammates" element={<Layout><Teammates /></Layout>} />
+                <Route path="/referral" element={<Layout><Referral /></Layout>} />
                 <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
               <Toaster />
