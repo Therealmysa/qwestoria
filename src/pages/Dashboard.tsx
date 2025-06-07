@@ -3,18 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag, RefreshCw } from "lucide-react";
+import { Coins, Trophy, Target, Users, Star, Gift, Clock, Zap, ShoppingBag, RefreshCw, Share2, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import AdBanner from "@/components/advertisements/AdBanner";
 import { useBradCoins } from "@/hooks/useBradCoins";
+import { useReferrals } from "@/hooks/useReferrals";
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { balance: bradCoinsBalance, refetch: refetchBradCoins, isLoading: isLoadingBradCoins } = useBradCoins();
+  const { userReferrals, userProfile, copyReferralLink } = useReferrals();
 
   // Log du solde BradCoins sur le Dashboard
   console.log('📊 Dashboard: BradCoins balance:', bradCoinsBalance, 'for user:', user?.id);
@@ -96,6 +98,8 @@ const Dashboard = () => {
     await refetchBradCoins();
   };
 
+  const completedReferrals = userReferrals?.filter(ref => ref.status === 'completed') || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-gray-900">
       <div className="container mx-auto px-4 pt-6">
@@ -166,6 +170,64 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Widget de Parrainage */}
+            <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-blue-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-blue-500/20 transform hover:scale-[1.02] transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500 flex items-center gap-2">
+                  <Share2 className="h-5 w-5" />
+                  Système de Parrainage
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
+                  Invitez vos amis et gagnez des BradCoins !
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="text-center p-3 dark:bg-blue-900/20 bg-blue-50/70 rounded-lg">
+                    <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{completedReferrals.length}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">Parrainages réussis</div>
+                  </div>
+                  <div className="text-center p-3 dark:bg-green-900/20 bg-green-50/70 rounded-lg">
+                    <div className="text-lg font-bold text-green-600 dark:text-green-400">{completedReferrals.length * 100}</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">BradCoins gagnés</div>
+                  </div>
+                  <div className="text-center p-3 dark:bg-purple-900/20 bg-purple-50/70 rounded-lg">
+                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                      {userReferrals?.filter(ref => ref.status === 'pending').length || 0}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-300">En attente</div>
+                  </div>
+                </div>
+                
+                {userProfile?.referral_code ? (
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                    <code className="text-sm font-mono font-bold text-primary flex-1">
+                      {userProfile.referral_code}
+                    </code>
+                    <Button
+                      onClick={() => copyReferralLink(userProfile.referral_code)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copier
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center text-sm text-muted-foreground">
+                    Votre code de parrainage sera généré automatiquement
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={() => navigate("/referral")} 
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Gérer mes parrainages
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Missions Récemment Complétées - Couleur Amber */}
             <Card className="dark:bg-slate-800/20 dark:backdrop-blur-xl dark:border dark:border-amber-500/20 bg-white/90 backdrop-blur-md shadow-xl dark:shadow-amber-500/20 transform hover:scale-[1.02] transition-all duration-300">
@@ -317,6 +379,14 @@ const Dashboard = () => {
                 >
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   Visiter la Boutique
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  onClick={() => navigate("/referral")}
+                  className="dark:bg-blue-700/30 dark:hover:bg-blue-700/50 bg-blue-100/70 hover:bg-blue-200/90 backdrop-blur-sm border-blue-300 dark:border-blue-500/30 text-blue-700 dark:text-blue-300"
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Système de Parrainage
                 </Button>
                 <Button 
                   variant="secondary" 

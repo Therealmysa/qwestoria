@@ -18,6 +18,7 @@ const formSchema = z.object({
   email: z.string().email("Entrez un email valide"),
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères").optional(),
+  referralCode: z.string().optional(),
 });
 
 const Auth = () => {
@@ -26,7 +27,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const referralCode = searchParams.get('ref');
+  const referralCodeFromUrl = searchParams.get('ref');
   
   // Rediriger si l'utilisateur est déjà connecté
   useEffect(() => {
@@ -41,6 +42,7 @@ const Auth = () => {
       email: "",
       password: "",
       username: "",
+      referralCode: referralCodeFromUrl || "",
     },
   });
 
@@ -50,8 +52,9 @@ const Auth = () => {
       email: "",
       password: "",
       username: isLogin ? undefined : "",
+      referralCode: isLogin ? undefined : (referralCodeFromUrl || ""),
     });
-  }, [isLogin, form]);
+  }, [isLogin, form, referralCodeFromUrl]);
 
   const socialLinks = [
     { 
@@ -109,8 +112,22 @@ const Auth = () => {
         };
 
         // Ajouter le code de parrainage si présent
+        const referralCode = values.referralCode || referralCodeFromUrl;
         if (referralCode) {
-          signUpData.options.data.referral_code = referralCode;
+          // Vérifier que le code de parrainage existe dans la base de données
+          const { data: referrerProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('referral_code', referralCode)
+            .single();
+          
+          if (referrerProfile) {
+            signUpData.options.data.referral_code = referralCode;
+          } else {
+            toast.error("Code de parrainage invalide");
+            setLoading(false);
+            return;
+          }
         }
 
         const { data, error } = await supabase.auth.signUp(signUpData);
@@ -170,14 +187,14 @@ const Auth = () => {
           </div>
         </motion.div>
 
-        {referralCode && (
+        {referralCodeFromUrl && (
           <motion.div variants={itemVariants} className="mb-4">
             <Card className="border-primary/20 bg-primary/5">
               <CardContent className="pt-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Users className="h-4 w-4 text-primary" />
                   <span className="text-foreground">
-                    Vous avez été invité avec le code : <strong>{referralCode}</strong>
+                    Vous avez été invité avec le code : <strong>{referralCodeFromUrl}</strong>
                   </span>
                 </div>
               </CardContent>
@@ -263,6 +280,28 @@ const Auth = () => {
                     </FormItem>
                   )}
                 />
+
+                {!isLogin && (
+                  <FormField
+                    control={form.control}
+                    name="referralCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-foreground">
+                          Code de parrainage (optionnel)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Entrez un code de parrainage"
+                            className="bg-background border-input focus:border-primary"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </CardContent>
 
               <CardFooter className="flex flex-col space-y-4">
